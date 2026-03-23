@@ -109,8 +109,8 @@
   - [x] Validation checks cover help, source resolution, non-interactive behavior, destructive flows, and the JSON contract.
 
 # Tasks
-- [ ] Bootstrap `.NET 10` Spectre CLI solution
-- [ ] Implement source loading pipeline
-- [ ] Implement Markdown rendering
-- [ ] Wire Spectre commands and output contracts
+- [x] Bootstrap `.NET 10` Spectre CLI solution
+- [x] Implement source loading pipeline
+- [x] Implement Markdown rendering
+- [x] Wire Spectre commands and output contracts
 - [ ] Add focused validation tests
