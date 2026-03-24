@@ -513,6 +513,33 @@ dt, th {
   gap: .65rem;
 }
 
+/* ── Stat grid (full-width overview cards) ──── */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .65rem;
+  margin-bottom: .65rem;
+}
+
+.stat-card {
+  text-align: center;
+}
+
+.stat-card h3 {
+  font-size: .8rem;
+  font-weight: 500;
+  opacity: .7;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 /* Compact grid for overview available-commands */
 #available-commands .card-grid {
   grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
@@ -1649,9 +1676,13 @@ pre {
 <p class="lede">Manage your Jellyfin server from the command line. Available command areas include authentication, items, library management, server administration, users, playlists, and more.</p>
 
 </section>
-<section class="section"><div class="section-head"><span class="eyebrow">Overview</span><h2>Reference context</h2></div><div class="info-grid">
-<article class="panel info-card"><h3>Reference scope</h3><dl><div><dt>Top-level command groups</dt><dd>20</dd></div><div><dt>Documented commands</dt><dd>193</dd></div><div><dt>Leaf commands</dt><dd>153</dd></div></dl></article>
-</div></section>
+<section class="section"><div class="section-head"><span class="eyebrow">Overview</span><h2>Reference context</h2></div>
+<div class="stat-grid">
+<article class="panel info-card stat-card"><h3>Top-level command groups</h3><div class="stat-value">20</div></article>
+<article class="panel info-card stat-card"><h3>Documented commands</h3><div class="stat-value">193</div></article>
+<article class="panel info-card stat-card"><h3>Leaf commands</h3><div class="stat-value">153</div></article>
+</div>
+</section>
 <section class="panel section" id="available-commands"><div class="section-head"><span class="eyebrow">Explore</span><h2>Available commands</h2></div><div class="card-grid">
 <a class="command-card" href="#command-artists"><div class="command-card-head"><strong>artists</strong><span class="command-card-arrow">→</span></div><p>Browse music artists or album artists</p></a>
 <a class="command-card" href="#command-auth"><div class="command-card-head"><strong>auth</strong><span class="command-card-arrow">→</span></div><p>Sign in, inspect identity, and manage API keys</p></a>
