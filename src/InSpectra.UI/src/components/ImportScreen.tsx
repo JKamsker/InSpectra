@@ -86,7 +86,10 @@ export function ImportScreen({ error, loading, onFilesSelected }: ImportScreenPr
             type="file"
             multiple
             accept=".json,.xml"
-            onChange={(event) => handleFiles(event.target.files)}
+            onChange={(event) => {
+              handleFiles(event.target.files);
+              event.target.value = "";
+            }}
           />
         </div>
 

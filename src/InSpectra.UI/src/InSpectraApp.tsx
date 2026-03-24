@@ -227,7 +227,10 @@ export function InSpectraApp() {
             type="file"
             multiple
             accept=".json,.xml"
-            onChange={(event) => void handleFiles(Array.from(event.target.files ?? []))}
+            onChange={(event) => {
+              void handleFiles(Array.from(event.target.files ?? []));
+              event.target.value = "";
+            }}
           />
 
           <button type="button" className="toolbar-button" onClick={() => setPaletteOpen(true)} title="Search commands (Ctrl+K)">
