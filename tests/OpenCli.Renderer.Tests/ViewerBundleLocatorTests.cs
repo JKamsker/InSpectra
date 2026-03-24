@@ -1,4 +1,5 @@
 using OpenCli.Renderer.Services;
+using OpenCli.Renderer.Runtime;
 using OpenCli.Renderer.Tests.TestSupport;
 
 namespace OpenCli.Renderer.Tests;
@@ -70,6 +71,29 @@ public class ViewerBundleLocatorTests
         Assert.True(locator.BuildInvoked);
         Assert.Equal(Path.Combine(frontendRoot, "dist"), resolved);
         Assert.True(File.Exists(Path.Combine(resolved, "index.html")));
+    }
+
+    [Fact]
+    public async Task Missing_repo_sources_fail_with_build_hint()
+    {
+        using var temp = new TempDirectory();
+        var repositoryRoot = Path.Combine(temp.Path, "repo");
+        Directory.CreateDirectory(repositoryRoot);
+
+        var locator = new ViewerBundleLocator(
+            new ExecutableResolver(),
+            new ProcessRunner(),
+            new ViewerBundleLocatorOptions
+            {
+                PackagedRootPath = Path.Combine(temp.Path, "missing"),
+                RepositoryRootPath = repositoryRoot,
+            });
+
+        var exception = await Assert.ThrowsAsync<CliUsageException>(() => locator.ResolveAsync(CancellationToken.None));
+
+        Assert.Contains("InSpectreUI sources were not found", exception.Message);
+        Assert.Contains("npm ci", exception.Message);
+        Assert.Contains("npm run build", exception.Message);
     }
 
     private static string CreateBundle(string bundleRoot)

@@ -44,6 +44,31 @@ describe("boot resolution", () => {
     expect(result.links.openCliUrl).toBe("https://example.test/viewer/opencli.json");
   });
 
+  it("prefers injected links bootstrap over URL params", () => {
+    document.body.innerHTML = `
+      <script id="inspectre-bootstrap" type="application/json">${JSON.stringify({
+        mode: "links",
+        directoryUrl: "./bundle-data/",
+        options: { includeMetadata: true },
+      })}</script>
+    `;
+
+    const result = resolveStartupRequest({
+      documentRef: document,
+      search: "?opencli=./ignored.json",
+      href: "https://example.test/viewer/index.html",
+    });
+
+    expect(result.kind).toBe("links");
+    if (result.kind !== "links") {
+      throw new Error("Expected links mode.");
+    }
+
+    expect(result.source).toBe("bootstrap");
+    expect(result.links.openCliUrl).toBe("https://example.test/viewer/bundle-data/opencli.json");
+    expect(result.options.includeMetadata).toBe(true);
+  });
+
   it("falls back to empty mode without bootstrap or query params", () => {
     const result = resolveStartupRequest({
       documentRef: document,
