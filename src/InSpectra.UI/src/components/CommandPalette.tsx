@@ -50,7 +50,7 @@ export function CommandPalette({ commands, open, onClose, onSelect }: CommandPal
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, filtered.length - 1));
+      setActiveIndex((i) => filtered.length === 0 ? 0 : Math.min(i + 1, filtered.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((i) => Math.max(i - 1, 0));
@@ -71,7 +71,7 @@ export function CommandPalette({ commands, open, onClose, onSelect }: CommandPal
   return (
     <div className="cmd-palette" onKeyDown={handleKeyDown}>
       <div className="cmd-backdrop" onClick={onClose} />
-      <div className="cmd-dialog">
+      <div className="cmd-dialog" role="dialog" aria-modal="true" aria-label="Command palette">
         <div className="cmd-header">
           <Search width={16} height={16} />
           <input
