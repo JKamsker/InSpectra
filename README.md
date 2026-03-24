@@ -1,15 +1,23 @@
-# InSpectraGen
+# InSpectra
 
 Turn an OpenCLI export into either Markdown or a relocatable HTML app bundle.
 
 ```bash
-inspectra-gen render file html mycli.json --out-dir ./docs
+inspectra render file html mycli.json --out-dir ./docs
 ```
 
-InSpectraGen is a .NET 10 tool that reads [OpenCLI](https://opencli.org/) JSON exports, optionally enriches them with XML metadata, and renders either:
+InSpectra is a .NET 10 tool that reads [OpenCLI](https://opencli.org/) JSON exports, optionally enriches them with XML metadata, and renders either:
 
 - GitHub-friendly Markdown
 - an interactive HTML viewer bundle with `index.html` plus built JS/CSS assets
+
+## Install
+
+```bash
+dotnet tool install -g InSpectra.Gen
+```
+
+This installs the `inspectra` command globally.
 
 ## Why
 
@@ -58,7 +66,7 @@ Open `jellyfin-docs/index.html` in a browser. The bundle is relocatable because 
 ## Command Surface
 
 ```text
-inspectra-gen render [file|exec] [markdown|html] [OPTIONS]
+inspectra render [file|exec] [markdown|html] [OPTIONS]
 ```
 
 ### Markdown
@@ -104,7 +112,7 @@ HTML uses bundle-directory output only:
 | `--json` | Emit machine-readable render results |
 | `--timeout <SECONDS>` | Exec-mode timeout |
 
-## HTML Viewer
+## HTML Viewer (InSpectraUI)
 
 The HTML renderer copies `src/InSpectra.UI/dist/**` and patches `index.html` with a bootstrap payload.
 
@@ -114,11 +122,14 @@ The bundled viewer supports three boot paths:
 - URL-driven loading with `?opencli=...`, `?xmldoc=...`, or `?dir=...`
 - manual import by dropping or picking `opencli.json` and optional `xmldoc.xml`
 
-Other viewer behavior:
+Other viewer features:
 
-- hash routing for deep links, so static hosts and `file`-based viewers work without rewrites
-- hidden-item filtering
-- metadata toggling
+- dark mode with theme toggle and localStorage persistence
+- command palette (Ctrl+K) for quick command search
+- composer panel for interactively building CLI commands
+- Ctrl+F to focus sidebar search
+- hash routing for deep links
+- hidden-item filtering and metadata toggling
 - recursive option inheritance
 - command-tree filtering
 
@@ -159,17 +170,12 @@ At runtime, HTML assets are resolved in this order:
 ## Project Layout
 
 ```text
-src/InSpectra.Gen/
-src/InSpectra.UI/
+src/InSpectra.Gen/       CLI tool and render services
+src/InSpectra.UI/        Vite + React + TypeScript viewer app
 tests/InSpectra.Gen.Tests/
 docs/
 examples/
 ```
-
-- `src/InSpectra.Gen/` contains the CLI, render services, and packaging logic
-- `src/InSpectra.UI/` is a standalone Vite + React + TypeScript app
-- `tests/InSpectra.Gen.Tests/` covers CLI contracts, render services, and bundle lookup
-- `examples/` contains tracked Markdown example renders plus source snapshots
 
 ## Testing
 
@@ -192,7 +198,7 @@ Coverage includes:
 
 ## CI
 
-CI builds the frontend before running the .NET test and packaging flow. GitHub Pages publishes HTML examples as bundle directories, so each example is served from its own `index.html`.
+CI builds the frontend before running the .NET test and packaging flow. Each build produces a versioned NuGet package (`0.0.<build-number>`) uploaded as a CI artifact. GitHub Pages publishes HTML examples as bundle directories.
 
 ## Examples
 
