@@ -9,6 +9,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>opencli-renderer</ToolCommandName>
     <PackageId>OpenCli.Renderer</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>0.1.0</Version>
   </PropertyGroup>
 
@@ -25,10 +26,13 @@
 
   <ItemGroup>
     <None Include="..\InSpectreUI\dist\**\*"
-          Pack="true"
-          PackagePath="tools\$(TargetFramework)\any\InSpectreUI\dist\%(RecursiveDir)%(Filename)%(Extension)"
           CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
           Link="InSpectreUI\dist\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="..\..\README.md"
+          Pack="true"
+          PackagePath="\"
+          Link="README.md" />
   </ItemGroup>
 
   <Target Name="EnsureInSpectreUiDistForPackOrPublish" BeforeTargets="Pack;Publish">
