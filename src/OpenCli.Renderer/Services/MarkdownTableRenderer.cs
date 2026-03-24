@@ -31,8 +31,8 @@ public sealed class MarkdownTableRenderer(RenderModelFormatter formatter)
 
     public void AppendOptionTable(IEnumerable<ResolvedOption> options, StringBuilder builder)
     {
-        builder.AppendLine("| Name | Aliases | Value | Required | Recursive | Scope | Group | Description |");
-        builder.AppendLine("| --- | --- | --- | --- | --- | --- | --- | --- |");
+        builder.AppendLine("| Name | Aliases | Value | Required | Recursive | Scope | Group | Description | Arguments |");
+        builder.AppendLine("| --- | --- | --- | --- | --- | --- | --- | --- | --- |");
         foreach (var resolved in options)
         {
             var option = resolved.Option;
@@ -52,6 +52,8 @@ public sealed class MarkdownTableRenderer(RenderModelFormatter formatter)
             builder.Append(EscapeCell(option.Group ?? "—"));
             builder.Append(" | ");
             builder.Append(EscapeCell(option.Description ?? "—"));
+            builder.Append(" | ");
+            builder.Append(EscapeCell(FormatOptionArguments(option.Arguments)));
             builder.AppendLine(" |");
         }
 
@@ -75,5 +77,42 @@ public sealed class MarkdownTableRenderer(RenderModelFormatter formatter)
         return value.Replace("\r", string.Empty, StringComparison.Ordinal)
             .Replace('\n', ' ')
             .Replace("|", "\\|", StringComparison.Ordinal);
+    }
+
+    private string FormatOptionArguments(IReadOnlyList<OpenCliArgument> arguments)
+    {
+        if (arguments.Count == 0)
+        {
+            return "—";
+        }
+
+        return string.Join("<br/>", arguments.Select(FormatOptionArgument));
+    }
+
+    private string FormatOptionArgument(OpenCliArgument argument)
+    {
+        var details = new List<string>
+        {
+            argument.Hidden ? $"{argument.Name} (hidden)" : argument.Name,
+            argument.Required ? "required" : "optional",
+            $"arity {formatter.FormatArity(argument)}",
+        };
+
+        if (argument.AcceptedValues.Count > 0)
+        {
+            details.Add($"accepted {string.Join(", ", argument.AcceptedValues)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(argument.Group))
+        {
+            details.Add($"group {argument.Group}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(argument.Description))
+        {
+            details.Add(argument.Description);
+        }
+
+        return string.Join(" · ", details);
     }
 }

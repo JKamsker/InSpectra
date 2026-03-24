@@ -6,18 +6,18 @@ namespace OpenCli.Renderer.Services;
 
 public sealed class MarkdownMetadataRenderer
 {
-    public void AppendRootMetadata(OpenCliDocument document, StringBuilder builder)
+    public void AppendRootMetadata(NormalizedCliDocument document, StringBuilder builder)
     {
-        if (document.Metadata.Count == 0)
+        if (!HasMetadata(document))
         {
             return;
         }
 
         builder.AppendLine("## Metadata Appendix");
         builder.AppendLine();
-        builder.AppendLine("### Root");
-        builder.AppendLine();
-        AppendMetadataList(document.Metadata, builder);
+        AppendMetadataSection("### Root", document.Source.Metadata, builder);
+        AppendArgumentMetadata("### Root Arguments", document.RootArguments, builder);
+        AppendOptionMetadata("### Root Options", document.RootOptions, builder);
     }
 
     public void AppendCommandMetadata(NormalizedCommand command, StringBuilder builder, int headingLevel)
@@ -39,8 +39,15 @@ public sealed class MarkdownMetadataRenderer
     {
         return command.Command.Metadata.Count > 0 ||
                command.Arguments.Any(argument => argument.Metadata.Count > 0) ||
-               command.DeclaredOptions.Any(option => option.Metadata.Count > 0) ||
-               command.InheritedOptions.Any(option => option.Option.Metadata.Count > 0);
+               command.DeclaredOptions.Any(HasMetadata) ||
+               command.InheritedOptions.Any(option => HasMetadata(option.Option));
+    }
+
+    private static bool HasMetadata(NormalizedCliDocument document)
+    {
+        return document.Source.Metadata.Count > 0 ||
+               document.RootArguments.Any(argument => argument.Metadata.Count > 0) ||
+               document.RootOptions.Any(HasMetadata);
     }
 
     private static void AppendMetadataSection(string heading, IEnumerable<OpenCliMetadata> metadata, StringBuilder builder)
@@ -58,13 +65,18 @@ public sealed class MarkdownMetadataRenderer
 
     private static void AppendArgumentMetadata(IEnumerable<OpenCliArgument> arguments, StringBuilder builder)
     {
+        AppendArgumentMetadata("#### Arguments", arguments, builder);
+    }
+
+    private static void AppendArgumentMetadata(string heading, IEnumerable<OpenCliArgument> arguments, StringBuilder builder)
+    {
         var argumentMetadata = arguments.Where(argument => argument.Metadata.Count > 0).ToList();
         if (argumentMetadata.Count == 0)
         {
             return;
         }
 
-        builder.AppendLine("#### Arguments");
+        builder.AppendLine(heading);
         builder.AppendLine();
         foreach (var argument in argumentMetadata)
         {
@@ -77,7 +89,7 @@ public sealed class MarkdownMetadataRenderer
 
     private static void AppendOptionMetadata(string heading, IEnumerable<OpenCliOption> options, StringBuilder builder)
     {
-        var optionMetadata = options.Where(option => option.Metadata.Count > 0).ToList();
+        var optionMetadata = options.Where(HasMetadata).ToList();
         if (optionMetadata.Count == 0)
         {
             return;
@@ -87,8 +99,7 @@ public sealed class MarkdownMetadataRenderer
         builder.AppendLine();
         foreach (var option in optionMetadata)
         {
-            builder.AppendLine($"- `{option.Name}`");
-            AppendMetadataList(option.Metadata, builder, "  ");
+            AppendOptionMetadata($"`{option.Name}`", option, builder);
         }
 
         builder.AppendLine();
@@ -96,7 +107,7 @@ public sealed class MarkdownMetadataRenderer
 
     private static void AppendInheritedOptionMetadata(IEnumerable<ResolvedOption> options, StringBuilder builder)
     {
-        var inheritedMetadata = options.Where(option => option.Option.Metadata.Count > 0).ToList();
+        var inheritedMetadata = options.Where(option => HasMetadata(option.Option)).ToList();
         if (inheritedMetadata.Count == 0)
         {
             return;
@@ -106,11 +117,35 @@ public sealed class MarkdownMetadataRenderer
         builder.AppendLine();
         foreach (var option in inheritedMetadata)
         {
-            builder.AppendLine($"- `{option.Option.Name}` from `{option.InheritedFromPath}`");
-            AppendMetadataList(option.Option.Metadata, builder, "  ");
+            AppendOptionMetadata($"`{option.Option.Name}` from `{option.InheritedFromPath}`", option.Option, builder);
         }
 
         builder.AppendLine();
+    }
+
+    private static bool HasMetadata(OpenCliOption option)
+    {
+        return option.Metadata.Count > 0 || option.Arguments.Any(argument => argument.Metadata.Count > 0);
+    }
+
+    private static void AppendOptionMetadata(string displayLabel, OpenCliOption option, StringBuilder builder)
+    {
+        builder.AppendLine($"- {displayLabel}");
+        if (option.Metadata.Count > 0)
+        {
+            AppendMetadataList(option.Metadata, builder, "  ");
+        }
+
+        AppendOptionArgumentMetadata(option.Arguments, builder, "  ");
+    }
+
+    private static void AppendOptionArgumentMetadata(IEnumerable<OpenCliArgument> arguments, StringBuilder builder, string indent)
+    {
+        foreach (var argument in arguments.Where(argument => argument.Metadata.Count > 0))
+        {
+            builder.AppendLine($"{indent}- Argument `{argument.Name}`");
+            AppendMetadataList(argument.Metadata, builder, $"{indent}  ");
+        }
     }
 
     private static void AppendMetadataList(IEnumerable<OpenCliMetadata> metadata, StringBuilder builder, string indent = "")

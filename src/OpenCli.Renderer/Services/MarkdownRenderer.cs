@@ -25,7 +25,7 @@ public sealed class MarkdownRenderer(
 
         if (includeMetadata)
         {
-            metadataRenderer.AppendRootMetadata(document.Source, builder);
+            metadataRenderer.AppendRootMetadata(document, builder);
         }
 
         return builder.ToString().TrimEnd() + Environment.NewLine;
@@ -184,7 +184,7 @@ public sealed class MarkdownRenderer(
 
         if (includeMetadata)
         {
-            metadataRenderer.AppendRootMetadata(document.Source, builder);
+            metadataRenderer.AppendRootMetadata(document, builder);
         }
 
         return builder.ToString().TrimEnd() + Environment.NewLine;

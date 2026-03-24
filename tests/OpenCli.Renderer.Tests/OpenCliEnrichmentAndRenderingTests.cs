@@ -1,3 +1,5 @@
+using System.Text.Json.Nodes;
+using OpenCli.Renderer.Models;
 using OpenCli.Renderer.Services;
 using OpenCli.Renderer.Tests.TestSupport;
 
@@ -60,6 +62,80 @@ public class OpenCliEnrichmentAndRenderingTests
     }
 
     [Fact]
+    public async Task Tree_markdown_includes_option_argument_details_and_metadata()
+    {
+        var document = await _loader.LoadFromFileAsync(FixturePaths.OpenCliJson, CancellationToken.None);
+        var normalized = _normalizer.Normalize(document, includeHidden: false);
+
+        var files = _renderer.RenderTree(normalized, includeMetadata: true);
+        var markdown = files.Single(file => file.RelativePath == "auth/login.md").Content;
+
+        Assert.Contains("| Name | Aliases | Value | Required | Recursive | Scope | Group | Description | Arguments |", markdown);
+        Assert.Contains("EMAIL · required · arity 1", markdown);
+        Assert.Contains("Metadata Appendix", markdown);
+        Assert.Contains("Argument `EMAIL`", markdown);
+        Assert.Contains("System.String", markdown);
+    }
+
+    [Fact]
+    public void Single_markdown_includes_root_parameter_metadata()
+    {
+        var document = new NormalizedCliDocument
+        {
+            Source = new OpenCliDocument
+            {
+                OpenCliVersion = "0.1-draft",
+                Info = new OpenCliInfo
+                {
+                    Title = "demo",
+                    Version = "1.0.0",
+                },
+                Metadata = [CreateMetadata("RootKind", "demo")],
+            },
+            RootArguments =
+            [
+                new OpenCliArgument
+                {
+                    Name = "TARGET",
+                    Required = true,
+                    Description = "Target to inspect.",
+                    Metadata = [CreateMetadata("ClrType", "System.String")],
+                },
+            ],
+            RootOptions =
+            [
+                new OpenCliOption
+                {
+                    Name = "--profile",
+                    Description = "Profile override.",
+                    Metadata = [CreateMetadata("Settings", "Demo.Profile")],
+                    Arguments =
+                    [
+                        new OpenCliArgument
+                        {
+                            Name = "NAME",
+                            Required = true,
+                            Description = "Profile name.",
+                            Metadata = [CreateMetadata("ClrType", "System.String")],
+                        },
+                    ],
+                },
+            ],
+            Commands = [],
+        };
+
+        var markdown = _renderer.RenderSingle(document, includeMetadata: true);
+
+        Assert.Contains("## Metadata Appendix", markdown);
+        Assert.Contains("### Root Arguments", markdown);
+        Assert.Contains("### Root Options", markdown);
+        Assert.Contains("Profile name.", markdown);
+        Assert.Contains("Argument `NAME`", markdown);
+        Assert.Contains("`Settings`: `Demo.Profile`", markdown);
+        Assert.Contains("`ClrType`: `System.String`", markdown);
+    }
+
+    [Fact]
     public async Task Single_html_uses_viewer_inspired_shell()
     {
         var document = await _loader.LoadFromFileAsync(FixturePaths.OpenCliJson, CancellationToken.None);
@@ -87,5 +163,14 @@ public class OpenCliEnrichmentAndRenderingTests
         Assert.Contains(files, file => file.RelativePath == "auth/login.html");
         Assert.Contains("Store encrypted auth material for a profile.", files.Single(file => file.RelativePath == "auth/login.html").Content);
         Assert.Contains("Search command tree", files.Single(file => file.RelativePath == "auth/login.html").Content);
+    }
+
+    private static OpenCliMetadata CreateMetadata(string name, string value)
+    {
+        return new OpenCliMetadata
+        {
+            Name = name,
+            Value = JsonValue.Create(value),
+        };
     }
 }
