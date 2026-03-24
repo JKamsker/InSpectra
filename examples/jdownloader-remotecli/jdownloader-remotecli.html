@@ -220,6 +220,7 @@ code, pre { font-family: var(--mono); }
   padding: .6rem .6rem .4rem;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .search span {
@@ -233,6 +234,7 @@ code, pre { font-family: var(--mono); }
 .search input {
   width: 100%;
   padding: .45rem .65rem;
+  padding-right: 3.5rem;
   border: 1px solid var(--border);
   border-radius: .4rem;
   background: var(--surface);
@@ -248,6 +250,26 @@ code, pre { font-family: var(--mono); }
 .search input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search input:focus + kbd { opacity: 0; }
+
+.search kbd {
+  position: absolute;
+  right: 1rem;
+  bottom: calc(.4rem + .45rem);
+  /* .4rem = label bottom padding, .45rem = input vertical padding */
+  font-family: var(--mono);
+  font-size: .58rem;
+  font-weight: 500;
+  color: var(--soft);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .2rem;
+  padding: .12rem .35rem;
+  line-height: 1;
+  pointer-events: none;
+  transition: opacity .15s var(--ease);
 }
 
 .sidebar-nav {
@@ -971,6 +993,223 @@ pre {
 .composer-copy.copied .copy-icon { display: none; }
 .composer-copy.copied .check-icon { display: block; color: var(--green); }
 
+/* ── Search trigger (topbar) ────────────────── */
+
+.search-trigger {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .3rem .65rem;
+  border: 1px solid var(--border);
+  border-radius: .35rem;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: .75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s var(--ease);
+}
+
+.search-trigger:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-glow);
+}
+
+.search-trigger kbd {
+  font-family: var(--mono);
+  font-size: .6rem;
+  color: var(--soft);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .2rem;
+  padding: .12rem .35rem;
+  line-height: 1;
+  margin-left: .1rem;
+}
+
+/* ── Command Palette ───────────────────────── */
+
+.cmd-palette {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: min(12vh, 8rem);
+}
+
+.cmd-palette[hidden] { display: none; }
+
+.cmd-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, .45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: cmdFadeIn .15s var(--ease-out);
+}
+
+[data-theme="dark"] .cmd-backdrop {
+  background: rgba(0, 0, 0, .6);
+}
+
+@keyframes cmdFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.cmd-dialog {
+  position: relative;
+  width: min(38rem, calc(100vw - 2rem));
+  max-height: min(26rem, 65vh);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, .2),
+    0 0 0 1px rgba(0, 0, 0, .04);
+  overflow: hidden;
+  animation: cmdDialogIn .2s var(--ease-out);
+}
+
+[data-theme="dark"] .cmd-dialog {
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, .5),
+    0 0 0 1px rgba(255, 255, 255, .04);
+}
+
+@keyframes cmdDialogIn {
+  from { opacity: 0; transform: scale(.98) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cmd-header {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .75rem .9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.cmd-header svg {
+  color: var(--soft);
+  flex-shrink: 0;
+}
+
+.cmd-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .95rem;
+  font-weight: 400;
+  outline: none;
+  min-width: 0;
+}
+
+.cmd-input::placeholder { color: var(--soft); }
+
+.cmd-header kbd {
+  font-family: var(--mono);
+  font-size: .62rem;
+  font-weight: 500;
+  color: var(--soft);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .25rem;
+  padding: .15rem .4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cmd-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: .35rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.cmd-results::-webkit-scrollbar { width: 5px; }
+.cmd-results::-webkit-scrollbar-track { background: transparent; }
+.cmd-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.cmd-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--soft);
+  font-size: .85rem;
+}
+
+.cmd-item {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  padding: .55rem .75rem;
+  border-radius: .45rem;
+  cursor: pointer;
+  transition: background .08s var(--ease);
+}
+
+.cmd-item:hover { background: var(--accent-glow); }
+
+.cmd-item.active {
+  background: var(--accent-glow);
+  outline: 1px solid var(--accent-border);
+}
+
+.cmd-path {
+  font-family: var(--mono);
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.cmd-desc {
+  font-size: .76rem;
+  color: var(--muted);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmd-item mark {
+  background: var(--accent-glow);
+  color: inherit;
+  padding: .02rem .1rem;
+  border-radius: .15rem;
+}
+
+.cmd-footer {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: .5rem .9rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  font-size: .68rem;
+  color: var(--soft);
+}
+
+.cmd-footer kbd {
+  font-family: var(--mono);
+  font-size: .58rem;
+  font-weight: 500;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: .2rem;
+  padding: .1rem .3rem;
+  margin-right: .2rem;
+  vertical-align: 1px;
+}
+
 /* ── Responsive ─────────────────────────────── */
 
 @media (max-width: 960px) {
@@ -988,6 +1227,9 @@ pre {
   }
   .content-inner { padding: 1.5rem 1rem 3rem; }
   table { min-width: 34rem; }
+  .search-trigger span,
+  .search-trigger kbd { display: none; }
+  .search-trigger { padding: .3rem; }
 }
 </style>
 </head>
@@ -995,11 +1237,11 @@ pre {
   <div class="shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark">&gt;_</span><div><strong>jdr</strong><span>v0.1.9+6dd86e43afbd0371e7788fb56426d6c59205e9a0 · OpenCLI 0.1-draft</span></div></div>
-      <div class="topbar-actions"><div class="topbar-context">Overview</div><button class="composer-toggle" data-composer-toggle title="Toggle Composer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg><span>Composer</span></button><button class="theme-toggle" data-theme-toggle title="Toggle theme"><svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div>
+      <div class="topbar-actions"><div class="topbar-context">Overview</div><button class="search-trigger" data-cmd-trigger title="Search commands (Ctrl+K)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search</span><kbd>Ctrl K</kbd></button><button class="composer-toggle" data-composer-toggle title="Toggle Composer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg><span>Composer</span></button><button class="theme-toggle" data-theme-toggle title="Toggle theme"><svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div>
     </header>
     <div class="layout">
       <aside class="sidebar">
-        <label class="search"><span>Filter commands</span><input type="search" placeholder="Search command tree" data-nav-search /></label>
+        <label class="search"><span>Filter commands</span><input type="search" placeholder="Filter command tree" data-nav-search /><kbd>Ctrl F</kbd></label>
         <nav class="sidebar-nav"><a class="nav-link active" href="#overview">Overview</a>
 <div class="nav-label">Commands</div><ul class="nav-tree">
 <li class="nav-item collapsed" data-nav-item data-label="accounts">
@@ -15628,6 +15870,7 @@ pre {
 </div></main>
       <aside class="composer" data-composer hidden><div class="composer-resize" data-composer-resize></div><div class="composer-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-5-6-5"/><path d="M12 19h8"/></svg><span>Composer</span></div><div class="composer-body"></div><div class="composer-footer"><span class="composer-label">Generated Command</span><div class="composer-output-wrap"><pre class="composer-output">...</pre><button class="composer-copy" data-composer-copy title="Copy to clipboard"><svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button></div></div></aside>
     </div>
+    <div class="cmd-palette" data-cmd-palette hidden role="dialog" aria-label="Search commands"><div class="cmd-backdrop"></div><div class="cmd-dialog"><div class="cmd-header"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="cmd-input" type="text" placeholder="Search commands…" data-cmd-input autocomplete="off" spellcheck="false"><kbd>Esc</kbd></div><div class="cmd-results" data-cmd-results></div><div class="cmd-footer"><span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span><span><kbd>↵</kbd> Open</span><span><kbd>Esc</kbd> Close</span></div></div></div>
   </div>
   <script>(()=>{
   /* ── Theme ── */
@@ -15941,6 +16184,129 @@ pre {
       document.body.style.userSelect = '';
     });
   }
+
+  /* ── Command Palette ── */
+  var cmdPalette = document.querySelector('[data-cmd-palette]');
+  var cmdInput = cmdPalette ? cmdPalette.querySelector('[data-cmd-input]') : null;
+  var cmdResultsEl = cmdPalette ? cmdPalette.querySelector('[data-cmd-results]') : null;
+  var cmdBackdrop = cmdPalette ? cmdPalette.querySelector('.cmd-backdrop') : null;
+  var cmdActiveIdx = 0;
+  var cmdIndex = [];
+
+  function cmdBuildIndex() {
+    cmdIndex = [];
+    var items = document.querySelectorAll('[data-nav-item]');
+    items.forEach(function(item) {
+      var path = item.dataset.label || '';
+      var link = item.querySelector(':scope > .nav-row > .nav-link');
+      if (!link) return;
+      var href = link.getAttribute('href');
+      var desc = '';
+      if (href && href.startsWith('#')) {
+        var tpl = document.querySelector('template[data-page="' + href.slice(1) + '"]');
+        if (tpl) {
+          var p = tpl.content.querySelector('.command-detail > p');
+          if (p && p.textContent.trim() !== 'No description provided.') desc = p.textContent.trim();
+        }
+      }
+      cmdIndex.push({ path: path, desc: desc, href: href });
+    });
+  }
+
+  function cmdEsc(s) { var d = document.createElement('span'); d.textContent = s; return d.innerHTML; }
+
+  function cmdHL(text, q) {
+    if (!q) return cmdEsc(text);
+    var i = text.toLowerCase().indexOf(q);
+    if (i === -1) return cmdEsc(text);
+    return cmdEsc(text.slice(0, i)) + '<mark>' + cmdEsc(text.slice(i, i + q.length)) + '</mark>' + cmdEsc(text.slice(i + q.length));
+  }
+
+  function cmdRender(q) {
+    if (!cmdResultsEl) return;
+    var query = (q || '').toLowerCase().trim();
+    var matches = query ? cmdIndex.filter(function(c) {
+      return c.path.indexOf(query) !== -1 || c.desc.toLowerCase().indexOf(query) !== -1;
+    }) : cmdIndex;
+    if (!matches.length) {
+      cmdResultsEl.innerHTML = '<div class="cmd-empty">No matching commands</div>';
+      cmdActiveIdx = -1;
+      return;
+    }
+    cmdActiveIdx = Math.min(Math.max(cmdActiveIdx, 0), matches.length - 1);
+    cmdResultsEl.innerHTML = matches.map(function(c, i) {
+      return '<div class="cmd-item' + (i === cmdActiveIdx ? ' active' : '') + '" data-href="' + c.href + '">' +
+        '<span class="cmd-path">' + cmdHL(c.path, query) + '</span>' +
+        (c.desc ? '<span class="cmd-desc">' + cmdHL(c.desc, query) + '</span>' : '') +
+        '</div>';
+    }).join('');
+    var act = cmdResultsEl.querySelector('.cmd-item.active');
+    if (act) act.scrollIntoView({ block: 'nearest' });
+  }
+
+  function cmdOpen() {
+    if (!cmdPalette) return;
+    cmdBuildIndex();
+    cmdPalette.hidden = false;
+    cmdInput.value = '';
+    cmdActiveIdx = 0;
+    cmdRender('');
+    requestAnimationFrame(function() { cmdInput.focus(); });
+  }
+
+  function cmdClose() { if (cmdPalette) cmdPalette.hidden = true; }
+
+  function cmdNav(dir) {
+    var items = cmdResultsEl ? cmdResultsEl.querySelectorAll('.cmd-item') : [];
+    if (!items.length) return;
+    cmdActiveIdx = Math.max(0, Math.min(cmdActiveIdx + dir, items.length - 1));
+    items.forEach(function(el, i) { el.classList.toggle('active', i === cmdActiveIdx); });
+    items[cmdActiveIdx].scrollIntoView({ block: 'nearest' });
+  }
+
+  function cmdSelect() {
+    var el = cmdResultsEl ? cmdResultsEl.querySelector('.cmd-item.active') || cmdResultsEl.querySelector('.cmd-item') : null;
+    if (!el) return;
+    var href = el.dataset.href;
+    cmdClose();
+    if (href && href.startsWith('#')) {
+      var pageId = href === '#overview' ? 'overview' : href.slice(1);
+      history.pushState(null, '', href);
+      showPage(pageId);
+    }
+  }
+
+  if (cmdInput) {
+    cmdInput.addEventListener('input', function() { cmdActiveIdx = 0; cmdRender(cmdInput.value); });
+    cmdInput.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); cmdNav(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); cmdNav(-1); }
+      else if (e.key === 'Enter') { e.preventDefault(); cmdSelect(); }
+      else if (e.key === 'Escape') { e.preventDefault(); cmdClose(); }
+    });
+  }
+  if (cmdBackdrop) cmdBackdrop.addEventListener('click', cmdClose);
+  if (cmdResultsEl) cmdResultsEl.addEventListener('click', function(e) {
+    var item = e.target.closest('.cmd-item');
+    if (!item) return;
+    var all = cmdResultsEl.querySelectorAll('.cmd-item');
+    for (var i = 0; i < all.length; i++) { if (all[i] === item) { cmdActiveIdx = i; break; } }
+    cmdSelect();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      cmdPalette && !cmdPalette.hidden ? cmdClose() : cmdOpen();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+      var navSearch = document.querySelector('[data-nav-search]');
+      if (navSearch) { e.preventDefault(); navSearch.focus(); navSearch.select(); }
+    }
+  });
+
+  var cmdTrigger = document.querySelector('[data-cmd-trigger]');
+  if (cmdTrigger) cmdTrigger.addEventListener('click', cmdOpen);
 
   /* ── Search / filter ── */
   var search = document.querySelector('[data-nav-search]');
