@@ -15,6 +15,11 @@ export function ComposerPanel({ command, cliTitle, width, onResize }: ComposerPa
   const [copied, setCopied] = useState(false);
   const resizeRef = useRef<HTMLDivElement>(null);
 
+  const allOptions = [
+    ...(command?.declaredOptions ?? []),
+    ...(command?.inheritedOptions.map((r) => r.option) ?? []),
+  ];
+
   useEffect(() => {
     setFlagValues({});
     setTextValues({});
@@ -22,14 +27,17 @@ export function ComposerPanel({ command, cliTitle, width, onResize }: ComposerPa
 
   function buildPreview(): string {
     const parts = [cliTitle, ...(command?.path.split(" ") ?? [])];
+    const nameToDisplay = new Map(
+      allOptions.map((opt) => [opt.name, opt.aliases?.[0] ?? opt.name]),
+    );
 
-    for (const [name, enabled] of Object.entries(flagValues)) {
-      if (enabled) parts.push(name);
+    for (const [key, enabled] of Object.entries(flagValues)) {
+      if (enabled) parts.push(nameToDisplay.get(key) ?? key);
     }
 
-    for (const [name, value] of Object.entries(textValues)) {
+    for (const [key, value] of Object.entries(textValues)) {
       if (value.trim()) {
-        parts.push(name);
+        parts.push(nameToDisplay.get(key) ?? key);
         parts.push(value.includes(" ") ? `"${value}"` : value);
       }
     }
@@ -52,10 +60,11 @@ export function ComposerPanel({ command, cliTitle, width, onResize }: ComposerPa
     const handle = resizeRef.current;
     if (handle) handle.classList.add("dragging");
     document.body.style.userSelect = "none";
+    let latestWidth = width;
 
     function onMove(ev: MouseEvent) {
-      const newWidth = Math.min(576, Math.max(224, document.documentElement.clientWidth - ev.clientX));
-      onResize(newWidth);
+      latestWidth = Math.min(576, Math.max(224, document.documentElement.clientWidth - ev.clientX));
+      onResize(latestWidth);
     }
 
     function onUp() {
@@ -63,17 +72,12 @@ export function ComposerPanel({ command, cliTitle, width, onResize }: ComposerPa
       document.removeEventListener("mouseup", onUp);
       document.body.style.userSelect = "";
       if (handle) handle.classList.remove("dragging");
-      localStorage.setItem("inspectra-composer-width", String(width));
+      localStorage.setItem("inspectra-composer-width", String(latestWidth));
     }
 
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
   }
-
-  const allOptions = [
-    ...(command?.declaredOptions ?? []),
-    ...(command?.inheritedOptions.map((r) => r.option) ?? []),
-  ];
 
   return (
     <aside className="composer" style={{ width }}>
@@ -94,21 +98,23 @@ export function ComposerPanel({ command, cliTitle, width, onResize }: ComposerPa
             </div>
             {allOptions.map((option) => {
               const kind = formatOptionValue(option);
-              const optName = option.aliases?.[0] ?? option.name;
+              const key = option.name;
+              const displayName = option.aliases?.[0] ?? option.name;
+              const inputId = `composer-opt-${key.replace(/[^a-zA-Z0-9-]/g, "-")}`;
 
               if (kind === "flag") {
                 return (
-                  <div className="composer-field" key={optName}>
+                  <div className="composer-field" key={key}>
                     <label className="composer-flag">
                       <input
                         type="checkbox"
-                        checked={flagValues[optName] ?? false}
+                        checked={flagValues[key] ?? false}
                         onChange={(e) =>
-                          setFlagValues((prev) => ({ ...prev, [optName]: e.target.checked }))
+                          setFlagValues((prev) => ({ ...prev, [key]: e.target.checked }))
                         }
                       />
                       <div>
-                        <span className="composer-opt-name">{optName}</span>
+                        <span className="composer-opt-name">{displayName}</span>
                         {option.description && (
                           <span className="composer-opt-desc">{option.description}</span>
                         )}
@@ -119,14 +125,15 @@ export function ComposerPanel({ command, cliTitle, width, onResize }: ComposerPa
               }
 
               return (
-                <div className="composer-field" key={optName}>
-                  <label className="composer-opt-name">{optName}</label>
+                <div className="composer-field" key={key}>
+                  <label className="composer-opt-name" htmlFor={inputId}>{displayName}</label>
                   <input
+                    id={inputId}
                     type="text"
                     placeholder={kind}
-                    value={textValues[optName] ?? ""}
+                    value={textValues[key] ?? ""}
                     onChange={(e) =>
-                      setTextValues((prev) => ({ ...prev, [optName]: e.target.value }))
+                      setTextValues((prev) => ({ ...prev, [key]: e.target.value }))
                     }
                     className="composer-input"
                   />
