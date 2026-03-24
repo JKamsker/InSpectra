@@ -9,7 +9,8 @@ public sealed class MarkdownRenderer(
     MarkdownTableRenderer tableRenderer,
     MarkdownMetadataRenderer metadataRenderer,
     CommandPathResolver pathResolver,
-    RenderModelFormatter formatter) : IDocumentRenderer
+    RenderModelFormatter formatter,
+    OverviewFormatter overviewFormatter) : IDocumentRenderer
 {
     public DocumentFormat Format => DocumentFormat.Markdown;
 
@@ -53,10 +54,11 @@ public sealed class MarkdownRenderer(
         builder.AppendLine($"- Version: `{document.Source.Info.Version}`");
         builder.AppendLine($"- OpenCLI: `{document.Source.OpenCliVersion}`");
 
-        if (!string.IsNullOrWhiteSpace(document.Source.Info.Summary))
+        var summary = overviewFormatter.BuildSummary(document);
+        if (!string.IsNullOrWhiteSpace(summary))
         {
             builder.AppendLine();
-            builder.AppendLine(document.Source.Info.Summary);
+            builder.AppendLine(summary);
         }
 
         if (!string.IsNullOrWhiteSpace(document.Source.Info.Description))
@@ -87,6 +89,7 @@ public sealed class MarkdownRenderer(
         builder.AppendLine("## Overview");
         builder.AppendLine();
         sectionRenderer.AppendInfoSection(document.Source, builder);
+        AppendOverviewFacts(document, builder);
     }
 
     private void AppendRootArguments(NormalizedCliDocument document, StringBuilder builder)
@@ -158,6 +161,7 @@ public sealed class MarkdownRenderer(
         AppendHeader(document, builder);
         builder.AppendLine();
         sectionRenderer.AppendInfoSection(document.Source, builder);
+        AppendOverviewFacts(document, builder);
         if (document.RootArguments.Count > 0)
         {
             builder.AppendLine();
@@ -188,6 +192,24 @@ public sealed class MarkdownRenderer(
         }
 
         return builder.ToString().TrimEnd() + Environment.NewLine;
+    }
+
+    private void AppendOverviewFacts(NormalizedCliDocument document, StringBuilder builder)
+    {
+        var facts = overviewFormatter.BuildFacts(document);
+        if (facts.Count == 0)
+        {
+            return;
+        }
+
+        builder.AppendLine("### CLI Scope");
+        builder.AppendLine();
+        foreach (var (label, value) in facts)
+        {
+            builder.AppendLine($"- {label}: `{value}`");
+        }
+
+        builder.AppendLine();
     }
 
     private void AppendCommandPages(NormalizedCommand command, bool includeMetadata, ICollection<RelativeRenderedFile> files)

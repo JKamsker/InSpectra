@@ -14,6 +14,7 @@ services.AddSingleton<OpenCliNormalizer>();
 services.AddSingleton<ExecutableResolver>();
 services.AddSingleton<ProcessRunner>();
 services.AddSingleton<RenderModelFormatter>();
+services.AddSingleton<OverviewFormatter>();
 services.AddSingleton<CommandPathResolver>();
 services.AddSingleton<MarkdownTableRenderer>();
 services.AddSingleton<MarkdownMetadataRenderer>();

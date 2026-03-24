@@ -40,6 +40,8 @@ public class OpenCliEnrichmentAndRenderingTests
         var markdownWithMetadata = _renderer.RenderSingle(normalized, includeMetadata: true);
 
         Assert.Contains("# jdr", markdownWithoutMetadata);
+        Assert.Contains("top-level command groups and", markdownWithoutMetadata);
+        Assert.Contains("### CLI Scope", markdownWithoutMetadata);
         Assert.Contains("## Commands", markdownWithoutMetadata);
         Assert.Contains("`auth login`", markdownWithoutMetadata);
         Assert.DoesNotContain("Metadata Appendix", markdownWithoutMetadata);
@@ -145,6 +147,8 @@ public class OpenCliEnrichmentAndRenderingTests
 
         Assert.Contains("<aside class=\"sidebar\">", html);
         Assert.Contains("Filter commands", html);
+        Assert.Contains("top-level command groups and", html);
+        Assert.Contains("Reference scope", html);
         Assert.Contains("command-card", html);
         Assert.Contains("option-card", html);
         Assert.Contains("Metadata appendix", html);

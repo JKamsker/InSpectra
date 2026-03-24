@@ -7,7 +7,8 @@ public sealed class HtmlSectionRenderer(
     HtmlContentFormatter contentFormatter,
     HtmlBlockRenderer blockRenderer,
     RenderModelFormatter formatter,
-    CommandPathResolver pathResolver)
+    CommandPathResolver pathResolver,
+    OverviewFormatter overviewFormatter)
 {
     public void AppendRootHero(NormalizedCliDocument document, StringBuilder builder)
     {
@@ -19,9 +20,10 @@ public sealed class HtmlSectionRenderer(
         builder.AppendLine($"<span class=\"badge\">OpenCLI {contentFormatter.Encode(document.Source.OpenCliVersion)}</span>");
         if (document.Source.Interactive) builder.AppendLine("<span class=\"badge badge-success\">Interactive</span>");
         builder.AppendLine("</div>");
-        if (!string.IsNullOrWhiteSpace(document.Source.Info.Summary))
+        var summary = overviewFormatter.BuildSummary(document);
+        if (!string.IsNullOrWhiteSpace(summary))
         {
-            builder.AppendLine($"<p class=\"lede\">{contentFormatter.Encode(document.Source.Info.Summary)}</p>");
+            builder.AppendLine($"<p class=\"lede\">{contentFormatter.Encode(summary)}</p>");
         }
 
         builder.AppendLine(contentFormatter.RenderParagraphBlock(document.Source.Info.Description));
@@ -30,7 +32,7 @@ public sealed class HtmlSectionRenderer(
 
     public void AppendRootDetails(NormalizedCliDocument document, StringBuilder builder, bool includeMetadata)
     {
-        AppendOverviewCards(document.Source, builder);
+        AppendOverviewCards(document, builder);
         AppendRootArguments(document, builder);
         AppendRootOptions(document, builder);
         AppendExamples(document.Source.Examples, builder);
@@ -74,22 +76,28 @@ public sealed class HtmlSectionRenderer(
         if (includeWrapper) builder.AppendLine("</section>");
     }
 
-    private void AppendOverviewCards(OpenCliDocument document, StringBuilder builder)
+    private void AppendOverviewCards(NormalizedCliDocument document, StringBuilder builder)
     {
         var cards = new List<string>();
-        if (document.Conventions is not null)
+        var facts = overviewFormatter.BuildFacts(document);
+        if (facts.Count > 0)
         {
-            cards.Add($"<article class=\"panel info-card\"><h3>Conventions</h3><dl>{contentFormatter.CreateDefinition("Group short options", document.Conventions.GroupOptions?.ToString() ?? "unspecified")}{contentFormatter.CreateDefinition("Option separator", document.Conventions.OptionSeparator ?? "unspecified")}</dl></article>");
+            cards.Add($"<article class=\"panel info-card\"><h3>Reference scope</h3><dl>{string.Concat(facts.Select(fact => contentFormatter.CreateDefinition(fact.Label, fact.Value)))}</dl></article>");
         }
 
-        if (document.Info.Contact is not null)
+        if (document.Source.Conventions is not null)
         {
-            cards.Add($"<article class=\"panel info-card\"><h3>Contact</h3><dl>{contentFormatter.CreateDefinition("Name", document.Info.Contact.Name)}{contentFormatter.CreateDefinition("Email", document.Info.Contact.Email)}{contentFormatter.CreateLinkDefinition("URL", document.Info.Contact.Url)}</dl></article>");
+            cards.Add($"<article class=\"panel info-card\"><h3>Conventions</h3><dl>{contentFormatter.CreateDefinition("Group short options", document.Source.Conventions.GroupOptions?.ToString() ?? "unspecified")}{contentFormatter.CreateDefinition("Option separator", document.Source.Conventions.OptionSeparator ?? "unspecified")}</dl></article>");
         }
 
-        if (document.Info.License is not null)
+        if (document.Source.Info.Contact is not null)
         {
-            cards.Add($"<article class=\"panel info-card\"><h3>License</h3><dl>{contentFormatter.CreateDefinition("Name", document.Info.License.Name)}{contentFormatter.CreateDefinition("Identifier", document.Info.License.Identifier)}{contentFormatter.CreateLinkDefinition("URL", document.Info.License.Url)}</dl></article>");
+            cards.Add($"<article class=\"panel info-card\"><h3>Contact</h3><dl>{contentFormatter.CreateDefinition("Name", document.Source.Info.Contact.Name)}{contentFormatter.CreateDefinition("Email", document.Source.Info.Contact.Email)}{contentFormatter.CreateLinkDefinition("URL", document.Source.Info.Contact.Url)}</dl></article>");
+        }
+
+        if (document.Source.Info.License is not null)
+        {
+            cards.Add($"<article class=\"panel info-card\"><h3>License</h3><dl>{contentFormatter.CreateDefinition("Name", document.Source.Info.License.Name)}{contentFormatter.CreateDefinition("Identifier", document.Source.Info.License.Identifier)}{contentFormatter.CreateLinkDefinition("URL", document.Source.Info.License.Url)}</dl></article>");
         }
 
         if (cards.Count == 0)
