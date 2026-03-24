@@ -366,12 +366,10 @@ code, pre { font-family: var(--mono); }
   display: none;
   flex-direction: column;
   gap: 1.5rem;
-  content-visibility: hidden;
 }
 
 .page.active {
   display: flex;
-  content-visibility: visible;
   animation: pageIn .3s var(--ease-out);
 }
 
@@ -1497,7 +1495,7 @@ pre {
 <article class="panel info-card"><h3>Reference scope</h3><dl><div><dt>Top-level command groups</dt><dd>12</dd></div><div><dt>Documented commands</dt><dd>145</dd></div><div><dt>Leaf commands</dt><dd>112</dd></div></dl></article>
 </div></section>
 </div>
-<div class="page" data-page="command-accounts">
+<template data-page="command-accounts">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">accounts</span></nav>
 <section class="panel command-detail" id="command-accounts">
 <h2>accounts</h2>
@@ -1515,8 +1513,8 @@ pre {
 <a class="command-card" href="#command-accounts-update"><div class="command-card-head"><strong>update</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-add">
+</template>
+<template data-page="command-accounts-add">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">add</span></nav>
 <section class="panel command-detail" id="command-accounts-add">
 <h2>add</h2>
@@ -1652,8 +1650,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-basic-auth">
+</template>
+<template data-page="command-accounts-basic-auth">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">basic-auth</span></nav>
 <section class="panel command-detail" id="command-accounts-basic-auth">
 <h2>basic-auth</h2>
@@ -1665,8 +1663,8 @@ pre {
 <a class="command-card" href="#command-accounts-basic-auth-update"><div class="command-card-head"><strong>update</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-basic-auth-add">
+</template>
+<template data-page="command-accounts-basic-auth-add">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><a href="#command-accounts-basic-auth">basic-auth</a><span class="crumb-sep">›</span><span class="crumb-current">add</span></nav>
 <section class="panel command-detail" id="command-accounts-basic-auth-add">
 <h2>add</h2>
@@ -1812,8 +1810,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-basic-auth-list">
+</template>
+<template data-page="command-accounts-basic-auth-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><a href="#command-accounts-basic-auth">basic-auth</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-accounts-basic-auth-list">
 <h2>list</h2>
@@ -1911,8 +1909,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-basic-auth-remove">
+</template>
+<template data-page="command-accounts-basic-auth-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><a href="#command-accounts-basic-auth">basic-auth</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-accounts-basic-auth-remove">
 <h2>remove</h2>
@@ -2020,8 +2018,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-basic-auth-update">
+</template>
+<template data-page="command-accounts-basic-auth-update">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><a href="#command-accounts-basic-auth">basic-auth</a><span class="crumb-sep">›</span><span class="crumb-current">update</span></nav>
 <section class="panel command-detail" id="command-accounts-basic-auth-update">
 <h2>update</h2>
@@ -2177,8 +2175,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-disable">
+</template>
+<template data-page="command-accounts-disable">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">disable</span></nav>
 <section class="panel command-detail" id="command-accounts-disable">
 <h2>disable</h2>
@@ -2286,8 +2284,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-enable">
+</template>
+<template data-page="command-accounts-enable">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">enable</span></nav>
 <section class="panel command-detail" id="command-accounts-enable">
 <h2>enable</h2>
@@ -2395,8 +2393,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-get">
+</template>
+<template data-page="command-accounts-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-accounts-get">
 <h2>get</h2>
@@ -2504,8 +2502,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-hosters">
+</template>
+<template data-page="command-accounts-hosters">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">hosters</span></nav>
 <section class="panel command-detail" id="command-accounts-hosters">
 <h2>hosters</h2>
@@ -2515,8 +2513,8 @@ pre {
 <a class="command-card" href="#command-accounts-hosters-urls"><div class="command-card-head"><strong>urls</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-hosters-list">
+</template>
+<template data-page="command-accounts-hosters-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><a href="#command-accounts-hosters">hosters</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-accounts-hosters-list">
 <h2>list</h2>
@@ -2614,8 +2612,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-hosters-urls">
+</template>
+<template data-page="command-accounts-hosters-urls">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><a href="#command-accounts-hosters">hosters</a><span class="crumb-sep">›</span><span class="crumb-current">urls</span></nav>
 <section class="panel command-detail" id="command-accounts-hosters-urls">
 <h2>urls</h2>
@@ -2713,8 +2711,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-list">
+</template>
+<template data-page="command-accounts-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-accounts-list">
 <h2>list</h2>
@@ -2892,8 +2890,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-refresh">
+</template>
+<template data-page="command-accounts-refresh">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">refresh</span></nav>
 <section class="panel command-detail" id="command-accounts-refresh">
 <h2>refresh</h2>
@@ -3001,8 +2999,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-remove">
+</template>
+<template data-page="command-accounts-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-accounts-remove">
 <h2>remove</h2>
@@ -3110,8 +3108,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-accounts-update">
+</template>
+<template data-page="command-accounts-update">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-accounts">accounts</a><span class="crumb-sep">›</span><span class="crumb-current">update</span></nav>
 <section class="panel command-detail" id="command-accounts-update">
 <h2>update</h2>
@@ -3247,8 +3245,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced">
+</template>
+<template data-page="command-advanced">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">advanced</span></nav>
 <section class="panel command-detail" id="command-advanced">
 <h2>advanced</h2>
@@ -3260,8 +3258,8 @@ pre {
 <a class="command-card" href="#command-advanced-raw"><div class="command-card-head"><strong>raw</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-content">
+</template>
+<template data-page="command-advanced-content">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><span class="crumb-current">content</span></nav>
 <section class="panel command-detail" id="command-advanced-content">
 <h2>content</h2>
@@ -3273,8 +3271,8 @@ pre {
 <a class="command-card" href="#command-advanced-content-icon"><div class="command-card-head"><strong>icon</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-content-describe">
+</template>
+<template data-page="command-advanced-content-describe">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-content">content</a><span class="crumb-sep">›</span><span class="crumb-current">describe</span></nav>
 <section class="panel command-detail" id="command-advanced-content-describe">
 <h2>describe</h2>
@@ -3382,8 +3380,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-content-favicon">
+</template>
+<template data-page="command-advanced-content-favicon">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-content">content</a><span class="crumb-sep">›</span><span class="crumb-current">favicon</span></nav>
 <section class="panel command-detail" id="command-advanced-content-favicon">
 <h2>favicon</h2>
@@ -3501,8 +3499,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-content-file-icon">
+</template>
+<template data-page="command-advanced-content-file-icon">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-content">content</a><span class="crumb-sep">›</span><span class="crumb-current">file-icon</span></nav>
 <section class="panel command-detail" id="command-advanced-content-file-icon">
 <h2>file-icon</h2>
@@ -3620,8 +3618,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-content-icon">
+</template>
+<template data-page="command-advanced-content-icon">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-content">content</a><span class="crumb-sep">›</span><span class="crumb-current">icon</span></nav>
 <section class="panel command-detail" id="command-advanced-content-icon">
 <h2>icon</h2>
@@ -3749,8 +3747,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-dialogs">
+</template>
+<template data-page="command-advanced-dialogs">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><span class="crumb-current">dialogs</span></nav>
 <section class="panel command-detail" id="command-advanced-dialogs">
 <h2>dialogs</h2>
@@ -3762,8 +3760,8 @@ pre {
 <a class="command-card" href="#command-advanced-dialogs-type-info"><div class="command-card-head"><strong>type-info</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-dialogs-answer">
+</template>
+<template data-page="command-advanced-dialogs-answer">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-dialogs">dialogs</a><span class="crumb-sep">›</span><span class="crumb-current">answer</span></nav>
 <section class="panel command-detail" id="command-advanced-dialogs-answer">
 <h2>answer</h2>
@@ -3881,8 +3879,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-dialogs-get">
+</template>
+<template data-page="command-advanced-dialogs-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-dialogs">dialogs</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-advanced-dialogs-get">
 <h2>get</h2>
@@ -4006,8 +4004,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-dialogs-list">
+</template>
+<template data-page="command-advanced-dialogs-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-dialogs">dialogs</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-advanced-dialogs-list">
 <h2>list</h2>
@@ -4105,8 +4103,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-dialogs-type-info">
+</template>
+<template data-page="command-advanced-dialogs-type-info">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-dialogs">dialogs</a><span class="crumb-sep">›</span><span class="crumb-current">type-info</span></nav>
 <section class="panel command-detail" id="command-advanced-dialogs-type-info">
 <h2>type-info</h2>
@@ -4214,8 +4212,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-ingest">
+</template>
+<template data-page="command-advanced-ingest">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><span class="crumb-current">ingest</span></nav>
 <section class="panel command-detail" id="command-advanced-ingest">
 <h2>ingest</h2>
@@ -4224,8 +4222,8 @@ pre {
 <a class="command-card" href="#command-advanced-ingest-cnl"><div class="command-card-head"><strong>cnl</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-ingest-cnl">
+</template>
+<template data-page="command-advanced-ingest-cnl">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-ingest">ingest</a><span class="crumb-sep">›</span><span class="crumb-current">cnl</span></nav>
 <section class="panel command-detail" id="command-advanced-ingest-cnl">
 <h2>cnl</h2>
@@ -4353,8 +4351,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-raw">
+</template>
+<template data-page="command-advanced-raw">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><span class="crumb-current">raw</span></nav>
 <section class="panel command-detail" id="command-advanced-raw">
 <h2>raw</h2>
@@ -4363,8 +4361,8 @@ pre {
 <a class="command-card" href="#command-advanced-raw-request"><div class="command-card-head"><strong>request</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-advanced-raw-request">
+</template>
+<template data-page="command-advanced-raw-request">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-advanced">advanced</a><span class="crumb-sep">›</span><a href="#command-advanced-raw">raw</a><span class="crumb-sep">›</span><span class="crumb-current">request</span></nav>
 <section class="panel command-detail" id="command-advanced-raw-request">
 <h2>request</h2>
@@ -4515,8 +4513,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth">
+</template>
+<template data-page="command-auth">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">auth</span></nav>
 <section class="panel command-detail" id="command-auth">
 <h2>auth</h2>
@@ -4529,8 +4527,8 @@ pre {
 <a class="command-card" href="#command-auth-whoami"><div class="command-card-head"><strong>whoami</strong><span class="command-card-arrow">→</span></div><p>Show the resolved profile and stored account.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-auth-login">
+</template>
+<template data-page="command-auth-login">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><span class="crumb-current">login</span></nav>
 <section class="panel command-detail" id="command-auth-login">
 <h2>login</h2>
@@ -4646,8 +4644,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-logout">
+</template>
+<template data-page="command-auth-logout">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><span class="crumb-current">logout</span></nav>
 <section class="panel command-detail" id="command-auth-logout">
 <h2>logout</h2>
@@ -4745,8 +4743,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-profiles">
+</template>
+<template data-page="command-auth-profiles">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><span class="crumb-current">profiles</span></nav>
 <section class="panel command-detail" id="command-auth-profiles">
 <h2>profiles</h2>
@@ -4760,8 +4758,8 @@ pre {
 <a class="command-card" href="#command-auth-profiles-use"><div class="command-card-head"><strong>use</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-auth-profiles-add">
+</template>
+<template data-page="command-auth-profiles-add">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><a href="#command-auth-profiles">profiles</a><span class="crumb-sep">›</span><span class="crumb-current">add</span></nav>
 <section class="panel command-detail" id="command-auth-profiles-add">
 <h2>add</h2>
@@ -4864,8 +4862,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-profiles-get">
+</template>
+<template data-page="command-auth-profiles-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><a href="#command-auth-profiles">profiles</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-auth-profiles-get">
 <h2>get</h2>
@@ -4968,8 +4966,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-profiles-list">
+</template>
+<template data-page="command-auth-profiles-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><a href="#command-auth-profiles">profiles</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-auth-profiles-list">
 <h2>list</h2>
@@ -5067,8 +5065,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-profiles-remove">
+</template>
+<template data-page="command-auth-profiles-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><a href="#command-auth-profiles">profiles</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-auth-profiles-remove">
 <h2>remove</h2>
@@ -5171,8 +5169,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-profiles-rename">
+</template>
+<template data-page="command-auth-profiles-rename">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><a href="#command-auth-profiles">profiles</a><span class="crumb-sep">›</span><span class="crumb-current">rename</span></nav>
 <section class="panel command-detail" id="command-auth-profiles-rename">
 <h2>rename</h2>
@@ -5276,8 +5274,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-profiles-use">
+</template>
+<template data-page="command-auth-profiles-use">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><a href="#command-auth-profiles">profiles</a><span class="crumb-sep">›</span><span class="crumb-current">use</span></nav>
 <section class="panel command-detail" id="command-auth-profiles-use">
 <h2>use</h2>
@@ -5380,8 +5378,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-status">
+</template>
+<template data-page="command-auth-status">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><span class="crumb-current">status</span></nav>
 <section class="panel command-detail" id="command-auth-status">
 <h2>status</h2>
@@ -5479,8 +5477,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-auth-whoami">
+</template>
+<template data-page="command-auth-whoami">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-auth">auth</a><span class="crumb-sep">›</span><span class="crumb-current">whoami</span></nav>
 <section class="panel command-detail" id="command-auth-whoami">
 <h2>whoami</h2>
@@ -5578,8 +5576,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-captcha">
+</template>
+<template data-page="command-captcha">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">captcha</span></nav>
 <section class="panel command-detail" id="command-captcha">
 <h2>captcha</h2>
@@ -5593,8 +5591,8 @@ pre {
 <a class="command-card" href="#command-captcha-solve"><div class="command-card-head"><strong>solve</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-forward">
+</template>
+<template data-page="command-captcha-forward">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><span class="crumb-current">forward</span></nav>
 <section class="panel command-detail" id="command-captcha-forward">
 <h2>forward</h2>
@@ -5604,8 +5602,8 @@ pre {
 <a class="command-card" href="#command-captcha-forward-get-result"><div class="command-card-head"><strong>get-result</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-forward-create-job">
+</template>
+<template data-page="command-captcha-forward-create-job">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><a href="#command-captcha-forward">forward</a><span class="crumb-sep">›</span><span class="crumb-current">create-job</span></nav>
 <section class="panel command-detail" id="command-captcha-forward-create-job">
 <h2>create-job</h2>
@@ -5711,8 +5709,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-forward-get-result">
+</template>
+<template data-page="command-captcha-forward-get-result">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><a href="#command-captcha-forward">forward</a><span class="crumb-sep">›</span><span class="crumb-current">get-result</span></nav>
 <section class="panel command-detail" id="command-captcha-forward-get-result">
 <h2>get-result</h2>
@@ -5820,8 +5818,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-get">
+</template>
+<template data-page="command-captcha-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-captcha-get">
 <h2>get</h2>
@@ -5939,8 +5937,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-job">
+</template>
+<template data-page="command-captcha-job">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><span class="crumb-current">job</span></nav>
 <section class="panel command-detail" id="command-captcha-job">
 <h2>job</h2>
@@ -6048,8 +6046,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-list">
+</template>
+<template data-page="command-captcha-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-captcha-list">
 <h2>list</h2>
@@ -6147,8 +6145,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-skip">
+</template>
+<template data-page="command-captcha-skip">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><span class="crumb-current">skip</span></nav>
 <section class="panel command-detail" id="command-captcha-skip">
 <h2>skip</h2>
@@ -6274,8 +6272,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-captcha-solve">
+</template>
+<template data-page="command-captcha-solve">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-captcha">captcha</a><span class="crumb-sep">›</span><span class="crumb-current">solve</span></nav>
 <section class="panel command-detail" id="command-captcha-solve">
 <h2>solve</h2>
@@ -6403,8 +6401,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-device">
+</template>
+<template data-page="command-device">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">device</span></nav>
 <section class="panel command-detail" id="command-device">
 <h2>device</h2>
@@ -6417,8 +6415,8 @@ pre {
 <a class="command-card" href="#command-device-use"><div class="command-card-head"><strong>use</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-device-direct-info">
+</template>
+<template data-page="command-device-direct-info">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-device">device</a><span class="crumb-sep">›</span><span class="crumb-current">direct-info</span></nav>
 <section class="panel command-detail" id="command-device-direct-info">
 <h2>direct-info</h2>
@@ -6516,8 +6514,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-device-get">
+</template>
+<template data-page="command-device-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-device">device</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-device-get">
 <h2>get</h2>
@@ -6615,8 +6613,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-device-list">
+</template>
+<template data-page="command-device-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-device">device</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-device-list">
 <h2>list</h2>
@@ -6714,8 +6712,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-device-ping">
+</template>
+<template data-page="command-device-ping">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-device">device</a><span class="crumb-sep">›</span><span class="crumb-current">ping</span></nav>
 <section class="panel command-detail" id="command-device-ping">
 <h2>ping</h2>
@@ -6813,8 +6811,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-device-use">
+</template>
+<template data-page="command-device-use">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-device">device</a><span class="crumb-sep">›</span><span class="crumb-current">use</span></nav>
 <section class="panel command-detail" id="command-device-use">
 <h2>use</h2>
@@ -6922,8 +6920,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-doctor">
+</template>
+<template data-page="command-doctor">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">doctor</span></nav>
 <section class="panel command-detail" id="command-doctor">
 <h2>doctor</h2>
@@ -7021,8 +7019,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads">
+</template>
+<template data-page="command-downloads">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">downloads</span></nav>
 <section class="panel command-detail" id="command-downloads">
 <h2>downloads</h2>
@@ -7038,8 +7036,8 @@ pre {
 <a class="command-card" href="#command-downloads-stopmark"><div class="command-card-head"><strong>stopmark</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-links">
+</template>
+<template data-page="command-downloads-links">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">links</span></nav>
 <section class="panel command-detail" id="command-downloads-links">
 <h2>links</h2>
@@ -7049,8 +7047,8 @@ pre {
 <a class="command-card" href="#command-downloads-links-remove"><div class="command-card-head"><strong>remove</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-links-list">
+</template>
+<template data-page="command-downloads-links-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><a href="#command-downloads-links">links</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-downloads-links-list">
 <h2>list</h2>
@@ -7228,8 +7226,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-links-remove">
+</template>
+<template data-page="command-downloads-links-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><a href="#command-downloads-links">links</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-downloads-links-remove">
 <h2>remove</h2>
@@ -7347,8 +7345,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-packages">
+</template>
+<template data-page="command-downloads-packages">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">packages</span></nav>
 <section class="panel command-detail" id="command-downloads-packages">
 <h2>packages</h2>
@@ -7358,8 +7356,8 @@ pre {
 <a class="command-card" href="#command-downloads-packages-remove"><div class="command-card-head"><strong>remove</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-packages-list">
+</template>
+<template data-page="command-downloads-packages-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><a href="#command-downloads-packages">packages</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-downloads-packages-list">
 <h2>list</h2>
@@ -7537,8 +7535,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-packages-remove">
+</template>
+<template data-page="command-downloads-packages-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><a href="#command-downloads-packages">packages</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-downloads-packages-remove">
 <h2>remove</h2>
@@ -7646,8 +7644,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-pause">
+</template>
+<template data-page="command-downloads-pause">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">pause</span></nav>
 <section class="panel command-detail" id="command-downloads-pause">
 <h2>pause</h2>
@@ -7753,8 +7751,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-speed">
+</template>
+<template data-page="command-downloads-speed">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">speed</span></nav>
 <section class="panel command-detail" id="command-downloads-speed">
 <h2>speed</h2>
@@ -7852,8 +7850,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-start">
+</template>
+<template data-page="command-downloads-start">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">start</span></nav>
 <section class="panel command-detail" id="command-downloads-start">
 <h2>start</h2>
@@ -7951,8 +7949,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-status">
+</template>
+<template data-page="command-downloads-status">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">status</span></nav>
 <section class="panel command-detail" id="command-downloads-status">
 <h2>status</h2>
@@ -8050,8 +8048,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-stop">
+</template>
+<template data-page="command-downloads-stop">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">stop</span></nav>
 <section class="panel command-detail" id="command-downloads-stop">
 <h2>stop</h2>
@@ -8149,8 +8147,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-stopmark">
+</template>
+<template data-page="command-downloads-stopmark">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><span class="crumb-current">stopmark</span></nav>
 <section class="panel command-detail" id="command-downloads-stopmark">
 <h2>stopmark</h2>
@@ -8161,8 +8159,8 @@ pre {
 <a class="command-card" href="#command-downloads-stopmark-set"><div class="command-card-head"><strong>set</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-stopmark-clear">
+</template>
+<template data-page="command-downloads-stopmark-clear">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><a href="#command-downloads-stopmark">stopmark</a><span class="crumb-sep">›</span><span class="crumb-current">clear</span></nav>
 <section class="panel command-detail" id="command-downloads-stopmark-clear">
 <h2>clear</h2>
@@ -8260,8 +8258,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-stopmark-get">
+</template>
+<template data-page="command-downloads-stopmark-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><a href="#command-downloads-stopmark">stopmark</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-downloads-stopmark-get">
 <h2>get</h2>
@@ -8359,8 +8357,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-downloads-stopmark-set">
+</template>
+<template data-page="command-downloads-stopmark-set">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-downloads">downloads</a><span class="crumb-sep">›</span><a href="#command-downloads-stopmark">stopmark</a><span class="crumb-sep">›</span><span class="crumb-current">set</span></nav>
 <section class="panel command-detail" id="command-downloads-stopmark-set">
 <h2>set</h2>
@@ -8478,8 +8476,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-events">
+</template>
+<template data-page="command-events">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">events</span></nav>
 <section class="panel command-detail" id="command-events">
 <h2>events</h2>
@@ -8494,8 +8492,8 @@ pre {
 <a class="command-card" href="#command-events-subscribe"><div class="command-card-head"><strong>subscribe</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-events-listen">
+</template>
+<template data-page="command-events-listen">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-events">events</a><span class="crumb-sep">›</span><span class="crumb-current">listen</span></nav>
 <section class="panel command-detail" id="command-events-listen">
 <h2>listen</h2>
@@ -8603,8 +8601,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-events-poll">
+</template>
+<template data-page="command-events-poll">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-events">events</a><span class="crumb-sep">›</span><span class="crumb-current">poll</span></nav>
 <section class="panel command-detail" id="command-events-poll">
 <h2>poll</h2>
@@ -8712,8 +8710,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-events-publishers">
+</template>
+<template data-page="command-events-publishers">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-events">events</a><span class="crumb-sep">›</span><span class="crumb-current">publishers</span></nav>
 <section class="panel command-detail" id="command-events-publishers">
 <h2>publishers</h2>
@@ -8811,8 +8809,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-events-remove">
+</template>
+<template data-page="command-events-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-events">events</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-events-remove">
 <h2>remove</h2>
@@ -8940,8 +8938,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-events-set">
+</template>
+<template data-page="command-events-set">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-events">events</a><span class="crumb-sep">›</span><span class="crumb-current">set</span></nav>
 <section class="panel command-detail" id="command-events-set">
 <h2>set</h2>
@@ -9069,8 +9067,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-events-status">
+</template>
+<template data-page="command-events-status">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-events">events</a><span class="crumb-sep">›</span><span class="crumb-current">status</span></nav>
 <section class="panel command-detail" id="command-events-status">
 <h2>status</h2>
@@ -9178,8 +9176,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-events-subscribe">
+</template>
+<template data-page="command-events-subscribe">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-events">events</a><span class="crumb-sep">›</span><span class="crumb-current">subscribe</span></nav>
 <section class="panel command-detail" id="command-events-subscribe">
 <h2>subscribe</h2>
@@ -9297,8 +9295,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-extraction">
+</template>
+<template data-page="command-extraction">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">extraction</span></nav>
 <section class="panel command-detail" id="command-extraction">
 <h2>extraction</h2>
@@ -9312,8 +9310,8 @@ pre {
 <a class="command-card" href="#command-extraction-start"><div class="command-card-head"><strong>start</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-add-password">
+</template>
+<template data-page="command-extraction-add-password">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><span class="crumb-current">add-password</span></nav>
 <section class="panel command-detail" id="command-extraction-add-password">
 <h2>add-password</h2>
@@ -9429,8 +9427,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-cancel">
+</template>
+<template data-page="command-extraction-cancel">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><span class="crumb-current">cancel</span></nav>
 <section class="panel command-detail" id="command-extraction-cancel">
 <h2>cancel</h2>
@@ -9538,8 +9536,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-info">
+</template>
+<template data-page="command-extraction-info">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><span class="crumb-current">info</span></nav>
 <section class="panel command-detail" id="command-extraction-info">
 <h2>info</h2>
@@ -9657,8 +9655,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-queue">
+</template>
+<template data-page="command-extraction-queue">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><span class="crumb-current">queue</span></nav>
 <section class="panel command-detail" id="command-extraction-queue">
 <h2>queue</h2>
@@ -9756,8 +9754,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-settings">
+</template>
+<template data-page="command-extraction-settings">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><span class="crumb-current">settings</span></nav>
 <section class="panel command-detail" id="command-extraction-settings">
 <h2>settings</h2>
@@ -9767,8 +9765,8 @@ pre {
 <a class="command-card" href="#command-extraction-settings-set"><div class="command-card-head"><strong>set</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-settings-get">
+</template>
+<template data-page="command-extraction-settings-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><a href="#command-extraction-settings">settings</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-extraction-settings-get">
 <h2>get</h2>
@@ -9876,8 +9874,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-settings-set">
+</template>
+<template data-page="command-extraction-settings-set">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><a href="#command-extraction-settings">settings</a><span class="crumb-sep">›</span><span class="crumb-current">set</span></nav>
 <section class="panel command-detail" id="command-extraction-settings-set">
 <h2>set</h2>
@@ -9995,8 +9993,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-extraction-start">
+</template>
+<template data-page="command-extraction-start">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-extraction">extraction</a><span class="crumb-sep">›</span><span class="crumb-current">start</span></nav>
 <section class="panel command-detail" id="command-extraction-start">
 <h2>start</h2>
@@ -10114,8 +10112,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber">
+</template>
+<template data-page="command-grabber">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">grabber</span></nav>
 <section class="panel command-detail" id="command-grabber">
 <h2>grabber</h2>
@@ -10131,8 +10129,8 @@ pre {
 <a class="command-card" href="#command-grabber-variants"><div class="command-card-head"><strong>variants</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-add">
+</template>
+<template data-page="command-grabber-add">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">add</span></nav>
 <section class="panel command-detail" id="command-grabber-add">
 <h2>add</h2>
@@ -10330,8 +10328,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-add-container">
+</template>
+<template data-page="command-grabber-add-container">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">add-container</span></nav>
 <section class="panel command-detail" id="command-grabber-add-container">
 <h2>add-container</h2>
@@ -10459,8 +10457,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-clear">
+</template>
+<template data-page="command-grabber-clear">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">clear</span></nav>
 <section class="panel command-detail" id="command-grabber-clear">
 <h2>clear</h2>
@@ -10558,8 +10556,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-jobs">
+</template>
+<template data-page="command-grabber-jobs">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">jobs</span></nav>
 <section class="panel command-detail" id="command-grabber-jobs">
 <h2>jobs</h2>
@@ -10569,8 +10567,8 @@ pre {
 <a class="command-card" href="#command-grabber-jobs-list"><div class="command-card-head"><strong>list</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-jobs-get">
+</template>
+<template data-page="command-grabber-jobs-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-jobs">jobs</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-grabber-jobs-get">
 <h2>get</h2>
@@ -10678,8 +10676,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-jobs-list">
+</template>
+<template data-page="command-grabber-jobs-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-jobs">jobs</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-grabber-jobs-list">
 <h2>list</h2>
@@ -10787,8 +10785,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-links">
+</template>
+<template data-page="command-grabber-links">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">links</span></nav>
 <section class="panel command-detail" id="command-grabber-links">
 <h2>links</h2>
@@ -10798,8 +10796,8 @@ pre {
 <a class="command-card" href="#command-grabber-links-remove"><div class="command-card-head"><strong>remove</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-links-list">
+</template>
+<template data-page="command-grabber-links-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-links">links</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-grabber-links-list">
 <h2>list</h2>
@@ -10977,8 +10975,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-links-remove">
+</template>
+<template data-page="command-grabber-links-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-links">links</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-grabber-links-remove">
 <h2>remove</h2>
@@ -11096,8 +11094,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-move-to-downloads">
+</template>
+<template data-page="command-grabber-move-to-downloads">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">move-to-downloads</span></nav>
 <section class="panel command-detail" id="command-grabber-move-to-downloads">
 <h2>move-to-downloads</h2>
@@ -11215,8 +11213,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-packages">
+</template>
+<template data-page="command-grabber-packages">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">packages</span></nav>
 <section class="panel command-detail" id="command-grabber-packages">
 <h2>packages</h2>
@@ -11226,8 +11224,8 @@ pre {
 <a class="command-card" href="#command-grabber-packages-remove"><div class="command-card-head"><strong>remove</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-packages-list">
+</template>
+<template data-page="command-grabber-packages-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-packages">packages</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-grabber-packages-list">
 <h2>list</h2>
@@ -11405,8 +11403,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-packages-remove">
+</template>
+<template data-page="command-grabber-packages-remove">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-packages">packages</a><span class="crumb-sep">›</span><span class="crumb-current">remove</span></nav>
 <section class="panel command-detail" id="command-grabber-packages-remove">
 <h2>remove</h2>
@@ -11514,8 +11512,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-variants">
+</template>
+<template data-page="command-grabber-variants">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><span class="crumb-current">variants</span></nav>
 <section class="panel command-detail" id="command-grabber-variants">
 <h2>variants</h2>
@@ -11525,8 +11523,8 @@ pre {
 <a class="command-card" href="#command-grabber-variants-set"><div class="command-card-head"><strong>set</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-variants-list">
+</template>
+<template data-page="command-grabber-variants-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-variants">variants</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-grabber-variants-list">
 <h2>list</h2>
@@ -11634,8 +11632,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-grabber-variants-set">
+</template>
+<template data-page="command-grabber-variants-set">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-grabber">grabber</a><span class="crumb-sep">›</span><a href="#command-grabber-variants">variants</a><span class="crumb-sep">›</span><span class="crumb-current">set</span></nav>
 <section class="panel command-detail" id="command-grabber-variants-set">
 <h2>set</h2>
@@ -11753,8 +11751,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings">
+</template>
+<template data-page="command-settings">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">settings</span></nav>
 <section class="panel command-detail" id="command-settings">
 <h2>settings</h2>
@@ -11765,8 +11763,8 @@ pre {
 <a class="command-card" href="#command-settings-plugins"><div class="command-card-head"><strong>plugins</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-settings-config">
+</template>
+<template data-page="command-settings-config">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><span class="crumb-current">config</span></nav>
 <section class="panel command-detail" id="command-settings-config">
 <h2>config</h2>
@@ -11778,8 +11776,8 @@ pre {
 <a class="command-card" href="#command-settings-config-set"><div class="command-card-head"><strong>set</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-settings-config-get">
+</template>
+<template data-page="command-settings-config-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-config">config</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-settings-config-get">
 <h2>get</h2>
@@ -11907,8 +11905,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-config-list">
+</template>
+<template data-page="command-settings-config-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-config">config</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-settings-config-list">
 <h2>list</h2>
@@ -12048,8 +12046,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-config-reset">
+</template>
+<template data-page="command-settings-config-reset">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-config">config</a><span class="crumb-sep">›</span><span class="crumb-current">reset</span></nav>
 <section class="panel command-detail" id="command-settings-config-reset">
 <h2>reset</h2>
@@ -12177,8 +12175,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-config-set">
+</template>
+<template data-page="command-settings-config-set">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-config">config</a><span class="crumb-sep">›</span><span class="crumb-current">set</span></nav>
 <section class="panel command-detail" id="command-settings-config-set">
 <h2>set</h2>
@@ -12326,8 +12324,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-extensions">
+</template>
+<template data-page="command-settings-extensions">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><span class="crumb-current">extensions</span></nav>
 <section class="panel command-detail" id="command-settings-extensions">
 <h2>extensions</h2>
@@ -12340,8 +12338,8 @@ pre {
 <a class="command-card" href="#command-settings-extensions-list"><div class="command-card-head"><strong>list</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-settings-extensions-disable">
+</template>
+<template data-page="command-settings-extensions-disable">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-extensions">extensions</a><span class="crumb-sep">›</span><span class="crumb-current">disable</span></nav>
 <section class="panel command-detail" id="command-settings-extensions-disable">
 <h2>disable</h2>
@@ -12459,8 +12457,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-extensions-enable">
+</template>
+<template data-page="command-settings-extensions-enable">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-extensions">extensions</a><span class="crumb-sep">›</span><span class="crumb-current">enable</span></nav>
 <section class="panel command-detail" id="command-settings-extensions-enable">
 <h2>enable</h2>
@@ -12578,8 +12576,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-extensions-get">
+</template>
+<template data-page="command-settings-extensions-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-extensions">extensions</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-settings-extensions-get">
 <h2>get</h2>
@@ -12697,8 +12695,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-extensions-install">
+</template>
+<template data-page="command-settings-extensions-install">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-extensions">extensions</a><span class="crumb-sep">›</span><span class="crumb-current">install</span></nav>
 <section class="panel command-detail" id="command-settings-extensions-install">
 <h2>install</h2>
@@ -12806,8 +12804,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-extensions-list">
+</template>
+<template data-page="command-settings-extensions-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-extensions">extensions</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-settings-extensions-list">
 <h2>list</h2>
@@ -12985,8 +12983,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-plugins">
+</template>
+<template data-page="command-settings-plugins">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><span class="crumb-current">plugins</span></nav>
 <section class="panel command-detail" id="command-settings-plugins">
 <h2>plugins</h2>
@@ -12996,8 +12994,8 @@ pre {
 <a class="command-card" href="#command-settings-plugins-list"><div class="command-card-head"><strong>list</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-settings-plugins-get">
+</template>
+<template data-page="command-settings-plugins-get">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-plugins">plugins</a><span class="crumb-sep">›</span><span class="crumb-current">get</span></nav>
 <section class="panel command-detail" id="command-settings-plugins-get">
 <h2>get</h2>
@@ -13125,8 +13123,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-settings-plugins-list">
+</template>
+<template data-page="command-settings-plugins-list">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-settings">settings</a><span class="crumb-sep">›</span><a href="#command-settings-plugins">plugins</a><span class="crumb-sep">›</span><span class="crumb-current">list</span></nav>
 <section class="panel command-detail" id="command-settings-plugins-list">
 <h2>list</h2>
@@ -13304,8 +13302,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system">
+</template>
+<template data-page="command-system">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><span class="crumb-current">system</span></nav>
 <section class="panel command-detail" id="command-system">
 <h2>system</h2>
@@ -13320,8 +13318,8 @@ pre {
 <a class="command-card" href="#command-system-update"><div class="command-card-head"><strong>update</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-system-info">
+</template>
+<template data-page="command-system-info">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><span class="crumb-current">info</span></nav>
 <section class="panel command-detail" id="command-system-info">
 <h2>info</h2>
@@ -13419,8 +13417,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-jd">
+</template>
+<template data-page="command-system-jd">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><span class="crumb-current">jd</span></nav>
 <section class="panel command-detail" id="command-system-jd">
 <h2>jd</h2>
@@ -13434,8 +13432,8 @@ pre {
 <a class="command-card" href="#command-system-jd-version"><div class="command-card-head"><strong>version</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-system-jd-exit">
+</template>
+<template data-page="command-system-jd-exit">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-jd">jd</a><span class="crumb-sep">›</span><span class="crumb-current">exit</span></nav>
 <section class="panel command-detail" id="command-system-jd-exit">
 <h2>exit</h2>
@@ -13533,8 +13531,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-jd-refresh-plugins">
+</template>
+<template data-page="command-system-jd-refresh-plugins">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-jd">jd</a><span class="crumb-sep">›</span><span class="crumb-current">refresh-plugins</span></nav>
 <section class="panel command-detail" id="command-system-jd-refresh-plugins">
 <h2>refresh-plugins</h2>
@@ -13632,8 +13630,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-jd-restart">
+</template>
+<template data-page="command-system-jd-restart">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-jd">jd</a><span class="crumb-sep">›</span><span class="crumb-current">restart</span></nav>
 <section class="panel command-detail" id="command-system-jd-restart">
 <h2>restart</h2>
@@ -13731,8 +13729,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-jd-revision">
+</template>
+<template data-page="command-system-jd-revision">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-jd">jd</a><span class="crumb-sep">›</span><span class="crumb-current">revision</span></nav>
 <section class="panel command-detail" id="command-system-jd-revision">
 <h2>revision</h2>
@@ -13830,8 +13828,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-jd-uptime">
+</template>
+<template data-page="command-system-jd-uptime">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-jd">jd</a><span class="crumb-sep">›</span><span class="crumb-current">uptime</span></nav>
 <section class="panel command-detail" id="command-system-jd-uptime">
 <h2>uptime</h2>
@@ -13929,8 +13927,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-jd-version">
+</template>
+<template data-page="command-system-jd-version">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-jd">jd</a><span class="crumb-sep">›</span><span class="crumb-current">version</span></nav>
 <section class="panel command-detail" id="command-system-jd-version">
 <h2>version</h2>
@@ -14028,8 +14026,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-os">
+</template>
+<template data-page="command-system-os">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><span class="crumb-current">os</span></nav>
 <section class="panel command-detail" id="command-system-os">
 <h2>os</h2>
@@ -14040,8 +14038,8 @@ pre {
 <a class="command-card" href="#command-system-os-standby"><div class="command-card-head"><strong>standby</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-system-os-hibernate">
+</template>
+<template data-page="command-system-os-hibernate">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-os">os</a><span class="crumb-sep">›</span><span class="crumb-current">hibernate</span></nav>
 <section class="panel command-detail" id="command-system-os-hibernate">
 <h2>hibernate</h2>
@@ -14139,8 +14137,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-os-shutdown">
+</template>
+<template data-page="command-system-os-shutdown">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-os">os</a><span class="crumb-sep">›</span><span class="crumb-current">shutdown</span></nav>
 <section class="panel command-detail" id="command-system-os-shutdown">
 <h2>shutdown</h2>
@@ -14246,8 +14244,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-os-standby">
+</template>
+<template data-page="command-system-os-standby">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-os">os</a><span class="crumb-sep">›</span><span class="crumb-current">standby</span></nav>
 <section class="panel command-detail" id="command-system-os-standby">
 <h2>standby</h2>
@@ -14345,8 +14343,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-reconnect">
+</template>
+<template data-page="command-system-reconnect">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><span class="crumb-current">reconnect</span></nav>
 <section class="panel command-detail" id="command-system-reconnect">
 <h2>reconnect</h2>
@@ -14444,8 +14442,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-storage">
+</template>
+<template data-page="command-system-storage">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><span class="crumb-current">storage</span></nav>
 <section class="panel command-detail" id="command-system-storage">
 <h2>storage</h2>
@@ -14553,8 +14551,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-toggle">
+</template>
+<template data-page="command-system-toggle">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><span class="crumb-current">toggle</span></nav>
 <section class="panel command-detail" id="command-system-toggle">
 <h2>toggle</h2>
@@ -14657,8 +14655,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-update">
+</template>
+<template data-page="command-system-update">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><span class="crumb-current">update</span></nav>
 <section class="panel command-detail" id="command-system-update">
 <h2>update</h2>
@@ -14669,8 +14667,8 @@ pre {
 <a class="command-card" href="#command-system-update-run"><div class="command-card-head"><strong>run</strong><span class="command-card-arrow">→</span></div><p>No description provided.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-system-update-check">
+</template>
+<template data-page="command-system-update-check">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-update">update</a><span class="crumb-sep">›</span><span class="crumb-current">check</span></nav>
 <section class="panel command-detail" id="command-system-update-check">
 <h2>check</h2>
@@ -14768,8 +14766,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-update-restart">
+</template>
+<template data-page="command-system-update-restart">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-update">update</a><span class="crumb-sep">›</span><span class="crumb-current">restart</span></nav>
 <section class="panel command-detail" id="command-system-update-restart">
 <h2>restart</h2>
@@ -14867,8 +14865,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-system-update-run">
+</template>
+<template data-page="command-system-update-run">
 <nav class="breadcrumb"><a href="#overview">jdr</a><span class="crumb-sep">›</span><a href="#command-system">system</a><span class="crumb-sep">›</span><a href="#command-system-update">update</a><span class="crumb-sep">›</span><span class="crumb-current">run</span></nav>
 <section class="panel command-detail" id="command-system-update-run">
 <h2>run</h2>
@@ -14966,7 +14964,7 @@ pre {
 </div>
 </div>
 </section>
-</div>
+</template>
 </div></main>
       <aside class="composer" data-composer hidden><div class="composer-resize" data-composer-resize></div><div class="composer-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-5-6-5"/><path d="M12 19h8"/></svg><span>Composer</span></div><div class="composer-body"></div><div class="composer-footer"><span class="composer-label">Generated Command</span><div class="composer-output-wrap"><pre class="composer-output">...</pre><button class="composer-copy" data-composer-copy title="Copy to clipboard"><svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button></div></div></aside>
     </div>
@@ -14990,10 +14988,13 @@ pre {
   });
 
   /* ── SPA navigation ── */
-  var pages = document.querySelectorAll('.page');
-  var navLinks = document.querySelectorAll('.nav-link');
   var content = document.querySelector('.content');
+  var contentInner = content ? content.querySelector('.content-inner') : null;
   var topbarCtx = document.querySelector('.topbar-context');
+
+  /* The overview page is a real DOM node; command pages are <template> elements */
+  var overviewPage = document.querySelector('.page[data-page="overview"]');
+  var dynamicPage = null; /* container for the currently materialized template */
 
   function expandParents(el) {
     var item = el.closest('.nav-item');
@@ -15007,7 +15008,6 @@ pre {
   function staggerCards(page) {
     var cards = page.querySelectorAll('.command-card, .option-card');
     if (!cards.length) return;
-    /* Cap stagger to first 20 cards; reveal rest instantly */
     var cap = 20;
     cards.forEach(function(c) { c.classList.add('card-enter'); });
     requestAnimationFrame(function() {
@@ -15026,30 +15026,49 @@ pre {
     });
   }
 
-  var activePage = document.querySelector('.page.active');
   var activeNav = document.querySelector('.nav-link.active');
 
   function showPage(pageId) {
-    if (activePage) activePage.classList.remove('active');
-    var target = document.querySelector('[data-page="' + pageId + '"]');
-    var scrollToEl = null;
+    /* Tear down previous dynamic page */
+    if (dynamicPage) {
+      dynamicPage.remove();
+      dynamicPage = null;
+    }
 
-    if (!target) {
-      /* pageId is an in-page anchor (e.g. root-arguments) — find
-         the element by ID and show its parent page instead. */
-      var el = document.getElementById(pageId);
-      if (el) {
-        target = el.closest('.page');
-        scrollToEl = el;
+    var visiblePage = null;
+
+    if (pageId === 'overview') {
+      overviewPage.classList.add('active');
+      visiblePage = overviewPage;
+    } else {
+      overviewPage.classList.remove('active');
+
+      /* Find the template */
+      var tpl = document.querySelector('template[data-page="' + pageId + '"]');
+
+      if (!tpl) {
+        /* pageId might be an in-page anchor — find the element inside a template */
+        var allTemplates = document.querySelectorAll('template[data-page]');
+        for (var i = 0; i < allTemplates.length; i++) {
+          if (allTemplates[i].content.getElementById(pageId)) {
+            tpl = allTemplates[i];
+            break;
+          }
+        }
+      }
+
+      if (tpl) {
+        dynamicPage = document.createElement('div');
+        dynamicPage.className = 'page active';
+        dynamicPage.setAttribute('data-page', tpl.getAttribute('data-page'));
+        dynamicPage.appendChild(tpl.content.cloneNode(true));
+        contentInner.appendChild(dynamicPage);
+        visiblePage = dynamicPage;
+        staggerCards(dynamicPage);
       }
     }
 
-    if (target) {
-      target.classList.add('active');
-      activePage = target;
-      staggerCards(target);
-    }
-
+    /* Update nav highlight */
     if (activeNav) activeNav.classList.remove('active');
     var href = pageId === 'overview' ? '#overview' : '#' + pageId;
     var active = document.querySelector('.nav-link[href="' + href + '"]');
@@ -15060,15 +15079,9 @@ pre {
       active.scrollIntoView({ block: 'nearest' });
     }
 
-    if (content) {
-      if (scrollToEl) {
-        requestAnimationFrame(function() { scrollToEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-      } else {
-        content.scrollTo(0, 0);
-      }
-    }
+    if (content) content.scrollTo(0, 0);
     if (topbarCtx) {
-      var h = target ? target.querySelector('h1, h2') : null;
+      var h = visiblePage ? visiblePage.querySelector('h1, h2') : null;
       topbarCtx.textContent = h ? h.textContent : 'Overview';
     }
     rebuildComposer();
@@ -15123,11 +15136,15 @@ pre {
     if (!composer.hidden) rebuildComposer();
   }
 
+  function getActivePage() {
+    return dynamicPage || (overviewPage.classList.contains('active') ? overviewPage : null);
+  }
+
   function rebuildComposer() {
     if (!composerBody || !composer || composer.hidden) return;
     composerBody.innerHTML = '';
 
-    var page = document.querySelector('.page.active');
+    var page = getActivePage();
     if (!page || page.getAttribute('data-page') === 'overview') {
       composerBody.innerHTML = '<div class="composer-empty">Select a command to start composing.</div>';
       updateComposerPreview();
@@ -15181,7 +15198,7 @@ pre {
 
   function updateComposerPreview() {
     if (!composerOutput) return;
-    var page = document.querySelector('.page.active');
+    var page = getActivePage();
     if (!page || page.getAttribute('data-page') === 'overview') {
       composerOutput.textContent = '...';
       return;

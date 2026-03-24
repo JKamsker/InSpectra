@@ -366,12 +366,10 @@ code, pre { font-family: var(--mono); }
   display: none;
   flex-direction: column;
   gap: 1.5rem;
-  content-visibility: hidden;
 }
 
 .page.active {
   display: flex;
-  content-visibility: visible;
   animation: pageIn .3s var(--ease-out);
 }
 
@@ -1023,7 +1021,7 @@ pre {
 <article class="panel info-card"><h3>Reference scope</h3><dl><div><dt>Top-level command groups</dt><dd>1</dd></div><div><dt>Documented commands</dt><dd>7</dd></div><div><dt>Leaf commands</dt><dd>4</dd></div></dl></article>
 </div></section>
 </div>
-<div class="page" data-page="command-render">
+<template data-page="command-render">
 <nav class="breadcrumb"><a href="#overview">opencli-renderer</a><span class="crumb-sep">›</span><span class="crumb-current">render</span></nav>
 <section class="panel command-detail" id="command-render">
 <h2>render</h2>
@@ -1033,8 +1031,8 @@ pre {
 <a class="command-card" href="#command-render-file"><div class="command-card-head"><strong>file</strong><span class="command-card-arrow">→</span></div><p>Render docs from saved OpenCLI export files.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-render-exec">
+</template>
+<template data-page="command-render-exec">
 <nav class="breadcrumb"><a href="#overview">opencli-renderer</a><span class="crumb-sep">›</span><a href="#command-render">render</a><span class="crumb-sep">›</span><span class="crumb-current">exec</span></nav>
 <section class="panel command-detail" id="command-render-exec">
 <h2>exec</h2>
@@ -1044,8 +1042,8 @@ pre {
 <a class="command-card" href="#command-render-exec-markdown"><div class="command-card-head"><strong>markdown</strong><span class="command-card-arrow">→</span></div><p>Render Markdown from a live CLI process and  optional `cli xmldoc` enrichment.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-render-exec-html">
+</template>
+<template data-page="command-render-exec-html">
 <nav class="breadcrumb"><a href="#overview">opencli-renderer</a><span class="crumb-sep">›</span><a href="#command-render">render</a><span class="crumb-sep">›</span><a href="#command-render-exec">exec</a><span class="crumb-sep">›</span><span class="crumb-current">html</span></nav>
 <section class="panel command-detail" id="command-render-exec-html">
 <h2>html</h2>
@@ -1222,8 +1220,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-render-exec-markdown">
+</template>
+<template data-page="command-render-exec-markdown">
 <nav class="breadcrumb"><a href="#overview">opencli-renderer</a><span class="crumb-sep">›</span><a href="#command-render">render</a><span class="crumb-sep">›</span><a href="#command-render-exec">exec</a><span class="crumb-sep">›</span><span class="crumb-current">markdown</span></nav>
 <section class="panel command-detail" id="command-render-exec-markdown">
 <h2>markdown</h2>
@@ -1400,8 +1398,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-render-file">
+</template>
+<template data-page="command-render-file">
 <nav class="breadcrumb"><a href="#overview">opencli-renderer</a><span class="crumb-sep">›</span><a href="#command-render">render</a><span class="crumb-sep">›</span><span class="crumb-current">file</span></nav>
 <section class="panel command-detail" id="command-render-file">
 <h2>file</h2>
@@ -1411,8 +1409,8 @@ pre {
 <a class="command-card" href="#command-render-file-markdown"><div class="command-card-head"><strong>markdown</strong><span class="command-card-arrow">→</span></div><p>Render Markdown from an OpenCLI JSON file and  optional XML enrichment file.</p></a>
 </div></div>
 </section>
-</div>
-<div class="page" data-page="command-render-file-html">
+</template>
+<template data-page="command-render-file-html">
 <nav class="breadcrumb"><a href="#overview">opencli-renderer</a><span class="crumb-sep">›</span><a href="#command-render">render</a><span class="crumb-sep">›</span><a href="#command-render-file">file</a><span class="crumb-sep">›</span><span class="crumb-current">html</span></nav>
 <section class="panel command-detail" id="command-render-file-html">
 <h2>html</h2>
@@ -1541,8 +1539,8 @@ pre {
 </div>
 </div>
 </section>
-</div>
-<div class="page" data-page="command-render-file-markdown">
+</template>
+<template data-page="command-render-file-markdown">
 <nav class="breadcrumb"><a href="#overview">opencli-renderer</a><span class="crumb-sep">›</span><a href="#command-render">render</a><span class="crumb-sep">›</span><a href="#command-render-file">file</a><span class="crumb-sep">›</span><span class="crumb-current">markdown</span></nav>
 <section class="panel command-detail" id="command-render-file-markdown">
 <h2>markdown</h2>
@@ -1671,7 +1669,7 @@ pre {
 </div>
 </div>
 </section>
-</div>
+</template>
 </div></main>
       <aside class="composer" data-composer hidden><div class="composer-resize" data-composer-resize></div><div class="composer-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-5-6-5"/><path d="M12 19h8"/></svg><span>Composer</span></div><div class="composer-body"></div><div class="composer-footer"><span class="composer-label">Generated Command</span><div class="composer-output-wrap"><pre class="composer-output">...</pre><button class="composer-copy" data-composer-copy title="Copy to clipboard"><svg class="copy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button></div></div></aside>
     </div>
@@ -1695,10 +1693,13 @@ pre {
   });
 
   /* ── SPA navigation ── */
-  var pages = document.querySelectorAll('.page');
-  var navLinks = document.querySelectorAll('.nav-link');
   var content = document.querySelector('.content');
+  var contentInner = content ? content.querySelector('.content-inner') : null;
   var topbarCtx = document.querySelector('.topbar-context');
+
+  /* The overview page is a real DOM node; command pages are <template> elements */
+  var overviewPage = document.querySelector('.page[data-page="overview"]');
+  var dynamicPage = null; /* container for the currently materialized template */
 
   function expandParents(el) {
     var item = el.closest('.nav-item');
@@ -1712,7 +1713,6 @@ pre {
   function staggerCards(page) {
     var cards = page.querySelectorAll('.command-card, .option-card');
     if (!cards.length) return;
-    /* Cap stagger to first 20 cards; reveal rest instantly */
     var cap = 20;
     cards.forEach(function(c) { c.classList.add('card-enter'); });
     requestAnimationFrame(function() {
@@ -1731,30 +1731,49 @@ pre {
     });
   }
 
-  var activePage = document.querySelector('.page.active');
   var activeNav = document.querySelector('.nav-link.active');
 
   function showPage(pageId) {
-    if (activePage) activePage.classList.remove('active');
-    var target = document.querySelector('[data-page="' + pageId + '"]');
-    var scrollToEl = null;
+    /* Tear down previous dynamic page */
+    if (dynamicPage) {
+      dynamicPage.remove();
+      dynamicPage = null;
+    }
 
-    if (!target) {
-      /* pageId is an in-page anchor (e.g. root-arguments) — find
-         the element by ID and show its parent page instead. */
-      var el = document.getElementById(pageId);
-      if (el) {
-        target = el.closest('.page');
-        scrollToEl = el;
+    var visiblePage = null;
+
+    if (pageId === 'overview') {
+      overviewPage.classList.add('active');
+      visiblePage = overviewPage;
+    } else {
+      overviewPage.classList.remove('active');
+
+      /* Find the template */
+      var tpl = document.querySelector('template[data-page="' + pageId + '"]');
+
+      if (!tpl) {
+        /* pageId might be an in-page anchor — find the element inside a template */
+        var allTemplates = document.querySelectorAll('template[data-page]');
+        for (var i = 0; i < allTemplates.length; i++) {
+          if (allTemplates[i].content.getElementById(pageId)) {
+            tpl = allTemplates[i];
+            break;
+          }
+        }
+      }
+
+      if (tpl) {
+        dynamicPage = document.createElement('div');
+        dynamicPage.className = 'page active';
+        dynamicPage.setAttribute('data-page', tpl.getAttribute('data-page'));
+        dynamicPage.appendChild(tpl.content.cloneNode(true));
+        contentInner.appendChild(dynamicPage);
+        visiblePage = dynamicPage;
+        staggerCards(dynamicPage);
       }
     }
 
-    if (target) {
-      target.classList.add('active');
-      activePage = target;
-      staggerCards(target);
-    }
-
+    /* Update nav highlight */
     if (activeNav) activeNav.classList.remove('active');
     var href = pageId === 'overview' ? '#overview' : '#' + pageId;
     var active = document.querySelector('.nav-link[href="' + href + '"]');
@@ -1765,15 +1784,9 @@ pre {
       active.scrollIntoView({ block: 'nearest' });
     }
 
-    if (content) {
-      if (scrollToEl) {
-        requestAnimationFrame(function() { scrollToEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-      } else {
-        content.scrollTo(0, 0);
-      }
-    }
+    if (content) content.scrollTo(0, 0);
     if (topbarCtx) {
-      var h = target ? target.querySelector('h1, h2') : null;
+      var h = visiblePage ? visiblePage.querySelector('h1, h2') : null;
       topbarCtx.textContent = h ? h.textContent : 'Overview';
     }
     rebuildComposer();
@@ -1828,11 +1841,15 @@ pre {
     if (!composer.hidden) rebuildComposer();
   }
 
+  function getActivePage() {
+    return dynamicPage || (overviewPage.classList.contains('active') ? overviewPage : null);
+  }
+
   function rebuildComposer() {
     if (!composerBody || !composer || composer.hidden) return;
     composerBody.innerHTML = '';
 
-    var page = document.querySelector('.page.active');
+    var page = getActivePage();
     if (!page || page.getAttribute('data-page') === 'overview') {
       composerBody.innerHTML = '<div class="composer-empty">Select a command to start composing.</div>';
       updateComposerPreview();
@@ -1886,7 +1903,7 @@ pre {
 
   function updateComposerPreview() {
     if (!composerOutput) return;
-    var page = document.querySelector('.page.active');
+    var page = getActivePage();
     if (!page || page.getAttribute('data-page') === 'overview') {
       composerOutput.textContent = '...';
       return;
