@@ -27,8 +27,12 @@ export function parseHashRoute(hash: string): HashRoute {
     return { kind: "overview" };
   }
 
-  const commandPath = encodedSegments.map((segment) => decodeURIComponent(segment)).join(" ");
-  return { kind: "command", commandPath };
+  try {
+    const commandPath = encodedSegments.map((segment) => decodeURIComponent(segment)).join(" ");
+    return { kind: "command", commandPath };
+  } catch {
+    return { kind: "overview" };
+  }
 }
 
 export function normalizeHash(hash: string): string {
