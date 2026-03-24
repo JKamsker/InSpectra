@@ -1,6 +1,7 @@
 import { ViewerOptions } from "../boot/contracts";
 import { StartupRequest } from "../boot/bootstrap";
 import { cloneOpenCliDocument, OpenCliDocument, parseOpenCliDocument } from "./openCli";
+import { ProbePackageSummary } from "./toolProbe";
 import { enrichDocumentFromXml } from "./xmlDoc";
 
 export interface LoadedSource {
@@ -9,7 +10,8 @@ export interface LoadedSource {
   warnings: string[];
   options: ViewerOptions;
   label: string;
-  mode: "inline" | "links" | "manual";
+  mode: "inline" | "links" | "manual" | "generated";
+  probeSummary?: ProbePackageSummary;
 }
 
 export async function loadFromStartupRequest(
@@ -21,7 +23,7 @@ export async function loadFromStartupRequest(
   }
 
   if (request.kind === "inline") {
-    return buildLoadedSource({
+    return createLoadedSource({
       document: parseOpenCliDocument(JSON.stringify(request.openCli)),
       xmlDoc: request.xmlDoc,
       options: request.options,
@@ -35,7 +37,7 @@ export async function loadFromStartupRequest(
     ? await fetchText(request.links.xmlDocUrl, request.links.xmlDocIsOptional, signal)
     : undefined;
 
-  return buildLoadedSource({
+  return createLoadedSource({
     document: parseOpenCliDocument(openCliText),
     xmlDoc: xmlDocText,
     options: request.options,
@@ -49,7 +51,7 @@ export async function loadFromFiles(files: File[], options: ViewerOptions): Prom
   const openCliText = await validated.openCli.text();
   const xmlDocText = validated.xmlDoc ? await validated.xmlDoc.text() : undefined;
 
-  return buildLoadedSource({
+  return createLoadedSource({
     document: parseOpenCliDocument(openCliText),
     xmlDoc: xmlDocText,
     options,
@@ -92,15 +94,17 @@ export function validateFiles(files: File[]): { openCli: File; xmlDoc?: File } {
   return { openCli, xmlDoc };
 }
 
-function buildLoadedSource(params: {
+export function createLoadedSource(params: {
   document: OpenCliDocument;
   xmlDoc?: string;
   options: ViewerOptions;
   label: string;
   mode: LoadedSource["mode"];
+  warnings?: string[];
+  probeSummary?: ProbePackageSummary;
 }): LoadedSource {
   const document = cloneOpenCliDocument(params.document);
-  const warnings: string[] = [];
+  const warnings = [...(params.warnings ?? [])];
 
   if (params.xmlDoc) {
     const enrichment = enrichDocumentFromXml(document, params.xmlDoc);
@@ -114,6 +118,7 @@ function buildLoadedSource(params: {
     options: params.options,
     label: params.label,
     mode: params.mode,
+    probeSummary: params.probeSummary,
   };
 }
 

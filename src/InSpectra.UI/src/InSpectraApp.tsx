@@ -1,25 +1,19 @@
-import {
-  Eye,
-  EyeOff,
-  FileUp,
-  PanelRight,
-  PanelRightClose,
-  Search,
-  Sparkles,
-} from "lucide-react";
 import { startTransition, useDeferredValue, useEffect, useRef, useState } from "react";
 import { resolveStartupRequest } from "./boot/bootstrap";
 import { defaultViewerOptions, ViewerOptions } from "./boot/contracts";
+import { loadFromNugetTool } from "./data/loadNugetTool";
+import { loadFromFiles, loadFromStartupRequest, LoadedSource } from "./data/loadSource";
+import { buildCommandHash, parseHashRoute } from "./data/navigation";
+import { findCommandByPath, normalizeOpenCliDocument, NormalizedCliDocument } from "./data/normalize";
+import { AppToolbar } from "./components/AppToolbar";
 import { CommandPalette } from "./components/CommandPalette";
 import { CommandPanel } from "./components/CommandPanel";
 import { CommandTree } from "./components/CommandTree";
 import { ComposerPanel } from "./components/ComposerPanel";
 import { ImportScreen } from "./components/ImportScreen";
 import { OverviewPanel } from "./components/OverviewPanel";
-import { ThemeToggle } from "./components/ThemeToggle";
-import { loadFromFiles, loadFromStartupRequest, LoadedSource } from "./data/loadSource";
-import { buildCommandHash, parseHashRoute } from "./data/navigation";
-import { findCommandByPath, normalizeOpenCliDocument, NormalizedCliDocument } from "./data/normalize";
+import { SourceSummaryCard } from "./components/SourceSummaryCard";
+import { ProbePackageSummary } from "./data/toolProbe";
 
 interface LoadState {
   status: "loading" | "ready" | "empty";
@@ -39,33 +33,31 @@ function readNumber(key: string, fallback: number): number {
 }
 
 export function InSpectraApp() {
-  const pickerRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [importMode, setImportMode] = useState<"files" | "nuget">("files");
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading", message: "Resolving viewer boot mode." });
   const [error, setError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [sourceLabel, setSourceLabel] = useState<string>("");
+  const [probeSummary, setProbeSummary] = useState<ProbePackageSummary | null>(null);
   const [viewerOptions, setViewerOptions] = useState<ViewerOptions>(defaultViewerOptions());
   const [document, setDocument] = useState<NormalizedCliDocument | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [routePath, setRoutePath] = useState<string | undefined>(parseHashRoute(window.location.hash).commandPath);
-  const deferredSearch = useDeferredValue(searchTerm);
-
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [composerOpen, setComposerOpen] = useState(() => readBool("inspectra-composer-open", true));
   const [composerWidth, setComposerWidth] = useState(() => readNumber("inspectra-composer-width", 304));
+  const deferredSearch = useDeferredValue(searchTerm);
 
   useEffect(() => {
     const controller = new AbortController();
     void initialize(controller.signal);
-
     return () => controller.abort();
   }, []);
 
   useEffect(() => {
     function handleHashChange() {
-      const route = parseHashRoute(window.location.hash);
-      setRoutePath(route.commandPath);
+      setRoutePath(parseHashRoute(window.location.hash).commandPath);
     }
 
     window.addEventListener("hashchange", handleHashChange);
@@ -83,19 +75,17 @@ export function InSpectraApp() {
     }
   }, [document]);
 
-  // Keyboard shortcuts: Ctrl+F (focus search), Ctrl+K (palette)
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      const mod = e.ctrlKey || e.metaKey;
-
-      if (mod && e.key === "f") {
-        e.preventDefault();
+    function handleKeyDown(event: KeyboardEvent) {
+      const mod = event.ctrlKey || event.metaKey;
+      if (mod && event.key === "f") {
+        event.preventDefault();
         searchInputRef.current?.focus();
       }
 
-      if (mod && e.key === "k") {
-        e.preventDefault();
-        setPaletteOpen((o) => !o);
+      if (mod && event.key === "k") {
+        event.preventDefault();
+        setPaletteOpen((open) => !open);
       }
     }
 
@@ -105,12 +95,8 @@ export function InSpectraApp() {
 
   async function initialize(signal: AbortSignal) {
     try {
-      const request = resolveStartupRequest({
-        search: window.location.search,
-        href: window.location.href,
-      });
+      const request = resolveStartupRequest({ search: window.location.search, href: window.location.href });
       const loaded = await loadFromStartupRequest(request, signal);
-
       if (!loaded) {
         setLoadState({ status: "empty" });
         return;
@@ -126,6 +112,7 @@ export function InSpectraApp() {
   function applyLoadedSource(source: LoadedSource) {
     setWarnings(source.warnings);
     setSourceLabel(source.label);
+    setProbeSummary(source.probeSummary ?? null);
     setViewerOptions(source.options);
     setDocument(normalizeOpenCliDocument(source.document, source.options.includeHidden));
     setSearchTerm("");
@@ -136,8 +123,18 @@ export function InSpectraApp() {
   async function handleFiles(files: File[]) {
     try {
       setLoadState({ status: "loading", message: "Importing local files." });
-      const loaded = await loadFromFiles(files, viewerOptions);
-      applyLoadedSource(loaded);
+      applyLoadedSource(await loadFromFiles(files, viewerOptions));
+      window.location.hash = "#/";
+    } catch (loadError) {
+      setError(toMessage(loadError));
+      setLoadState(document ? { status: "ready" } : { status: "empty" });
+    }
+  }
+
+  async function handleNugetTool(request: { id: string; version: string }) {
+    try {
+      setLoadState({ status: "loading", message: "Downloading and probing the NuGet tool." });
+      applyLoadedSource(await loadFromNugetTool(request, viewerOptions));
       window.location.hash = "#/";
     } catch (loadError) {
       setError(toMessage(loadError));
@@ -152,15 +149,21 @@ export function InSpectraApp() {
 
     startTransition(() => {
       setViewerOptions((current) => {
-        const next = {
-          ...current,
-          [option]: !current[option],
-        };
-
+        const next = { ...current, [option]: !current[option] };
         setDocument(normalizeOpenCliDocument(document.source, next.includeHidden));
         return next;
       });
     });
+  }
+
+  function resetToImportScreen() {
+    setDocument(null);
+    setWarnings([]);
+    setError(null);
+    setSourceLabel("");
+    setProbeSummary(null);
+    setSearchTerm("");
+    setLoadState({ status: "empty" });
   }
 
   function toggleComposer() {
@@ -180,12 +183,29 @@ export function InSpectraApp() {
     window.location.hash = buildCommandHash(path);
   }
 
+  function downloadCurrentDocument() {
+    if (!document) {
+      return;
+    }
+
+    const blob = new Blob([JSON.stringify(document.source, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = window.document.createElement("a");
+    link.href = url;
+    link.download = "opencli.generated.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   if (loadState.status !== "ready" || !document) {
     return (
       <ImportScreen
         error={error}
         loading={loadState.status === "loading"}
+        mode={importMode}
         onFilesSelected={handleFiles}
+        onModeChange={setImportMode}
+        onToolInspect={handleNugetTool}
       />
     );
   }
@@ -206,51 +226,17 @@ export function InSpectraApp() {
           </div>
         </div>
 
-        <div className="toolbar">
-          <button type="button" className="toolbar-button" onClick={() => toggleOption("includeHidden")}>
-            {viewerOptions.includeHidden ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-            <span>{viewerOptions.includeHidden ? "Hide hidden" : "Show hidden"}</span>
-          </button>
-
-          <button type="button" className="toolbar-button" onClick={() => toggleOption("includeMetadata")}>
-            <Sparkles aria-hidden="true" />
-            <span>{viewerOptions.includeMetadata ? "Hide metadata" : "Show metadata"}</span>
-          </button>
-
-          <button type="button" className="toolbar-button" onClick={() => pickerRef.current?.click()}>
-            <FileUp aria-hidden="true" />
-            <span>Import</span>
-          </button>
-          <input
-            ref={pickerRef}
-            className="visually-hidden"
-            type="file"
-            multiple
-            accept=".json,.xml"
-            onChange={(event) => {
-              void handleFiles(Array.from(event.target.files ?? []));
-              event.target.value = "";
-            }}
-          />
-
-          <button type="button" className="toolbar-button" onClick={() => setPaletteOpen(true)} title="Search commands (Ctrl+K)">
-            <Search aria-hidden="true" />
-            <span>Search</span>
-            <kbd className="kbd-hint">Ctrl K</kbd>
-          </button>
-
-          <button
-            type="button"
-            className={`toolbar-button${composerOpen ? " active" : ""}`}
-            onClick={toggleComposer}
-            title="Toggle Composer"
-          >
-            {composerOpen ? <PanelRightClose aria-hidden="true" /> : <PanelRight aria-hidden="true" />}
-            <span>Composer</span>
-          </button>
-
-          <ThemeToggle />
-        </div>
+        <AppToolbar
+          composerOpen={composerOpen}
+          hasDocument={true}
+          onDownloadJson={downloadCurrentDocument}
+          onFilesSelected={(files) => void handleFiles(files)}
+          onPaletteOpen={() => setPaletteOpen(true)}
+          onResetToImport={resetToImportScreen}
+          onToggleComposer={toggleComposer}
+          onToggleOption={toggleOption}
+          viewerOptions={viewerOptions}
+        />
       </header>
 
       <div className="app-grid">
@@ -266,13 +252,9 @@ export function InSpectraApp() {
             <kbd className="kbd-hint sidebar-kbd">Ctrl F</kbd>
           </div>
           <nav className="sidebar-nav">
-            <button
-              type="button"
-              className={`overview-row ${!activeCommand ? "selected" : ""}`}
-              onClick={() => {
-                window.location.hash = "#/";
-              }}
-            >
+            <button type="button" className={`overview-row ${!activeCommand ? "selected" : ""}`} onClick={() => {
+              window.location.hash = "#/";
+            }}>
               Overview
             </button>
             <div className="nav-label">Commands</div>
@@ -303,6 +285,8 @@ export function InSpectraApp() {
               </div>
             ) : null}
 
+            {probeSummary ? <SourceSummaryCard summary={probeSummary} /> : null}
+
             {activeCommand ? (
               <CommandPanel
                 command={activeCommand}
@@ -323,14 +307,14 @@ export function InSpectraApp() {
           </div>
         </main>
 
-        {composerOpen && (
+        {composerOpen ? (
           <ComposerPanel
             command={activeCommand}
             cliTitle={document.source.info.title || "cli"}
             width={composerWidth}
             onResize={handleComposerResize}
           />
-        )}
+        ) : null}
       </div>
 
       <CommandPalette
