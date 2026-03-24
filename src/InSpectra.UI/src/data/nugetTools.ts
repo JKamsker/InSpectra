@@ -23,6 +23,7 @@ interface NugetVersionIndexResponse {
 }
 
 const versionIndexCache = new Map<string, Promise<string[]>>();
+const packageCache = new Map<string, Promise<Uint8Array>>();
 
 export async function searchNugetTools(query: string, includePrerelease: boolean): Promise<NugetSearchResult[]> {
   const normalized = query.trim();
@@ -76,6 +77,27 @@ export async function fetchNugetToolVersions(id: string, includePrerelease: bool
 export async function downloadNugetPackage(id: string, version: string): Promise<Uint8Array> {
   const normalizedId = id.trim().toLowerCase();
   const normalizedVersion = version.trim().toLowerCase();
+  const cacheKey = `${normalizedId}|${normalizedVersion}`;
+  const cached = packageCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const pending = loadNugetPackage(normalizedId, normalizedVersion).catch((error: unknown) => {
+    packageCache.delete(cacheKey);
+    throw error;
+  });
+
+  packageCache.set(cacheKey, pending);
+  return pending;
+}
+
+export function resetNugetToolCachesForTests(): void {
+  versionIndexCache.clear();
+  packageCache.clear();
+}
+
+async function loadNugetPackage(normalizedId: string, normalizedVersion: string): Promise<Uint8Array> {
   const fileName = `${normalizedId}.${normalizedVersion}.nupkg`;
   const url = `https://api.nuget.org/v3-flatcontainer/${normalizedId}/${normalizedVersion}/${fileName}`;
 
@@ -85,10 +107,6 @@ export async function downloadNugetPackage(id: string, version: string): Promise
   }
 
   return new Uint8Array(await response.arrayBuffer());
-}
-
-export function resetNugetToolCachesForTests(): void {
-  versionIndexCache.clear();
 }
 
 async function loadNugetToolVersions(normalizedId: string, includePrerelease: boolean): Promise<string[]> {
