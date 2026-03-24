@@ -320,6 +320,7 @@ section{padding:6rem 0}
 .qs-panel{
   display:none;padding:1.5rem;font-family:var(--mono);font-size:.82rem;
   line-height:2;color:var(--text-dim);overflow-x:auto;min-height:220px;
+  white-space:pre;
 }
 .qs-panel.active{display:block}
 .qs-panel .comment{color:var(--text-muted)}
@@ -581,42 +582,36 @@ section{padding:6rem 0}
           <button class="tab" onclick="switchTab(this,'panel-exec')">From CLI</button>
           <button class="tab" onclick="switchTab(this,'panel-tree')">Output Modes</button>
         </div>
-        <div id="panel-file" class="qs-panel active">
-<span class="comment"># Install</span>
+        <div id="panel-file" class="qs-panel active"><span class="comment"># Install</span>
 <span class="c">dotnet tool install</span> -g InSpectra.Gen
 
 <span class="comment"># Render interactive HTML</span>
 <span class="c">inspectra</span> <span class="a">render file html</span> \
-&nbsp;&nbsp;mycli.json <span class="f">--xmldoc</span> mycli.xml \
-&nbsp;&nbsp;<span class="f">--out-dir</span> ./docs
+  mycli.json <span class="f">--xmldoc</span> mycli.xml \
+  <span class="f">--out-dir</span> ./docs
 
 <span class="comment"># Render Markdown</span>
 <span class="c">inspectra</span> <span class="a">render file markdown</span> \
-&nbsp;&nbsp;mycli.json <span class="f">--out</span> docs.md
-        </div>
-        <div id="panel-exec" class="qs-panel">
-<span class="comment"># Render directly from a running CLI</span>
+  mycli.json <span class="f">--out</span> docs.md</div>
+        <div id="panel-exec" class="qs-panel"><span class="comment"># Render directly from a running CLI</span>
 <span class="c">inspectra</span> <span class="a">render exec html</span> \
-&nbsp;&nbsp;jf <span class="f">--with-xmldoc</span> \
-&nbsp;&nbsp;<span class="f">--out-dir</span> ./jellyfin-docs
+  jf <span class="f">--with-xmldoc</span> \
+  <span class="f">--out-dir</span> ./jellyfin-docs
 
 <span class="comment"># Custom OpenCLI arguments</span>
 <span class="c">inspectra</span> <span class="a">render exec markdown</span> \
-&nbsp;&nbsp;mytool <span class="f">--opencli-arg</span> "cli opencli" \
-&nbsp;&nbsp;<span class="f">--out</span> docs.md
-        </div>
-        <div id="panel-tree" class="qs-panel">
-<span class="comment"># HTML always writes an app bundle directory</span>
+  mytool <span class="f">--opencli-arg</span> "cli opencli" \
+  <span class="f">--out</span> docs.md</div>
+        <div id="panel-tree" class="qs-panel"><span class="comment"># HTML always writes an app bundle directory</span>
 <span class="c">inspectra</span> <span class="a">render file html</span> \
-&nbsp;&nbsp;mycli.json \
-&nbsp;&nbsp;<span class="f">--out-dir</span> ./docs/
+  mycli.json \
+  <span class="f">--out-dir</span> ./docs/
 
 <span class="comment"># Markdown keeps tree layout support</span>
 <span class="c">inspectra</span> <span class="a">render file markdown</span> \
-&nbsp;&nbsp;mycli.json \
-&nbsp;&nbsp;<span class="f">--layout</span> tree \
-&nbsp;&nbsp;<span class="f">--out-dir</span> ./docs/
-        </div>
+  mycli.json \
+  <span class="f">--layout</span> tree \
+  <span class="f">--out-dir</span> ./docs/</div>
       </div>
     </div>
   </div>
