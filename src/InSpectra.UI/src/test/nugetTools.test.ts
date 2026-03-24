@@ -1,10 +1,62 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { downloadNugetPackage, fetchNugetToolVersions, resetNugetToolCachesForTests } from "../data/nugetTools";
+import { downloadNugetPackage, fetchNugetToolVersions, resetNugetToolCachesForTests, searchNugetTools } from "../data/nugetTools";
 
 describe("nugetTools", () => {
   afterEach(() => {
     resetNugetToolCachesForTests();
     vi.unstubAllGlobals();
+  });
+
+  it("caches search lookups by normalized query and prerelease mode", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        data: [
+          {
+            id: "Demo.Tool",
+            version: "1.2.3",
+            versions: [{ version: "1.2.3" }],
+          },
+        ],
+      }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const first = await searchNugetTools(" Demo.Tool ", false);
+    const second = await searchNugetTools("demo.tool", false);
+    const prerelease = await searchNugetTools("demo.tool", true);
+
+    expect(first).toHaveLength(1);
+    expect(second).toHaveLength(1);
+    expect(prerelease).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("drops failed searches from the cache so a retry can succeed", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 504,
+        statusText: "Gateway Timeout",
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [
+            {
+              id: "Demo.Tool",
+              version: "1.2.3",
+              versions: [{ version: "1.2.3" }],
+            },
+          ],
+        }),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(searchNugetTools("Demo.Tool", false)).rejects.toThrow("NuGet search failed: 504 Gateway Timeout");
+    await expect(searchNugetTools("Demo.Tool", false)).resolves.toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("caches published version lookups by package and prerelease mode", async () => {

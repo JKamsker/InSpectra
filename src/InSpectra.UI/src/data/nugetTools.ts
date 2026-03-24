@@ -22,6 +22,7 @@ interface NugetVersionIndexResponse {
   versions?: string[];
 }
 
+const searchCache = new Map<string, Promise<NugetSearchResult[]>>();
 const versionIndexCache = new Map<string, Promise<string[]>>();
 const packageCache = new Map<string, Promise<Uint8Array>>();
 
@@ -31,6 +32,30 @@ export async function searchNugetTools(query: string, includePrerelease: boolean
     return [];
   }
 
+  const cacheKey = `${normalized.toLowerCase()}|${includePrerelease ? "all" : "stable"}`;
+  return getOrCreateCached(searchCache, cacheKey, () => loadNugetToolSearch(normalized, includePrerelease));
+}
+
+export async function fetchNugetToolVersions(id: string, includePrerelease: boolean): Promise<string[]> {
+  const normalizedId = id.trim().toLowerCase();
+  const cacheKey = `${normalizedId}|${includePrerelease ? "all" : "stable"}`;
+  return getOrCreateCached(versionIndexCache, cacheKey, () => loadNugetToolVersions(normalizedId, includePrerelease));
+}
+
+export async function downloadNugetPackage(id: string, version: string): Promise<Uint8Array> {
+  const normalizedId = id.trim().toLowerCase();
+  const normalizedVersion = version.trim().toLowerCase();
+  const cacheKey = `${normalizedId}|${normalizedVersion}`;
+  return getOrCreateCached(packageCache, cacheKey, () => loadNugetPackage(normalizedId, normalizedVersion));
+}
+
+export function resetNugetToolCachesForTests(): void {
+  searchCache.clear();
+  versionIndexCache.clear();
+  packageCache.clear();
+}
+
+async function loadNugetToolSearch(normalized: string, includePrerelease: boolean): Promise<NugetSearchResult[]> {
   const url = new URL("https://azuresearch-usnc.nuget.org/query");
   url.searchParams.set("q", normalized);
   url.searchParams.set("packageType", "DotnetTool");
@@ -57,50 +82,9 @@ export async function searchNugetTools(query: string, includePrerelease: boolean
     }));
 }
 
-export async function fetchNugetToolVersions(id: string, includePrerelease: boolean): Promise<string[]> {
-  const normalizedId = id.trim().toLowerCase();
-  const cacheKey = `${normalizedId}|${includePrerelease ? "all" : "stable"}`;
-  const cached = versionIndexCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
-  const pending = loadNugetToolVersions(normalizedId, includePrerelease).catch((error: unknown) => {
-    versionIndexCache.delete(cacheKey);
-    throw error;
-  });
-
-  versionIndexCache.set(cacheKey, pending);
-  return pending;
-}
-
-export async function downloadNugetPackage(id: string, version: string): Promise<Uint8Array> {
-  const normalizedId = id.trim().toLowerCase();
-  const normalizedVersion = version.trim().toLowerCase();
-  const cacheKey = `${normalizedId}|${normalizedVersion}`;
-  const cached = packageCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
-  const pending = loadNugetPackage(normalizedId, normalizedVersion).catch((error: unknown) => {
-    packageCache.delete(cacheKey);
-    throw error;
-  });
-
-  packageCache.set(cacheKey, pending);
-  return pending;
-}
-
-export function resetNugetToolCachesForTests(): void {
-  versionIndexCache.clear();
-  packageCache.clear();
-}
-
 async function loadNugetPackage(normalizedId: string, normalizedVersion: string): Promise<Uint8Array> {
   const fileName = `${normalizedId}.${normalizedVersion}.nupkg`;
   const url = `https://api.nuget.org/v3-flatcontainer/${normalizedId}/${normalizedVersion}/${fileName}`;
-
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`NuGet download failed: ${response.status} ${response.statusText}`);
@@ -120,4 +104,19 @@ async function loadNugetToolVersions(normalizedId: string, includePrerelease: bo
   const versions = (payload.versions ?? []).filter((version): version is string => typeof version === "string");
   const filtered = includePrerelease ? versions : versions.filter((version) => !version.includes("-"));
   return filtered.reverse();
+}
+
+async function getOrCreateCached<T>(cache: Map<string, Promise<T>>, key: string, loader: () => Promise<T>): Promise<T> {
+  const cached = cache.get(key);
+  if (cached) {
+    return cached;
+  }
+
+  const pending = loader().catch((error: unknown) => {
+    cache.delete(key);
+    throw error;
+  });
+
+  cache.set(key, pending);
+  return pending;
 }
