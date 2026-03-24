@@ -1,256 +1,203 @@
 # OpenCLI Renderer
 
-**Turn any CLI's OpenCLI spec into beautiful, navigable documentation -- Markdown or interactive HTML -- in a single command.**
+Turn an OpenCLI export into either Markdown or a relocatable HTML app bundle.
 
+```bash
+opencli-renderer render file html mycli.json --out-dir ./docs
 ```
-opencli-renderer render file html mycli.json --out docs.html
-```
 
-OpenCLI Renderer is a .NET 10 tool that reads [OpenCLI](https://opencli.org/) JSON exports, optionally enriches them with XML metadata, and produces polished documentation you can ship, host, or commit alongside your project.
+OpenCLI Renderer is a .NET 10 tool that reads [OpenCLI](https://opencli.org/) JSON exports, optionally enriches them with XML metadata, and renders either:
 
----
+- GitHub-friendly Markdown
+- an interactive HTML viewer bundle with `index.html` plus built JS/CSS assets
 
-## Why?
+## Why
 
-CLI docs rot. They fall out of sync with `--help`, live in wikis nobody updates, or just don't exist. OpenCLI Renderer closes that gap:
-
-- **Single source of truth** -- your CLI already exposes its structure via `cli opencli`. Render it.
-- **Zero network calls** -- everything runs locally, validates against an embedded JSON Schema, and writes to disk.
-- **Two output formats** -- Markdown for GitHub/docs sites, interactive HTML for standalone hosting.
-- **Two layout modes** -- single-file for quick reference, tree layout mirroring your command hierarchy.
-- **Optional XML enrichment** -- merge richer descriptions from `cli xmldoc` without overwriting the spec.
-
----
+- OpenCLI JSON stays the source of truth. Render docs directly from what the CLI exposes.
+- Validation happens before rendering, so broken specs fail early.
+- XML enrichment is additive. It only fills missing descriptions.
+- Markdown and HTML share the same normalization and enrichment rules.
 
 ## Quick Start
 
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- Node.js for local frontend builds, CI, and `dotnet pack` / `dotnet publish`
 
-### Install & Run
+### Build the viewer bundle
 
 ```bash
-# Clone
-git clone https://github.com/JKamsker/OpenCLI-Renderer.git
-cd OpenCLI-Renderer
+cd src/InSpectreUI
+npm ci
+npm test
+npm run build
+cd ../..
+```
 
-# Build
-dotnet build --configuration Release
+### Render Markdown
 
-# Render Markdown from an OpenCLI JSON file
+```bash
 dotnet run --project src/OpenCli.Renderer -- \
   render file markdown examples/jellyfin-cli/opencli.json \
   --xmldoc examples/jellyfin-cli/xmldoc.xml \
   --out jellyfin-docs.md
+```
 
-# Render interactive HTML
+### Render HTML
+
+```bash
 dotnet run --project src/OpenCli.Renderer -- \
   render file html examples/jellyfin-cli/opencli.json \
   --xmldoc examples/jellyfin-cli/xmldoc.xml \
-  --out jellyfin-docs.html
+  --out-dir jellyfin-docs
 ```
 
-Open `jellyfin-docs.html` in your browser -- you get a full SPA with sidebar navigation, search, dark mode, and a command composer.
+Open `jellyfin-docs/index.html` in a browser. The bundle is relocatable because the viewer is built with `base: "./"`.
 
----
+## Command Surface
 
-## Command Reference
-
-```
+```text
 opencli-renderer render [file|exec] [markdown|html] [OPTIONS]
 ```
 
-### Source Modes
-
-| Mode | Description |
-|------|-------------|
-| `file` | Render from saved `.json` / `.xml` files on disk |
-| `exec` | Execute a live CLI process and capture its OpenCLI output |
-
-### File Commands
+### Markdown
 
 ```bash
 render file markdown <OPENCLI_JSON> [OPTIONS]
-render file html     <OPENCLI_JSON> [OPTIONS]
+render exec markdown <SOURCE> [OPTIONS]
 ```
 
-### Exec Commands
+Markdown supports:
+
+- `--out <FILE>` for single-file output
+- `--out-dir <DIR>` with `--layout tree`
+- `--layout single|tree`
+
+### HTML
 
 ```bash
-render exec markdown <SOURCE> [OPTIONS]
-render exec html     <SOURCE> [OPTIONS]
+render file html <OPENCLI_JSON> --out-dir <DIR> [OPTIONS]
+render exec html <SOURCE> --out-dir <DIR> [OPTIONS]
 ```
 
-### Key Options
+HTML uses bundle-directory output only:
+
+- `--out-dir <DIR>` is required
+- `--out` is rejected
+- `--layout` is rejected
+- machine-readable JSON reports `layout: "app"`
+
+### Common Options
 
 | Option | Description |
-|--------|-------------|
-| `--xmldoc <PATH>` | XML enrichment file to merge |
-| `--layout single\|tree` | Output layout (default: `single`) |
-| `--out <FILE>` | Output file path |
-| `--out-dir <DIR>` | Output directory (for `tree` layout) |
+| --- | --- |
+| `--xmldoc <PATH>` | XML enrichment file for `render file ...` |
+| `--with-xmldoc` | Also invoke `cli xmldoc` in exec mode |
+| `--source-arg <ARG>` | Argument passed to the source CLI |
+| `--opencli-arg <ARG>` | Override the OpenCLI export invocation |
+| `--xmldoc-arg <ARG>` | Override the xmldoc invocation |
 | `--include-hidden` | Include hidden commands and options |
-| `--include-metadata` | Append metadata section |
-| `--overwrite` | Overwrite existing files |
-| `--dry-run` | Preview output without writing |
-| `--json` | Machine-readable JSON output |
-| `--verbose` / `--quiet` | Control log verbosity |
-| `--timeout <SECONDS>` | Process timeout for exec mode (default: 30) |
+| `--include-metadata` | Include metadata sections in rendered output |
+| `--overwrite` | Overwrite existing output |
+| `--dry-run` | Preview output without writing files |
+| `--json` | Emit machine-readable render results |
+| `--timeout <SECONDS>` | Exec-mode timeout |
 
-### Exec-Specific Options
+## HTML Viewer
 
-| Option | Description |
-|--------|-------------|
-| `--source-arg <ARG>` | Arguments passed to the source CLI |
-| `--opencli-arg <ARG>` | Arguments to invoke the OpenCLI export |
-| `--with-xmldoc` | Also run `cli xmldoc` for enrichment |
-| `--xmldoc-arg <ARG>` | Custom arguments for xmldoc invocation |
+The HTML renderer copies `src/InSpectreUI/dist/**` and patches `index.html` with a bootstrap payload.
 
----
+The bundled viewer supports three boot paths:
 
-## Output Formats
+- injected inline data from the renderer
+- URL-driven loading with `?opencli=...`, `?xmldoc=...`, or `?dir=...`
+- manual import by dropping or picking `opencli.json` and optional `xmldoc.xml`
 
-### Markdown
+Other viewer behavior:
 
-Clean, GitHub-compatible Markdown with:
-- Full table of contents with anchor links
-- Command sections with arguments, options, examples, and exit codes
-- Inherited options clearly separated from declared ones
-- Single-file or tree layout (one `.md` per command group)
+- hash routing for deep links, so static hosts and `file`-based viewers work without rewrites
+- hidden-item filtering
+- metadata toggling
+- recursive option inheritance
+- command-tree filtering
 
-### Interactive HTML
+`?dir=<url>` resolves:
 
-A standalone `.html` file (no external dependencies) featuring:
-- **SPA Navigation** -- click through your command tree without page reloads
-- **Dark / Light Theme** -- toggle with one click, persisted in localStorage
-- **Real-Time Search** -- filter the command tree as you type
-- **Command Composer** -- interactively build commands with a resizable side panel
-- **Breadcrumb Navigation** -- always know where you are in the command hierarchy
-- **Command Cards** -- visual cards for subcommands with descriptions
-- **Smooth Animations** -- staggered card reveals on navigation
-- **Embedded Fonts** -- JetBrains Mono for code, Plus Jakarta Sans for text
+- `<dir>/opencli.json`
+- optional `<dir>/xmldoc.xml`
 
----
+Missing inferred `xmldoc.xml` is non-fatal.
 
 ## Architecture
 
-The rendering pipeline:
+### Data flow
 
-```
+```text
 OpenCLI JSON ──┐
-               ├──▶ Validate ──▶ Normalize ──▶ Enrich ──▶ Render ──▶ Output
-XML Metadata ──┘     (schema)    (inheritance)   (optional)  (md/html)  (file/dir)
+XML metadata ──┴─> validate -> enrich -> normalize -> render -> write
 ```
 
-### Key Design Decisions
+### HTML runtime model
 
-- **Normalization layer** -- the `OpenCliDocument` is transformed into a `NormalizedCliDocument` that resolves recursive option inheritance, filters hidden items, and flattens the command tree for renderers.
-- **Schema validation** -- an embedded JSON Schema (`0.1-draft`, draft 2020-12) validates input before any processing.
-- **XML enrichment is additive** -- XML metadata fills gaps but never overwrites existing JSON values.
-- **Renderers are format-agnostic** -- Markdown and HTML renderers share the same normalized model, ensuring consistent output.
+- v1 uses raw `opencli.json` plus optional `xmldoc.xml` as the canonical browser input
+- the .NET HTML pipeline keeps the existing acquisition and validation flow
+- injected HTML output defaults to inline bootstrap mode
+- internal links-mode support remains available for hosted scenarios
 
-### Service Pipeline
+### Bundle resolution
 
-| Service | Role |
-|---------|------|
-| `OpenCliDocumentLoader` | Load & validate JSON against schema |
-| `OpenCliNormalizer` | Build normalized document with option inheritance |
-| `OpenCliXmlEnricher` | Merge XML metadata (optional) |
-| `MarkdownRenderer` / `HtmlRenderer` | Format-specific rendering |
-| `DocumentRenderService` | Orchestrate the full pipeline |
-| `ProcessRunner` | Execute external CLIs (exec mode) |
-| `ExecutableResolver` | Resolve CLI paths via PATH lookup |
+At runtime, HTML assets are resolved in this order:
 
----
+1. packaged `InSpectreUI/dist` beside the installed tool
+2. repo-local `src/InSpectreUI/dist`
+3. repo-local `npm ci` plus `npm run build` if `dist` is missing and `npm` is available
+4. otherwise a clear error telling you how to build the frontend
 
-## Examples
+`dotnet pack` and `dotnet publish` do not run npm implicitly. They fail if `src/InSpectreUI/dist/index.html` is missing.
 
-The `examples/` directory contains rendered documentation for real CLIs:
+## Project Layout
 
-| CLI | Description |
-|-----|-------------|
-| [jellyfin-cli](examples/jellyfin-cli/) | Jellyfin media server management CLI |
-| [jdownloader-remotecli](examples/jdownloader-remotecli/) | JDownloader remote control CLI |
-
-Each includes the source `opencli.json`, `xmldoc.xml`, a single-file render, and a tree render.
-
----
-
-## Project Structure
-
-```
+```text
 src/OpenCli.Renderer/
-├── Commands/Render/     # CLI command handlers (file/exec x markdown/html)
-├── Services/            # Rendering pipeline (21 services)
-├── Models/              # OpenCliDocument, NormalizedCliDocument
-├── Schema/              # Embedded OpenCLI JSON Schema
-├── Templates/           # HTML CSS & JS (embedded resources)
-├── Common/              # DI type registration
-├── Runtime/             # Error handling, contracts
-└── Program.cs           # Entry point & service wiring
-
+src/InSpectreUI/
 tests/OpenCli.Renderer.Tests/
-├── MarkdownRenderServiceTests.cs
-├── OpenCliEnrichmentAndRenderingTests.cs
-├── ExecutableResolverTests.cs
-└── ...
+docs/
+examples/
 ```
 
----
+- `src/OpenCli.Renderer/` contains the CLI, render services, and packaging logic
+- `src/InSpectreUI/` is a standalone Vite + React + TypeScript app
+- `tests/OpenCli.Renderer.Tests/` covers CLI contracts, render services, and bundle lookup
+- `examples/` contains tracked Markdown example renders plus source snapshots
 
 ## Testing
 
 ```bash
-dotnet test --configuration Release
+cd src/InSpectreUI
+npm test
+npm run build
+cd ../..
+
+dotnet test OpenCli.Renderer.sln --configuration Release
 ```
 
-The test suite covers:
-- Schema validation with detailed error messages
-- Full pipeline (load -> normalize -> enrich -> render)
-- Markdown and HTML output for single and tree layouts
-- Exec mode with process execution
-- Overwrite protection and destructive operation guards
-- Executable resolution and PATH lookup
+Coverage includes:
 
----
+- frontend bootstrap precedence and import flows
+- XML enrichment and normalization behavior
+- HTML output contract and bootstrap injection
+- bundle resolution order
+- Markdown output paths and layout handling
 
-## CI/CD
+## CI
 
-GitHub Actions runs on every push and PR:
+CI builds the frontend before running the .NET test and packaging flow. GitHub Pages publishes HTML examples as bundle directories, so each example is served from its own `index.html`.
 
-1. **Build** -- `dotnet build --configuration Release`
-2. **Test** -- `dotnet test --configuration Release`
-3. **Render** -- generates all four output combinations (markdown/html x single/tree)
-4. **Artifact** -- uploads rendered docs as a downloadable artifact
+## Examples
 
----
+- [examples/jellyfin-cli](examples/jellyfin-cli/)
+- [examples/jdownloader-remotecli](examples/jdownloader-remotecli/)
+- [docs/opencli-renderer](docs/opencli-renderer/)
 
-## Tech Stack
-
-| Component | Library |
-|-----------|---------|
-| CLI Framework | [Spectre.Console.Cli](https://spectreconsole.net/) |
-| Console Output | [Spectre.Console](https://spectreconsole.net/) |
-| JSON Schema | [JsonSchema.Net](https://github.com/gregsdennis/json-everything) |
-| Dependency Injection | Microsoft.Extensions.DependencyInjection |
-| Runtime | .NET 10 |
-| Tests | xUnit |
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-thing`)
-3. Keep files under 300 lines where possible (500 max)
-4. Add tests for new functionality
-5. Submit a pull request
-
----
-
-## Related Projects
-
-- **[OpenCLI Spec](https://opencli.org/)** ([GitHub](https://github.com/spectreconsole/open-cli)) -- the JSON specification that describes CLI structure
-- **[Jellyfin-Cli](https://github.com/JKamsker/Jellyfin-Cli)** -- a CLI built with OpenCLI support
-- **[JDownloader-RemoteCli](https://github.com/JKamsker/JDownloader-RemoteCli)** -- another OpenCLI-enabled CLI
+The hosted HTML examples live under the Pages site as bundle directories. The repository keeps Markdown renders and source snapshots checked in.

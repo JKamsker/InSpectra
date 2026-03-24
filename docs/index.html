@@ -403,7 +403,7 @@ section{padding:6rem 0}
     <h1>Turn any CLI into<br><span class="accent">beautiful docs</span></h1>
     <p class="hero-sub">
       Generate polished, interactive documentation from your CLI's OpenCLI spec.
-      Markdown or standalone HTML. One command.
+      Markdown or relocatable HTML app bundles. One command.
     </p>
 
     <div class="install-block">
@@ -427,8 +427,8 @@ section{padding:6rem 0}
         <div class="line"><span class="dim">&nbsp;&nbsp;Validating OpenCLI schema...</span> <span class="ok">OK</span></div>
         <div class="line"><span class="dim">&nbsp;&nbsp;Normalizing 47 commands, 128 options...</span> <span class="ok">OK</span></div>
         <div class="line"><span class="dim">&nbsp;&nbsp;Enriching from XML metadata...</span> <span class="ok">OK</span></div>
-        <div class="line"><span class="dim">&nbsp;&nbsp;Rendering interactive HTML...</span> <span class="ok">OK</span></div>
-        <div class="line"><span class="ok">&nbsp;&nbsp;&#10003; Written to jellyfin-docs.html</span> <span class="dim">(standalone, 0 dependencies)</span></div>
+        <div class="line"><span class="dim">&nbsp;&nbsp;Copying HTML app bundle...</span> <span class="ok">OK</span></div>
+        <div class="line"><span class="ok">&nbsp;&nbsp;&#10003; Written index.html and assets to jellyfin-docs/</span> <span class="dim">(relocatable static bundle)</span></div>
       </div>
     </div>
   </div>
@@ -445,7 +445,7 @@ section{padding:6rem 0}
 
     <div class="examples-grid">
 
-      <a href="./examples/opencli-renderer/opencli-renderer.html" class="example-card card-self reveal">
+      <a href="./examples/opencli-renderer/" class="example-card card-self reveal">
         <div class="card-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
         </div>
@@ -460,7 +460,7 @@ section{padding:6rem 0}
         </span>
       </a>
 
-      <a href="./examples/jellyfin-cli/jellyfin-cli.html" class="example-card reveal reveal-delay-1">
+      <a href="./examples/jellyfin-cli/" class="example-card reveal reveal-delay-1">
         <div class="card-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
         </div>
@@ -475,7 +475,7 @@ section{padding:6rem 0}
         </span>
       </a>
 
-      <a href="./examples/jdownloader-remotecli/jdownloader-remotecli.html" class="example-card reveal reveal-delay-2">
+      <a href="./examples/jdownloader-remotecli/" class="example-card reveal reveal-delay-2">
         <div class="card-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </div>
@@ -507,27 +507,27 @@ section{padding:6rem 0}
       <div class="feature reveal">
         <span class="feature-icon">&#9997;</span>
         <div class="feature-name">Markdown & HTML</div>
-        <div class="feature-desc">Two output formats. GitHub-compatible Markdown for repos, standalone HTML for hosting.</div>
+        <div class="feature-desc">Two output formats. GitHub-compatible Markdown for repos, plus an HTML app bundle for static hosting.</div>
       </div>
       <div class="feature reveal reveal-delay-1">
         <span class="feature-icon">&#9889;</span>
         <div class="feature-name">Interactive SPA</div>
-        <div class="feature-desc">Generated HTML is a full single-page app with client-side navigation. No server needed.</div>
+        <div class="feature-desc">Generated HTML is a full single-page app with hash-based deep links, command filtering, and static-host friendly routing.</div>
       </div>
       <div class="feature reveal reveal-delay-1">
         <span class="feature-icon">&#9681;</span>
-        <div class="feature-name">Dark & Light Theme</div>
-        <div class="feature-desc">Theme toggle baked into every generated page. Respects system preference, persists choice.</div>
+        <div class="feature-name">Drop or Link</div>
+        <div class="feature-desc">Boot with injected data, fetchable URLs, or manual file import. One viewer covers local previews and hosted bundles.</div>
       </div>
       <div class="feature reveal reveal-delay-2">
         <span class="feature-icon">&#9000;</span>
-        <div class="feature-name">Command Composer</div>
-        <div class="feature-desc">An interactive panel to assemble commands visually. Resizable, with state persistence.</div>
+        <div class="feature-name">Source of Truth</div>
+        <div class="feature-desc">HTML runs on raw <code>opencli.json</code> plus optional <code>xmldoc.xml</code>. No parallel viewer schema in v1.</div>
       </div>
       <div class="feature reveal reveal-delay-1">
         <span class="feature-icon">&#9776;</span>
-        <div class="feature-name">Tree & Single Layouts</div>
-        <div class="feature-desc">Render a single monolithic file or a directory tree that mirrors your command hierarchy.</div>
+        <div class="feature-name">Markdown Layouts</div>
+        <div class="feature-desc">Markdown still supports single-file and tree layouts. HTML intentionally ships as an app bundle directory.</div>
       </div>
       <div class="feature reveal reveal-delay-2">
         <span class="feature-icon">&#10003;</span>
@@ -579,7 +579,7 @@ section{padding:6rem 0}
         <div class="tab-bar">
           <button class="tab active" onclick="switchTab(this,'panel-file')">From File</button>
           <button class="tab" onclick="switchTab(this,'panel-exec')">From CLI</button>
-          <button class="tab" onclick="switchTab(this,'panel-tree')">Tree Layout</button>
+          <button class="tab" onclick="switchTab(this,'panel-tree')">Output Modes</button>
         </div>
         <div id="panel-file" class="qs-panel active">
 <span class="comment"># Install</span>
@@ -588,7 +588,7 @@ section{padding:6rem 0}
 <span class="comment"># Render interactive HTML</span>
 <span class="c">opencli-renderer</span> <span class="a">render file html</span> \
 &nbsp;&nbsp;mycli.json <span class="f">--xmldoc</span> mycli.xml \
-&nbsp;&nbsp;<span class="f">--out</span> docs.html
+&nbsp;&nbsp;<span class="f">--out-dir</span> ./docs
 
 <span class="comment"># Render Markdown</span>
 <span class="c">opencli-renderer</span> <span class="a">render file markdown</span> \
@@ -598,7 +598,7 @@ section{padding:6rem 0}
 <span class="comment"># Render directly from a running CLI</span>
 <span class="c">opencli-renderer</span> <span class="a">render exec html</span> \
 &nbsp;&nbsp;jf <span class="f">--with-xmldoc</span> \
-&nbsp;&nbsp;<span class="f">--out</span> jellyfin-docs.html
+&nbsp;&nbsp;<span class="f">--out-dir</span> ./jellyfin-docs
 
 <span class="comment"># Custom OpenCLI arguments</span>
 <span class="c">opencli-renderer</span> <span class="a">render exec markdown</span> \
@@ -606,13 +606,12 @@ section{padding:6rem 0}
 &nbsp;&nbsp;<span class="f">--out</span> docs.md
         </div>
         <div id="panel-tree" class="qs-panel">
-<span class="comment"># Output one file per command group</span>
+<span class="comment"># HTML always writes an app bundle directory</span>
 <span class="c">opencli-renderer</span> <span class="a">render file html</span> \
 &nbsp;&nbsp;mycli.json \
-&nbsp;&nbsp;<span class="f">--layout</span> tree \
 &nbsp;&nbsp;<span class="f">--out-dir</span> ./docs/
 
-<span class="comment"># Same for Markdown</span>
+<span class="comment"># Markdown keeps tree layout support</span>
 <span class="c">opencli-renderer</span> <span class="a">render file markdown</span> \
 &nbsp;&nbsp;mycli.json \
 &nbsp;&nbsp;<span class="f">--layout</span> tree \

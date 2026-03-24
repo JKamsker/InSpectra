@@ -45,7 +45,7 @@ app.Configure(config =>
             file.AddCommand<FileMarkdownCommand>("markdown")
                 .WithDescription("Render Markdown from an OpenCLI JSON file and optional XML enrichment file.");
             file.AddCommand<FileHtmlCommand>("html")
-                .WithDescription("Render HTML from an OpenCLI JSON file and optional XML enrichment file.");
+                .WithDescription("Render an HTML app bundle from an OpenCLI JSON file and optional XML enrichment file.");
         });
 
         render.AddBranch("exec", exec =>
@@ -54,7 +54,7 @@ app.Configure(config =>
             exec.AddCommand<ExecMarkdownCommand>("markdown")
                 .WithDescription("Render Markdown from a live CLI process and optional `cli xmldoc` enrichment.");
             exec.AddCommand<ExecHtmlCommand>("html")
-                .WithDescription("Render HTML from a live CLI process and optional `cli xmldoc` enrichment.");
+                .WithDescription("Render an HTML app bundle from a live CLI process and optional `cli xmldoc` enrichment.");
         });
     });
 });

@@ -3,7 +3,9 @@
 - Root: [index](../../index.md)
 - Parent: [render exec](index.md)
 
-Render HTML from a live CLI process and optional  `cli xmldoc` enrichment.
+Render an HTML app bundle from a live CLI process and optional `cli xmldoc` enrichment.
+
+HTML output is bundle-directory-only. Use `--out-dir`; `--out` and `--layout` are rejected.
 
 ## Arguments
 
@@ -20,10 +22,8 @@ Render HTML from a live CLI process and optional  `cli xmldoc` enrichment.
 | --include-hidden | — | flag | No | No | Declared | — | — | — |
 | --include-metadata | — | flag | No | No | Declared | — | — | — |
 | --json | — | flag | No | No | Declared | — | — | — |
-| --layout | — | <LAYOUT> | No | No | Declared | — | — | LAYOUT · required · arity 1 |
 | --no-color | — | flag | No | No | Declared | — | — | — |
 | --opencli-arg | — | <ARG> | No | No | Declared | — | — | ARG · required · arity 1 |
-| --out | — | <FILE> | No | No | Declared | — | — | FILE · required · arity 1 |
 | --out-dir | — | <DIR> | No | No | Declared | — | — | DIR · required · arity 1 |
 | --output | — | <MODE> | No | No | Declared | — | — | MODE · required · arity 1 |
 | --overwrite | — | flag | No | No | Declared | — | — | — |

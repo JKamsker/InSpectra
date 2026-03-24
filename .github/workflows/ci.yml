@@ -18,6 +18,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/InSpectreUI/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: src/InSpectreUI
+        run: npm ci
+
+      - name: Test frontend
+        working-directory: src/InSpectreUI
+        run: npm test
+
+      - name: Build frontend
+        working-directory: src/InSpectreUI
+        run: npm run build
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
@@ -32,11 +51,32 @@ jobs:
       - name: Test
         run: dotnet test OpenCli.Renderer.sln --configuration Release --no-build
 
+      - name: Pack tool
+        run: dotnet pack src/OpenCli.Renderer/OpenCli.Renderer.csproj --configuration Release --no-build
+
+      - name: Smoke render HTML bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp_dir="$(mktemp -d)"
+          out_dir="$tmp_dir/opencli-renderer"
+
+          dotnet run --project src/OpenCli.Renderer --configuration Release --no-build -- \
+            render file html \
+            docs/opencli-renderer/opencli.json \
+            --xmldoc docs/opencli-renderer/xmldoc.xml \
+            --out-dir "$out_dir"
+
+          test -f "$out_dir/index.html"
+          grep -q './assets/' "$out_dir/index.html"
+
       - name: Upload build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: build
-          path: src/OpenCli.Renderer/bin/Release/net10.0/
+          path: |
+            src/OpenCli.Renderer/bin/Release/net10.0/
+            src/OpenCli.Renderer/bin/Release/*.nupkg
 
   deploy-pages:
     needs: build-test
@@ -47,18 +87,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/InSpectreUI/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: src/InSpectreUI
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: src/InSpectreUI
+        run: npm run build
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
-      - name: Build renderer
-        run: dotnet build OpenCli.Renderer.sln --configuration Release
+      - name: Restore
+        run: dotnet restore OpenCli.Renderer.sln
 
-      - name: Install .NET tool — JDownloader-RemoteCli
+      - name: Build renderer
+        run: dotnet build OpenCli.Renderer.sln --configuration Release --no-restore
+
+      - name: Install .NET tool - JDownloader-RemoteCli
         run: dotnet tool install --global JDownloader-RemoteCli
 
-      - name: Install .NET tool — JellyfinCli
+      - name: Install .NET tool - JellyfinCli
         run: dotnet tool install -g JellyfinCli
 
       - name: Prepare site directory
@@ -66,45 +124,50 @@ jobs:
         run: |
           set -euo pipefail
           site="_site"
-          mkdir -p "$site/examples/opencli-renderer" \
-                   "$site/examples/jellyfin-cli" \
-                   "$site/examples/jdownloader-remotecli"
+          mkdir -p "$site/examples"
 
-          # Landing page and GitHub Pages files
           cp docs/index.html "$site/index.html"
           echo "opencli.kamsker.at" > "$site/CNAME"
           touch "$site/.nojekyll"
 
-      - name: Render — OpenCLI Renderer (self)
+      - name: Render - OpenCLI Renderer
         shell: bash
         run: |
           set -euo pipefail
-          renderer="dotnet run --project src/OpenCli.Renderer --configuration Release --no-build --"
-
-          $renderer render file html \
+          dotnet run --project src/OpenCli.Renderer --configuration Release --no-build -- \
+            render file html \
             docs/opencli-renderer/opencli.json \
             --xmldoc docs/opencli-renderer/xmldoc.xml \
-            --out _site/examples/opencli-renderer/opencli-renderer.html
+            --out-dir _site/examples/opencli-renderer
 
-      - name: Render — Jellyfin CLI
+      - name: Render - Jellyfin CLI
         shell: bash
         run: |
           set -euo pipefail
-          renderer="dotnet run --project src/OpenCli.Renderer --configuration Release --no-build --"
-
-          $renderer render exec html jf \
+          dotnet run --project src/OpenCli.Renderer --configuration Release --no-build -- \
+            render exec html jf \
             --with-xmldoc \
-            --out _site/examples/jellyfin-cli/jellyfin-cli.html
+            --out-dir _site/examples/jellyfin-cli
 
-      - name: Render — JDownloader RemoteCli
+      - name: Render - JDownloader RemoteCli
         shell: bash
         run: |
           set -euo pipefail
-          renderer="dotnet run --project src/OpenCli.Renderer --configuration Release --no-build --"
-
-          $renderer render exec html jdr \
+          dotnet run --project src/OpenCli.Renderer --configuration Release --no-build -- \
+            render exec html jdr \
             --with-xmldoc \
-            --out _site/examples/jdownloader-remotecli/jdownloader-remotecli.html
+            --out-dir _site/examples/jdownloader-remotecli
+
+      - name: Verify published bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for example in opencli-renderer jellyfin-cli jdownloader-remotecli; do
+            index_path="_site/examples/$example/index.html"
+            test -f "$index_path"
+            grep -q './assets/' "$index_path"
+          done
 
       - name: Summarize site
         shell: bash

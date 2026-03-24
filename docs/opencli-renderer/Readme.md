@@ -34,7 +34,6 @@ Command-line reference for `opencli-renderer`. Available command areas include r
 
 - [render](#command-render) — Render documentation from OpenCLI exports.
 
-
 <a id="commands"></a>
 ## Commands
 
@@ -55,13 +54,15 @@ Render docs by executing a CLI that exposes `cli  opencli`.
 
 #### Subcommands
 
-- `html` — Render HTML from a live CLI process and optional  `cli xmldoc` enrichment.
-- `markdown` — Render Markdown from a live CLI process and  optional `cli xmldoc` enrichment.
+- `html` — Render an HTML app bundle from a live CLI process and optional `cli xmldoc` enrichment.
+- `markdown` — Render Markdown from a live CLI process and optional `cli xmldoc` enrichment.
 
 <a id="command-render-exec-html"></a>
 #### `render exec html`
 
-Render HTML from a live CLI process and optional  `cli xmldoc` enrichment.
+Render an HTML app bundle from a live CLI process and optional `cli xmldoc` enrichment.
+
+HTML output is bundle-directory-only. Use `--out-dir`; `--out` and `--layout` are rejected.
 
 ##### Arguments
 
@@ -78,10 +79,8 @@ Render HTML from a live CLI process and optional  `cli xmldoc` enrichment.
 | --include-hidden | — | flag | No | No | Declared | — | — | — |
 | --include-metadata | — | flag | No | No | Declared | — | — | — |
 | --json | — | flag | No | No | Declared | — | — | — |
-| --layout | — | <LAYOUT> | No | No | Declared | — | — | LAYOUT · required · arity 1 |
 | --no-color | — | flag | No | No | Declared | — | — | — |
 | --opencli-arg | — | <ARG> | No | No | Declared | — | — | ARG · required · arity 1 |
-| --out | — | <FILE> | No | No | Declared | — | — | FILE · required · arity 1 |
 | --out-dir | — | <DIR> | No | No | Declared | — | — | DIR · required · arity 1 |
 | --output | — | <MODE> | No | No | Declared | — | — | MODE · required · arity 1 |
 | --overwrite | — | flag | No | No | Declared | — | — | — |
@@ -95,7 +94,7 @@ Render HTML from a live CLI process and optional  `cli xmldoc` enrichment.
 <a id="command-render-exec-markdown"></a>
 #### `render exec markdown`
 
-Render Markdown from a live CLI process and  optional `cli xmldoc` enrichment.
+Render Markdown from a live CLI process and optional `cli xmldoc` enrichment.
 
 ##### Arguments
 
@@ -133,13 +132,15 @@ Render docs from saved OpenCLI export files.
 
 #### Subcommands
 
-- `html` — Render HTML from an OpenCLI JSON file and optional XML enrichment file.
-- `markdown` — Render Markdown from an OpenCLI JSON file and  optional XML enrichment file.
+- `html` — Render an HTML app bundle from an OpenCLI JSON file and optional XML enrichment file.
+- `markdown` — Render Markdown from an OpenCLI JSON file and optional XML enrichment file.
 
 <a id="command-render-file-html"></a>
 #### `render file html`
 
-Render HTML from an OpenCLI JSON file and optional XML enrichment file.
+Render an HTML app bundle from an OpenCLI JSON file and optional XML enrichment file.
+
+HTML output is bundle-directory-only. Use `--out-dir`; `--out` and `--layout` are rejected.
 
 ##### Arguments
 
@@ -155,9 +156,7 @@ Render HTML from an OpenCLI JSON file and optional XML enrichment file.
 | --include-hidden | — | flag | No | No | Declared | — | — | — |
 | --include-metadata | — | flag | No | No | Declared | — | — | — |
 | --json | — | flag | No | No | Declared | — | — | — |
-| --layout | — | <LAYOUT> | No | No | Declared | — | — | LAYOUT · required · arity 1 |
 | --no-color | — | flag | No | No | Declared | — | — | — |
-| --out | — | <FILE> | No | No | Declared | — | — | FILE · required · arity 1 |
 | --out-dir | — | <DIR> | No | No | Declared | — | — | DIR · required · arity 1 |
 | --output | — | <MODE> | No | No | Declared | — | — | MODE · required · arity 1 |
 | --overwrite | — | flag | No | No | Declared | — | — | — |
@@ -168,7 +167,7 @@ Render HTML from an OpenCLI JSON file and optional XML enrichment file.
 <a id="command-render-file-markdown"></a>
 #### `render file markdown`
 
-Render Markdown from an OpenCLI JSON file and  optional XML enrichment file.
+Render Markdown from an OpenCLI JSON file and optional XML enrichment file.
 
 ##### Arguments
 

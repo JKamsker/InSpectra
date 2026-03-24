@@ -49,8 +49,8 @@ Kind="scalar" ClrType="System.String" />
       <Command Name="html" IsBranch="false" 
 ClrType="OpenCli.Renderer.Commands.Render.FileHtmlCommand" 
 Settings="OpenCli.Renderer.Commands.Render.FileRenderSettings">
-        <Description>Render HTML from an OpenCLI JSON file and optional XML 
-enrichment file.</Description>
+        <Description>Render an HTML app bundle from an OpenCLI JSON file and 
+optional XML enrichment file.</Description>
         <Parameters>
           <Argument Name="OPENCLI_JSON" Position="0" Required="true" 
 Kind="scalar" ClrType="System.String" />
@@ -62,12 +62,8 @@ Kind="flag" ClrType="System.Boolean" />
 Kind="flag" ClrType="System.Boolean" />
           <Option Short="" Long="json" Value="NULL" Required="false" Kind="flag"
 ClrType="System.Boolean" />
-          <Option Short="" Long="layout" Value="LAYOUT" Required="false" 
-Kind="scalar" ClrType="System.String" />
           <Option Short="" Long="no-color" Value="NULL" Required="false" 
 Kind="flag" ClrType="System.Boolean" />
-          <Option Short="" Long="out" Value="FILE" Required="false" 
-Kind="scalar" ClrType="System.String" />
           <Option Short="" Long="out-dir" Value="DIR" Required="false" 
 Kind="scalar" ClrType="System.String" />
           <Option Short="" Long="output" Value="MODE" Required="false" 
@@ -140,8 +136,8 @@ Kind="vector" ClrType="System.String[]" />
       <Command Name="html" IsBranch="false" 
 ClrType="OpenCli.Renderer.Commands.Render.ExecHtmlCommand" 
 Settings="OpenCli.Renderer.Commands.Render.ExecRenderSettings">
-        <Description>Render HTML from a live CLI process and optional `cli 
-xmldoc` enrichment.</Description>
+        <Description>Render an HTML app bundle from a live CLI process and 
+optional `cli xmldoc` enrichment.</Description>
         <Parameters>
           <Argument Name="SOURCE" Position="0" Required="true" Kind="scalar" 
 ClrType="System.String" />
@@ -155,14 +151,10 @@ Kind="flag" ClrType="System.Boolean" />
 Kind="flag" ClrType="System.Boolean" />
           <Option Short="" Long="json" Value="NULL" Required="false" Kind="flag"
 ClrType="System.Boolean" />
-          <Option Short="" Long="layout" Value="LAYOUT" Required="false" 
-Kind="scalar" ClrType="System.String" />
           <Option Short="" Long="no-color" Value="NULL" Required="false" 
 Kind="flag" ClrType="System.Boolean" />
           <Option Short="" Long="opencli-arg" Value="ARG" Required="false" 
 Kind="vector" ClrType="System.String[]" />
-          <Option Short="" Long="out" Value="FILE" Required="false" 
-Kind="scalar" ClrType="System.String" />
           <Option Short="" Long="out-dir" Value="DIR" Required="false" 
 Kind="scalar" ClrType="System.String" />
           <Option Short="" Long="output" Value="MODE" Required="false" 

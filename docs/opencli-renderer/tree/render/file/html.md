@@ -3,7 +3,9 @@
 - Root: [index](../../index.md)
 - Parent: [render file](index.md)
 
-Render HTML from an OpenCLI JSON file and optional XML enrichment file.
+Render an HTML app bundle from an OpenCLI JSON file and optional XML enrichment file.
+
+HTML output is bundle-directory-only. Use `--out-dir`; `--out` and `--layout` are rejected.
 
 ## Arguments
 
@@ -19,9 +21,7 @@ Render HTML from an OpenCLI JSON file and optional XML enrichment file.
 | --include-hidden | — | flag | No | No | Declared | — | — | — |
 | --include-metadata | — | flag | No | No | Declared | — | — | — |
 | --json | — | flag | No | No | Declared | — | — | — |
-| --layout | — | <LAYOUT> | No | No | Declared | — | — | LAYOUT · required · arity 1 |
 | --no-color | — | flag | No | No | Declared | — | — | — |
-| --out | — | <FILE> | No | No | Declared | — | — | FILE · required · arity 1 |
 | --out-dir | — | <DIR> | No | No | Declared | — | — | DIR · required · arity 1 |
 | --output | — | <MODE> | No | No | Declared | — | — | MODE · required · arity 1 |
 | --overwrite | — | flag | No | No | Declared | — | — | — |

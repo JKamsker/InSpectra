@@ -1,5 +1,12 @@
   # OpenCLI Renderer v1
 
+  ## Status
+
+  - Historical planning note for the initial implementation.
+  - The current HTML renderer no longer follows the single-file or tree-page model described below.
+  - HTML now emits an InSpectreUI app bundle directory, requires `--out-dir`, rejects `--out` and `--layout`, and reports layout `app`.
+  - Use `README.md` and `docs/opencli-renderer/` for the current public contract.
+
   ## Summary
 
   - Build a new local-only .NET 10 Spectre.Console.Cli tool that renders documentation from OpenCLI exports, with Markdown and HTML shipped on top of the same normalized pipeline.
