@@ -126,6 +126,7 @@ The bundled viewer supports three boot paths:
 - URL-driven loading with `?opencli=...`, `?xmldoc=...`, or `?dir=...`
 - manual import by dropping or picking `opencli.json` and optional `xmldoc.xml`
 - a `NuGet Tool` mode that searches NuGet.org, downloads a `.nupkg` in-browser, and either reads a bundled `opencli.json` or runs a static Spectre.Console.Cli probe
+- the NuGet version picker loads published versions from the flat-container index before inspection
 
 Other viewer features:
 

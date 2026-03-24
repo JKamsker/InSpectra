@@ -1134,6 +1134,13 @@ code {
   margin-top: 0.85rem;
 }
 
+.nuget-version-note {
+  margin-top: 0.45rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
 .nuget-toggle {
   display: inline-flex;
   align-items: center;

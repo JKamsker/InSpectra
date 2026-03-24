@@ -51,21 +51,36 @@ describe("InSpectraUI NuGet mode", () => {
       '<div id="inspectra-root"></div><script id="inspectra-bootstrap" type="application/json">__INSPECTRA_BOOTSTRAP__</script>';
     window.history.replaceState({}, "", "https://example.test/viewer/index.html#/");
     loadFromNugetTool.mockReset();
-    vi.stubGlobal("fetch", vi.fn(async () => ({
-      ok: true,
-      json: async () => ({
-        data: [
-          {
-            id: "Demo.Tool",
-            version: "2.0.0",
-            description: "Probe me",
-            authors: "Kamsker",
-            totalDownloads: 42,
-            versions: [{ version: "2.0.0" }, { version: "1.9.0" }],
-          },
-        ],
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string | URL) => {
+        const url = String(input);
+        if (url.includes("/index.json")) {
+          return {
+            ok: true,
+            json: async () => ({
+              versions: ["1.9.0", "2.0.0"],
+            }),
+          };
+        }
+
+        return {
+          ok: true,
+          json: async () => ({
+            data: [
+              {
+                id: "Demo.Tool",
+                version: "2.0.0",
+                description: "Probe me",
+                authors: "Kamsker",
+                totalDownloads: 42,
+                versions: [{ version: "2.0.0" }, { version: "1.9.0" }],
+              },
+            ],
+          }),
+        };
       }),
-    })));
+    );
   });
 
   afterEach(() => {
@@ -102,6 +117,7 @@ describe("InSpectraUI NuGet mode", () => {
     await user.click(screen.getByRole("button", { name: /search nuget/i }));
 
     expect(await screen.findByRole("button", { name: /demo.tool/i })).toBeInTheDocument();
+    expect(await screen.findByText("Loaded 2 published versions.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /inspect tool/i }));
 
@@ -145,6 +161,7 @@ describe("InSpectraUI NuGet mode", () => {
     await user.click(screen.getByRole("tab", { name: /nuget tool/i }));
     await user.type(screen.getByLabelText("NuGet package query"), "Demo.Tool");
     await user.click(screen.getByRole("button", { name: /search nuget/i }));
+    expect(await screen.findByText("Loaded 2 published versions.")).toBeInTheDocument();
     await user.click(await screen.findByRole("button", { name: /inspect tool/i }));
 
     expect(await screen.findByText("Last Probe Attempt")).toBeInTheDocument();

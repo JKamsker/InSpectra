@@ -1,7 +1,7 @@
 import { LoaderCircle, Search } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ProbeDiagnostics } from "../data/toolProbe";
-import { NugetSearchResult, searchNugetTools } from "../data/nugetTools";
+import { fetchNugetToolVersions, NugetSearchResult, searchNugetTools } from "../data/nugetTools";
 import { NugetToolRequest } from "../data/loadNugetTool";
 import { ProbeDiagnosticsCard } from "./ProbeDiagnosticsCard";
 
@@ -19,9 +19,56 @@ export function NugetToolPanel({ diagnostics, loading, onInspect }: NugetToolPan
   const [results, setResults] = useState<NugetSearchResult[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedVersion, setSelectedVersion] = useState("");
+  const [versionError, setVersionError] = useState<string | null>(null);
+  const [versionOptions, setVersionOptions] = useState<string[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(false);
 
   const selected = results.find((item) => item.id === selectedId) ?? null;
-  const versions = selected?.versions.length ? selected.versions : selected ? [selected.version] : [];
+  const versions = versionOptions.length ? versionOptions : selected?.versions.length ? selected.versions : selected ? [selected.version] : [];
+
+  useEffect(() => {
+    if (!selected) {
+      setVersionOptions([]);
+      setVersionError(null);
+      setVersionsLoading(false);
+      return;
+    }
+
+    const fallbackVersions = selected.versions.length ? selected.versions : [selected.version];
+    let cancelled = false;
+    setVersionOptions(fallbackVersions);
+    setVersionError(null);
+    setVersionsLoading(true);
+
+    void fetchNugetToolVersions(selected.id, includePrerelease)
+      .then((nextVersions) => {
+        if (cancelled) {
+          return;
+        }
+
+        const resolvedVersions = nextVersions.length ? nextVersions : fallbackVersions;
+        setVersionOptions(resolvedVersions);
+        setSelectedVersion((current) => (resolvedVersions.includes(current) ? current : resolvedVersions[0] ?? ""));
+      })
+      .catch((error) => {
+        if (cancelled) {
+          return;
+        }
+
+        setVersionError(toMessage(error));
+        setVersionOptions(fallbackVersions);
+        setSelectedVersion((current) => current || fallbackVersions[0] || "");
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setVersionsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [includePrerelease, selected]);
 
   async function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,6 +78,8 @@ export function NugetToolPanel({ diagnostics, loading, onInspect }: NugetToolPan
     try {
       const nextResults = await searchNugetTools(query, includePrerelease);
       setResults(nextResults);
+      setVersionOptions([]);
+      setVersionError(null);
 
       const nextSelected = nextResults[0] ?? null;
       setSelectedId(nextSelected?.id ?? null);
@@ -104,6 +153,8 @@ export function NugetToolPanel({ diagnostics, loading, onInspect }: NugetToolPan
                 onClick={() => {
                   setSelectedId(item.id);
                   setSelectedVersion(item.version);
+                  setVersionOptions([]);
+                  setVersionError(null);
                 }}
               >
                 <strong>{item.id}</strong>
@@ -143,6 +194,7 @@ export function NugetToolPanel({ diagnostics, loading, onInspect }: NugetToolPan
                 <select
                   aria-label="Package version"
                   value={selectedVersion}
+                  disabled={versionsLoading && versions.length === 0}
                   onChange={(event) => setSelectedVersion(event.target.value)}
                 >
                   {versions.map((version) => (
@@ -152,6 +204,14 @@ export function NugetToolPanel({ diagnostics, loading, onInspect }: NugetToolPan
                   ))}
                 </select>
               </label>
+
+              <p className="nuget-version-note">
+                {versionsLoading
+                  ? "Loading published versions from NuGet..."
+                  : versionError
+                    ? versionError
+                    : `Loaded ${versions.length} published version${versions.length === 1 ? "" : "s"}.`}
+              </p>
 
               <button
                 type="button"

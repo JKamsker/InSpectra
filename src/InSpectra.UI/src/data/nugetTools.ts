@@ -18,6 +18,10 @@ interface NugetQueryResponse {
   }>;
 }
 
+interface NugetVersionIndexResponse {
+  versions?: string[];
+}
+
 export async function searchNugetTools(query: string, includePrerelease: boolean): Promise<NugetSearchResult[]> {
   const normalized = query.trim();
   if (!normalized) {
@@ -48,6 +52,21 @@ export async function searchNugetTools(query: string, includePrerelease: boolean
         .map((version) => version.version)
         .filter((version): version is string => typeof version === "string"),
     }));
+}
+
+export async function fetchNugetToolVersions(id: string, includePrerelease: boolean): Promise<string[]> {
+  const normalizedId = id.trim().toLowerCase();
+  const url = `https://api.nuget.org/v3-flatcontainer/${normalizedId}/index.json`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`NuGet versions failed: ${response.status} ${response.statusText}`);
+  }
+
+  const payload = (await response.json()) as NugetVersionIndexResponse;
+  const versions = (payload.versions ?? []).filter((version): version is string => typeof version === "string");
+  const filtered = includePrerelease ? versions : versions.filter((version) => !version.includes("-"));
+  return filtered.reverse();
 }
 
 export async function downloadNugetPackage(id: string, version: string): Promise<Uint8Array> {
