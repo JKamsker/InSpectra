@@ -110,7 +110,7 @@ export function InSpectraApp() {
     setLoadState({ status: "ready" });
   }
   function clearNugetTransientState() { setError(null); setProbeDiagnostics(null); }
-
+  function handleImportModeChange(mode: "files" | "nuget") { clearNugetTransientState(); setImportMode(mode); }
   async function handleFiles(files: File[]) {
     try {
       setLoadState({ status: "loading", message: "Importing local files." });
@@ -165,7 +165,6 @@ export function InSpectraApp() {
       return next;
     });
   }
-
   function handleComposerResize(width: number) {
     setComposerWidth(width);
     localStorage.setItem("inspectra-composer-width", String(width));
@@ -196,7 +195,7 @@ export function InSpectraApp() {
         loading={loadState.status === "loading"}
         mode={importMode}
         onFilesSelected={handleFiles}
-        onModeChange={setImportMode}
+        onModeChange={handleImportModeChange}
         onNugetInteraction={clearNugetTransientState}
         onToolInspect={handleNugetTool}
         probeDiagnostics={probeDiagnostics}
