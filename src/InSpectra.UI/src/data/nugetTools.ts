@@ -22,6 +22,8 @@ interface NugetVersionIndexResponse {
   versions?: string[];
 }
 
+const versionIndexCache = new Map<string, Promise<string[]>>();
+
 export async function searchNugetTools(query: string, includePrerelease: boolean): Promise<NugetSearchResult[]> {
   const normalized = query.trim();
   if (!normalized) {
@@ -56,17 +58,19 @@ export async function searchNugetTools(query: string, includePrerelease: boolean
 
 export async function fetchNugetToolVersions(id: string, includePrerelease: boolean): Promise<string[]> {
   const normalizedId = id.trim().toLowerCase();
-  const url = `https://api.nuget.org/v3-flatcontainer/${normalizedId}/index.json`;
-
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`NuGet versions failed: ${response.status} ${response.statusText}`);
+  const cacheKey = `${normalizedId}|${includePrerelease ? "all" : "stable"}`;
+  const cached = versionIndexCache.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
-  const payload = (await response.json()) as NugetVersionIndexResponse;
-  const versions = (payload.versions ?? []).filter((version): version is string => typeof version === "string");
-  const filtered = includePrerelease ? versions : versions.filter((version) => !version.includes("-"));
-  return filtered.reverse();
+  const pending = loadNugetToolVersions(normalizedId, includePrerelease).catch((error: unknown) => {
+    versionIndexCache.delete(cacheKey);
+    throw error;
+  });
+
+  versionIndexCache.set(cacheKey, pending);
+  return pending;
 }
 
 export async function downloadNugetPackage(id: string, version: string): Promise<Uint8Array> {
@@ -81,4 +85,21 @@ export async function downloadNugetPackage(id: string, version: string): Promise
   }
 
   return new Uint8Array(await response.arrayBuffer());
+}
+
+export function resetNugetToolCachesForTests(): void {
+  versionIndexCache.clear();
+}
+
+async function loadNugetToolVersions(normalizedId: string, includePrerelease: boolean): Promise<string[]> {
+  const url = `https://api.nuget.org/v3-flatcontainer/${normalizedId}/index.json`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`NuGet versions failed: ${response.status} ${response.statusText}`);
+  }
+
+  const payload = (await response.json()) as NugetVersionIndexResponse;
+  const versions = (payload.versions ?? []).filter((version): version is string => typeof version === "string");
+  const filtered = includePrerelease ? versions : versions.filter((version) => !version.includes("-"));
+  return filtered.reverse();
 }
