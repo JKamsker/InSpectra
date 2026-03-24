@@ -356,12 +356,10 @@ code, pre { font-family: var(--mono); }
   display: none;
   flex-direction: column;
   gap: 1.5rem;
-  content-visibility: hidden;
 }
 
 .page.active {
   display: flex;
-  content-visibility: visible;
   animation: pageIn .3s var(--ease-out);
 }
 

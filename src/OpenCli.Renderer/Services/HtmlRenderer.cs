@@ -43,11 +43,11 @@ public sealed class HtmlRenderer(
         foreach (var command in commands)
         {
             var anchorId = pathResolver.CreateAnchorId(command.Path);
-            content.AppendLine($"<div class=\"page\" data-page=\"command-{anchorId}\">");
+            content.AppendLine($"<template data-page=\"command-{anchorId}\">");
             sectionRenderer.AppendCommandBreadcrumb(document, command, content);
             sectionRenderer.AppendCommandBody(command, content, includeMetadata,
                 child => $"#command-{pathResolver.CreateAnchorId(child.Path)}", includeWrapper: true);
-            content.AppendLine("</div>");
+            content.AppendLine("</template>");
 
             AppendCommandPages(document, command.Commands, content, includeMetadata);
         }

@@ -17,10 +17,13 @@
   });
 
   /* ── SPA navigation ── */
-  var pages = document.querySelectorAll('.page');
-  var navLinks = document.querySelectorAll('.nav-link');
   var content = document.querySelector('.content');
+  var contentInner = content ? content.querySelector('.content-inner') : null;
   var topbarCtx = document.querySelector('.topbar-context');
+
+  /* The overview page is a real DOM node; command pages are <template> elements */
+  var overviewPage = document.querySelector('.page[data-page="overview"]');
+  var dynamicPage = null; /* container for the currently materialized template */
 
   function expandParents(el) {
     var item = el.closest('.nav-item');
@@ -34,7 +37,6 @@
   function staggerCards(page) {
     var cards = page.querySelectorAll('.command-card, .option-card');
     if (!cards.length) return;
-    /* Cap stagger to first 20 cards; reveal rest instantly */
     var cap = 20;
     cards.forEach(function(c) { c.classList.add('card-enter'); });
     requestAnimationFrame(function() {
@@ -53,30 +55,49 @@
     });
   }
 
-  var activePage = document.querySelector('.page.active');
   var activeNav = document.querySelector('.nav-link.active');
 
   function showPage(pageId) {
-    if (activePage) activePage.classList.remove('active');
-    var target = document.querySelector('[data-page="' + pageId + '"]');
-    var scrollToEl = null;
+    /* Tear down previous dynamic page */
+    if (dynamicPage) {
+      dynamicPage.remove();
+      dynamicPage = null;
+    }
 
-    if (!target) {
-      /* pageId is an in-page anchor (e.g. root-arguments) — find
-         the element by ID and show its parent page instead. */
-      var el = document.getElementById(pageId);
-      if (el) {
-        target = el.closest('.page');
-        scrollToEl = el;
+    var visiblePage = null;
+
+    if (pageId === 'overview') {
+      overviewPage.classList.add('active');
+      visiblePage = overviewPage;
+    } else {
+      overviewPage.classList.remove('active');
+
+      /* Find the template */
+      var tpl = document.querySelector('template[data-page="' + pageId + '"]');
+
+      if (!tpl) {
+        /* pageId might be an in-page anchor — find the element inside a template */
+        var allTemplates = document.querySelectorAll('template[data-page]');
+        for (var i = 0; i < allTemplates.length; i++) {
+          if (allTemplates[i].content.getElementById(pageId)) {
+            tpl = allTemplates[i];
+            break;
+          }
+        }
+      }
+
+      if (tpl) {
+        dynamicPage = document.createElement('div');
+        dynamicPage.className = 'page active';
+        dynamicPage.setAttribute('data-page', tpl.getAttribute('data-page'));
+        dynamicPage.appendChild(tpl.content.cloneNode(true));
+        contentInner.appendChild(dynamicPage);
+        visiblePage = dynamicPage;
+        staggerCards(dynamicPage);
       }
     }
 
-    if (target) {
-      target.classList.add('active');
-      activePage = target;
-      staggerCards(target);
-    }
-
+    /* Update nav highlight */
     if (activeNav) activeNav.classList.remove('active');
     var href = pageId === 'overview' ? '#overview' : '#' + pageId;
     var active = document.querySelector('.nav-link[href="' + href + '"]');
@@ -87,15 +108,9 @@
       active.scrollIntoView({ block: 'nearest' });
     }
 
-    if (content) {
-      if (scrollToEl) {
-        requestAnimationFrame(function() { scrollToEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-      } else {
-        content.scrollTo(0, 0);
-      }
-    }
+    if (content) content.scrollTo(0, 0);
     if (topbarCtx) {
-      var h = target ? target.querySelector('h1, h2') : null;
+      var h = visiblePage ? visiblePage.querySelector('h1, h2') : null;
       topbarCtx.textContent = h ? h.textContent : 'Overview';
     }
     rebuildComposer();
@@ -150,11 +165,15 @@
     if (!composer.hidden) rebuildComposer();
   }
 
+  function getActivePage() {
+    return dynamicPage || (overviewPage.classList.contains('active') ? overviewPage : null);
+  }
+
   function rebuildComposer() {
     if (!composerBody || !composer || composer.hidden) return;
     composerBody.innerHTML = '';
 
-    var page = document.querySelector('.page.active');
+    var page = getActivePage();
     if (!page || page.getAttribute('data-page') === 'overview') {
       composerBody.innerHTML = '<div class="composer-empty">Select a command to start composing.</div>';
       updateComposerPreview();
@@ -208,7 +227,7 @@
 
   function updateComposerPreview() {
     if (!composerOutput) return;
-    var page = document.querySelector('.page.active');
+    var page = getActivePage();
     if (!page || page.getAttribute('data-page') === 'overview') {
       composerOutput.textContent = '...';
       return;
