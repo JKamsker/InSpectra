@@ -87,6 +87,7 @@
       var h = target ? target.querySelector('h1, h2') : null;
       topbarCtx.textContent = h ? h.textContent : 'Overview';
     }
+    rebuildComposer();
   }
 
   function handleNav(e) {
@@ -120,6 +121,121 @@
   if (window.location.hash && window.location.hash !== '#overview') {
     showPage(window.location.hash.slice(1));
   }
+
+  /* ── Composer ── */
+  var composer = document.querySelector('[data-composer]');
+  var composerBody = composer ? composer.querySelector('.composer-body') : null;
+  var composerOutput = composer ? composer.querySelector('.composer-output') : null;
+  var composerToggleBtn = document.querySelector('[data-composer-toggle]');
+
+  function toggleComposer() {
+    if (!composer) return;
+    composer.hidden = !composer.hidden;
+    if (composerToggleBtn) composerToggleBtn.classList.toggle('active', !composer.hidden);
+    if (!composer.hidden) rebuildComposer();
+  }
+
+  function rebuildComposer() {
+    if (!composerBody || !composer || composer.hidden) return;
+    composerBody.innerHTML = '';
+
+    var page = document.querySelector('.page.active');
+    if (!page || page.getAttribute('data-page') === 'overview') {
+      composerBody.innerHTML = '<div class="composer-empty">Select a command to start composing.</div>';
+      updateComposerPreview();
+      return;
+    }
+
+    var optionCards = page.querySelectorAll('.option-card');
+    if (!optionCards.length) {
+      composerBody.innerHTML = '<div class="composer-empty">This command has no configurable options.</div>';
+      updateComposerPreview();
+      return;
+    }
+
+    var heading = document.createElement('p');
+    heading.className = 'composer-section-title';
+    var cmdName = page.querySelector('h2');
+    heading.innerHTML = 'Options for <code>' + (cmdName ? cmdName.textContent : '') + '</code>';
+    composerBody.appendChild(heading);
+
+    optionCards.forEach(function(card) {
+      var nameEl = card.querySelector('.option-head strong code');
+      if (!nameEl) return;
+      var optName = nameEl.textContent.replace(/ \(hidden\)$/, '');
+      var badges = card.querySelectorAll('.badge');
+      var isFlag = Array.from(badges).some(function(b) { return b.textContent.trim() === 'flag'; });
+      var descEl = card.querySelector(':scope > p');
+      var desc = descEl ? descEl.textContent.trim() : '';
+      if (desc === 'No description provided.') desc = '';
+
+      var field = document.createElement('div');
+      field.className = 'composer-field';
+
+      if (isFlag) {
+        var lbl = document.createElement('label');
+        lbl.className = 'composer-flag';
+        lbl.innerHTML = '<input type="checkbox" data-opt="' + optName + '"><div><span class="composer-opt-name">' + optName + '</span>' + (desc ? '<span class="composer-opt-desc">' + desc + '</span>' : '') + '</div>';
+        field.appendChild(lbl);
+      } else {
+        var placeholder = 'value';
+        var pBadge = card.querySelector('.badge-primary');
+        if (pBadge) placeholder = pBadge.textContent.trim().replace(/[<>]/g, '');
+        field.innerHTML = '<label class="composer-opt-name">' + optName + '</label><input type="text" placeholder="' + placeholder + '" data-opt="' + optName + '" class="composer-input">' + (desc ? '<span class="composer-opt-desc">' + desc + '</span>' : '');
+      }
+      composerBody.appendChild(field);
+    });
+
+    composerBody.addEventListener('input', updateComposerPreview);
+    composerBody.addEventListener('change', updateComposerPreview);
+    updateComposerPreview();
+  }
+
+  function updateComposerPreview() {
+    if (!composerOutput) return;
+    var page = document.querySelector('.page.active');
+    if (!page || page.getAttribute('data-page') === 'overview') {
+      composerOutput.textContent = '...';
+      return;
+    }
+    var parts = [];
+    var bc = page.querySelector('.breadcrumb');
+    if (bc) {
+      bc.querySelectorAll('a, .crumb-current').forEach(function(el) { parts.push(el.textContent.trim()); });
+    }
+    if (composerBody) {
+      composerBody.querySelectorAll('[data-opt]').forEach(function(inp) {
+        var name = inp.getAttribute('data-opt');
+        if (inp.type === 'checkbox' && inp.checked) {
+          parts.push(name);
+        } else if (inp.type === 'text' && inp.value.trim()) {
+          var v = inp.value.trim();
+          v = v.indexOf(' ') !== -1 ? '"' + v + '"' : v;
+          parts.push(name + ' ' + v);
+        }
+      });
+    }
+    composerOutput.textContent = parts.join(' ') || '...';
+  }
+
+  function copyComposerCommand() {
+    if (!composerOutput) return;
+    var text = composerOutput.textContent;
+    if (!text || text === '...') return;
+    var btn = composer.querySelector('[data-composer-copy]');
+    var done = function() {
+      if (btn) { btn.classList.add('copied'); setTimeout(function() { btn.classList.remove('copied'); }, 2000); }
+    };
+    try {
+      if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done); }
+      else { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); }
+    } catch(e) {}
+  }
+
+  if (composerToggleBtn) composerToggleBtn.addEventListener('click', toggleComposer);
+  if (composer) composer.addEventListener('click', function(e) {
+    if (e.target.closest('[data-composer-copy]')) copyComposerCommand();
+  });
 
   /* ── Search / filter ── */
   var search = document.querySelector('[data-nav-search]');
