@@ -23,7 +23,7 @@ public sealed class HtmlRenderer(
             content,
             includeMetadata,
             command => $"#command-{pathResolver.CreateAnchorId(command.Path)}",
-            includeCommandCards: false);
+            includeCommandCards: true);
         content.AppendLine("</div>");
 
         if (document.Commands.Count > 0)
