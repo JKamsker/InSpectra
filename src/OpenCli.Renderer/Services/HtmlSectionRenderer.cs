@@ -94,7 +94,6 @@ public sealed class HtmlSectionRenderer(
         bool includeWrapper)
     {
         if (includeWrapper) builder.AppendLine($"<section class=\"panel command-detail\" id=\"command-{pathResolver.CreateAnchorId(command.Path)}\">");
-        builder.AppendLine($"<span class=\"command-path\">{contentFormatter.Encode(command.Path)}</span>");
         builder.AppendLine($"<h2>{contentFormatter.Encode(command.Command.Name)}</h2>");
         builder.AppendLine(contentFormatter.RenderParagraphBlock(command.Command.Description, "No description provided."));
         AppendAttributes(command.Command, builder);
@@ -104,6 +103,7 @@ public sealed class HtmlSectionRenderer(
         AppendCommandExamples(command.Command.Examples, builder);
         AppendCommandExitCodes(command.Command.ExitCodes, builder);
         if (includeMetadata) blockRenderer.AppendCommandMetadata(command, builder);
+        AppendEmptyState(command, builder);
         if (includeWrapper) builder.AppendLine("</section>");
     }
 
@@ -155,7 +155,7 @@ public sealed class HtmlSectionRenderer(
         builder.AppendLine("<section class=\"panel section\" id=\"available-commands\"><div class=\"section-head\"><span class=\"eyebrow\">Explore</span><h2>Available commands</h2></div><div class=\"card-grid\">");
         foreach (var command in topLevelCommands)
         {
-            builder.AppendLine($"<a class=\"command-card\" href=\"{contentFormatter.Encode(commandLinkFactory(command))}\"><strong>{contentFormatter.Encode(command.Command.Name)}</strong><p>{contentFormatter.EncodeOrFallback(command.Command.Description, "No description provided.")}</p></a>");
+            builder.AppendLine($"<a class=\"command-card\" href=\"{contentFormatter.Encode(commandLinkFactory(command))}\"><div class=\"command-card-head\"><strong>{contentFormatter.Encode(command.Command.Name)}</strong><span class=\"command-card-arrow\">\u2192</span></div><p>{contentFormatter.EncodeOrFallback(command.Command.Description, "No description provided.")}</p></a>");
         }
 
         builder.AppendLine("</div></section>");
@@ -207,10 +207,10 @@ public sealed class HtmlSectionRenderer(
     private void AppendSubcommands(NormalizedCommand command, StringBuilder builder, Func<NormalizedCommand, string> childLinkFactory)
     {
         if (command.Commands.Count == 0) return;
-        builder.AppendLine("<div class=\"detail-block\"><h3>Subcommands</h3><div class=\"card-grid\">");
+        builder.AppendLine("<div class=\"detail-block\"><h3><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#3b82f6\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z\"/><path d=\"M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z\"/></svg>Subcommands</h3><div class=\"card-grid\">");
         foreach (var child in command.Commands)
         {
-            builder.AppendLine($"<a class=\"command-card\" href=\"{contentFormatter.Encode(childLinkFactory(child))}\"><strong>{contentFormatter.Encode(child.Command.Name)}</strong><p>{contentFormatter.EncodeOrFallback(child.Command.Description, "No description provided.")}</p></a>");
+            builder.AppendLine($"<a class=\"command-card\" href=\"{contentFormatter.Encode(childLinkFactory(child))}\"><div class=\"command-card-head\"><strong>{contentFormatter.Encode(child.Command.Name)}</strong><span class=\"command-card-arrow\">\u2192</span></div><p>{contentFormatter.EncodeOrFallback(child.Command.Description, "No description provided.")}</p></a>");
         }
 
         builder.AppendLine("</div></div>");
@@ -219,7 +219,7 @@ public sealed class HtmlSectionRenderer(
     private void AppendArguments(NormalizedCommand command, StringBuilder builder)
     {
         if (command.Arguments.Count == 0) return;
-        builder.AppendLine("<div class=\"detail-block\"><h3>Arguments</h3>");
+        builder.AppendLine("<div class=\"detail-block\"><h3><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#f59e0b\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 7V4h16v3\"/><path d=\"M9 20h6\"/><path d=\"M12 4v16\"/></svg>Arguments</h3>");
         blockRenderer.AppendArgumentTable(command.Arguments, builder);
         builder.AppendLine("</div>");
     }
@@ -227,7 +227,7 @@ public sealed class HtmlSectionRenderer(
     private void AppendOptions(NormalizedCommand command, StringBuilder builder)
     {
         if (command.DeclaredOptions.Count == 0 && command.InheritedOptions.Count == 0) return;
-        builder.AppendLine("<div class=\"detail-block\"><h3>Options</h3>");
+        builder.AppendLine("<div class=\"detail-block\"><h3><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#6366f1\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 7h-9\"/><path d=\"M14 17H5\"/><circle cx=\"17\" cy=\"17\" r=\"3\"/><circle cx=\"7\" cy=\"7\" r=\"3\"/></svg>Options</h3>");
         blockRenderer.AppendOptionCards(command.DeclaredOptions.Select(option => new ResolvedOption { Option = option, IsInherited = false }).Concat(command.InheritedOptions), builder);
         builder.AppendLine("</div>");
     }
@@ -236,7 +236,7 @@ public sealed class HtmlSectionRenderer(
     {
         var exampleList = examples.ToList();
         if (exampleList.Count == 0) return;
-        builder.AppendLine("<div class=\"detail-block\"><h3>Examples</h3>");
+        builder.AppendLine("<div class=\"detail-block\"><h3><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#22c55e\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m4 17 6-5-6-5\"/><path d=\"M12 19h8\"/></svg>Examples</h3>");
         blockRenderer.AppendExamples(exampleList, builder);
         builder.AppendLine("</div>");
     }
@@ -245,8 +245,20 @@ public sealed class HtmlSectionRenderer(
     {
         var codes = exitCodes.ToList();
         if (codes.Count == 0) return;
-        builder.AppendLine("<div class=\"detail-block\"><h3>Exit codes</h3>");
+        builder.AppendLine("<div class=\"detail-block\"><h3><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#ef4444\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 8v4\"/><path d=\"M12 16h.01\"/></svg>Exit codes</h3>");
         blockRenderer.AppendExitCodeTable(codes, builder);
         builder.AppendLine("</div>");
+    }
+
+    private void AppendEmptyState(NormalizedCommand command, StringBuilder builder)
+    {
+        if (command.Commands.Count > 0 || command.Arguments.Count > 0 ||
+            command.DeclaredOptions.Count > 0 || command.InheritedOptions.Count > 0 ||
+            command.Command.Examples.Count > 0 || command.Command.ExitCodes.Count > 0)
+        {
+            return;
+        }
+
+        builder.AppendLine("<div class=\"empty-state\"><svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m4 17 6-5-6-5\"/><path d=\"M12 19h8\"/></svg><p>No additional details or options defined for this command.</p></div>");
     }
 }

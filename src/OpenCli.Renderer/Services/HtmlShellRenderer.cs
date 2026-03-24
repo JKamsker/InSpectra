@@ -84,8 +84,24 @@ public sealed class HtmlShellRenderer(
         var href = isSinglePage
             ? $"#command-{pathResolver.CreateAnchorId(command.Path)}"
             : pathResolver.CreateRelativeLink(currentPagePath, pathResolver.GetCommandRelativePath(command, "html"));
-        builder.AppendLine($"<li class=\"nav-item\" data-nav-item data-label=\"{contentFormatter.Encode(command.Path.ToLowerInvariant())}\"><a class=\"nav-link{(command.Path == currentPath ? " active" : string.Empty)}\" href=\"{contentFormatter.Encode(href)}\">{contentFormatter.Encode(command.Command.Name)}</a>");
-        if (command.Commands.Count > 0)
+        var hasChildren = command.Commands.Count > 0;
+
+        builder.AppendLine($"<li class=\"nav-item\" data-nav-item data-label=\"{contentFormatter.Encode(command.Path.ToLowerInvariant())}\">");
+        builder.Append("<div class=\"nav-row\">");
+
+        if (hasChildren)
+        {
+            builder.Append("<span class=\"nav-chevron\" data-nav-toggle><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m9 18 6-6-6-6\"/></svg></span>");
+        }
+        else
+        {
+            builder.Append("<span class=\"nav-icon\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m4 17 6-5-6-5\"/><path d=\"M12 19h8\"/></svg></span>");
+        }
+
+        builder.Append($"<a class=\"nav-link{(command.Path == currentPath ? " active" : string.Empty)}\" href=\"{contentFormatter.Encode(href)}\">{contentFormatter.Encode(command.Command.Name)}</a>");
+        builder.AppendLine("</div>");
+
+        if (hasChildren)
         {
             builder.AppendLine("<ul class=\"nav-tree\">");
             foreach (var child in command.Commands)

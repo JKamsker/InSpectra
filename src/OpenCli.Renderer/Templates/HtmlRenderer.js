@@ -4,6 +4,15 @@
   const content = document.querySelector('.content');
   const topbarCtx = document.querySelector('.topbar-context');
 
+  function expandParents(el) {
+    var item = el.closest('.nav-item');
+    while (item) {
+      item.classList.remove('collapsed');
+      item.hidden = false;
+      item = item.parentElement ? item.parentElement.closest('.nav-item') : null;
+    }
+  }
+
   function showPage(pageId) {
     pages.forEach(p => p.classList.remove('active'));
     const target = document.querySelector('[data-page="' + pageId + '"]');
@@ -14,13 +23,7 @@
     const active = document.querySelector('.nav-link[href="' + href + '"]');
     if (active) {
       active.classList.add('active');
-      var item = active.closest('.nav-item');
-      while (item) {
-        item.hidden = false;
-        var tree = item.querySelector(':scope > .nav-tree');
-        if (tree) tree.hidden = false;
-        item = item.parentElement ? item.parentElement.closest('.nav-item') : null;
-      }
+      expandParents(active);
       active.scrollIntoView({ block: 'nearest' });
     }
 
@@ -32,6 +35,16 @@
   }
 
   function handleNav(e) {
+    /* Toggle chevron expand/collapse */
+    var toggle = e.target.closest('[data-nav-toggle]');
+    if (toggle) {
+      e.preventDefault();
+      e.stopPropagation();
+      var item = toggle.closest('.nav-item');
+      if (item) item.classList.toggle('collapsed');
+      return;
+    }
+
     var link = e.target.closest('a[href^="#"]');
     if (!link) return;
     var href = link.getAttribute('href');

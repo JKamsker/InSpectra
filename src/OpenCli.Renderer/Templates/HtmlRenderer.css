@@ -146,9 +146,48 @@ code, pre, input {
 .nav-tree {
   list-style: none;
   margin: 0;
-  padding: 0 0 0 .6rem;
+  padding: 0 0 0 .25rem;
   border-left: 1px solid var(--border);
-  margin-left: .5rem;
+  margin-left: .55rem;
+  margin-top: .15rem;
+}
+
+.nav-row {
+  display: flex;
+  align-items: center;
+}
+
+.nav-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--soft);
+  opacity: .7;
+  transition: transform .15s ease;
+  transform: rotate(90deg);
+}
+
+.nav-item.collapsed > .nav-row > .nav-chevron {
+  transform: rotate(0deg);
+}
+
+.nav-item.collapsed > .nav-tree {
+  display: none;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--soft);
+  opacity: .35;
 }
 
 .nav-link {
@@ -429,20 +468,25 @@ tbody tr:last-child td { border-bottom: none; }
   box-shadow: 0 8px 24px rgba(37, 99, 235, .08);
 }
 
-.command-card strong, .command-path {
+.command-card strong {
   font-family: "Cascadia Code", Consolas, monospace;
   color: var(--blue);
 }
 
-.command-path {
-  display: inline-flex;
-  margin-bottom: .5rem;
-  padding: .35rem .6rem;
-  border-radius: .5rem;
-  background: #0f172a;
-  color: #e2e8f0;
-  font-size: .82rem;
-  width: max-content;
+.command-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.command-card-arrow {
+  color: var(--border);
+  font-size: 1rem;
+  transition: color .12s;
+}
+
+.command-card:hover .command-card-arrow {
+  color: var(--blue);
 }
 
 /* ── Detail blocks ── */
@@ -476,6 +520,25 @@ pre {
 .empty {
   font-style: italic;
   color: var(--soft);
+}
+
+/* ── Empty state ── */
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--soft);
+  border: 2px dashed var(--border);
+  border-radius: .75rem;
+}
+
+.empty-state svg {
+  margin: 0 auto .75rem;
+  display: block;
+}
+
+.empty-state p {
+  margin: 0;
 }
 
 /* ── Responsive ── */
