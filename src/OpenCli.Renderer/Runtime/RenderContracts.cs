@@ -21,8 +21,15 @@ public enum MarkdownLayout
     Tree,
 }
 
+public enum RenderLayout
+{
+    Single,
+    Tree,
+    App,
+}
+
 public sealed record RenderExecutionOptions(
-    MarkdownLayout Layout,
+    RenderLayout Layout,
     ResolvedOutputMode OutputMode,
     bool DryRun,
     bool Quiet,
@@ -64,13 +71,13 @@ public sealed record RenderStats(
 public sealed record RenderedFile(
     string RelativePath,
     string FullPath,
-    string Content);
+    string? Content);
 
 public sealed class RenderExecutionResult
 {
     public required DocumentFormat Format { get; init; }
 
-    public required MarkdownLayout Layout { get; init; }
+    public required RenderLayout Layout { get; init; }
 
     public required RenderSourceInfo Source { get; init; }
 

@@ -4,11 +4,11 @@ using Spectre.Console.Cli;
 
 namespace OpenCli.Renderer.Commands.Render;
 
-public sealed class ExecHtmlCommand(DocumentRenderService renderService, HtmlRenderer renderer) : AsyncCommand<ExecRenderSettings>
+public sealed class ExecHtmlCommand(HtmlRenderService renderService) : AsyncCommand<ExecRenderSettings>
 {
     public override Task<int> ExecuteAsync(CommandContext context, ExecRenderSettings settings, CancellationToken cancellationToken)
     {
-        var options = RenderRequestFactory.CreateOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true);
+        var options = RenderRequestFactory.CreateHtmlOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true);
         var workingDirectory = RenderRequestFactory.ResolveWorkingDirectory(settings.WorkingDirectory);
         var request = new ExecRenderRequest(
             settings.Source,
@@ -23,6 +23,6 @@ public sealed class ExecHtmlCommand(DocumentRenderService renderService, HtmlRen
         return CommandOutputHandler.ExecuteAsync(
             options.OutputMode,
             options.Verbose,
-            () => renderService.RenderFromExecAsync(request, renderer, cancellationToken));
+            () => renderService.RenderFromExecAsync(request, cancellationToken));
     }
 }

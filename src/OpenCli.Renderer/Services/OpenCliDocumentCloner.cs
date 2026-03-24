@@ -1,0 +1,16 @@
+using System.Text.Json;
+using OpenCli.Renderer.Models;
+
+namespace OpenCli.Renderer.Services;
+
+public sealed class OpenCliDocumentCloner
+{
+    private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+
+    public OpenCliDocument Clone(OpenCliDocument document)
+    {
+        var json = JsonSerializer.Serialize(document, SerializerOptions);
+        return JsonSerializer.Deserialize<OpenCliDocument>(json, SerializerOptions)
+            ?? throw new InvalidOperationException("Failed to clone the OpenCLI document.");
+    }
+}

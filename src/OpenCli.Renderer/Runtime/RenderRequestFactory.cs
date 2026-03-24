@@ -2,7 +2,7 @@ namespace OpenCli.Renderer.Runtime;
 
 public static class RenderRequestFactory
 {
-    public static RenderExecutionOptions CreateOptions(
+    public static RenderExecutionOptions CreateMarkdownOptions(
         CommonCommandSettings settings,
         string? layoutValue,
         string? outputFile,
@@ -11,9 +11,9 @@ public static class RenderRequestFactory
         bool hasTimeoutSupport)
     {
         var outputMode = ResolveOutputMode(settings);
-        var layout = ResolveLayout(layoutValue);
+        var layout = ResolveMarkdownLayout(layoutValue);
 
-        ValidateLayoutOutputCombination(layout, outputMode, outputFile, outputDirectory);
+        ValidateMarkdownLayoutOutputCombination(layout, outputMode, outputFile, outputDirectory);
 
         if (hasTimeoutSupport && timeoutSeconds is <= 0)
         {
@@ -31,6 +31,37 @@ public static class RenderRequestFactory
             settings.IncludeMetadata,
             settings.Overwrite,
             NormalizePath(outputFile),
+            NormalizePath(outputDirectory));
+    }
+
+    public static RenderExecutionOptions CreateHtmlOptions(
+        CommonCommandSettings settings,
+        string? layoutValue,
+        string? outputFile,
+        string? outputDirectory,
+        int? timeoutSeconds,
+        bool hasTimeoutSupport)
+    {
+        var outputMode = ResolveOutputMode(settings);
+
+        ValidateHtmlOutputCombination(layoutValue, outputFile, outputDirectory);
+
+        if (hasTimeoutSupport && timeoutSeconds is <= 0)
+        {
+            throw new CliUsageException("`--timeout` must be greater than zero.");
+        }
+
+        return new RenderExecutionOptions(
+            RenderLayout.App,
+            outputMode,
+            settings.DryRun,
+            ResolveFlag(settings.Quiet, "OPENCLI_RENDERER_QUIET"),
+            ResolveFlag(settings.Verbose, "OPENCLI_RENDERER_VERBOSE"),
+            settings.NoColor || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("NO_COLOR")),
+            settings.IncludeHidden,
+            settings.IncludeMetadata,
+            settings.Overwrite,
+            OutputFile: null,
             NormalizePath(outputDirectory));
     }
 
@@ -104,19 +135,19 @@ public static class RenderRequestFactory
             : ResolvedOutputMode.Human;
     }
 
-    private static MarkdownLayout ResolveLayout(string? layoutValue)
+    private static RenderLayout ResolveMarkdownLayout(string? layoutValue)
     {
         var normalized = layoutValue?.Trim().ToLowerInvariant();
         return normalized switch
         {
-            null or "" or "single" => MarkdownLayout.Single,
-            "tree" => MarkdownLayout.Tree,
+            null or "" or "single" => RenderLayout.Single,
+            "tree" => RenderLayout.Tree,
             _ => throw new CliUsageException("`--layout` must be `single` or `tree`."),
         };
     }
 
-    private static void ValidateLayoutOutputCombination(
-        MarkdownLayout layout,
+    private static void ValidateMarkdownLayoutOutputCombination(
+        RenderLayout layout,
         ResolvedOutputMode outputMode,
         string? outputFile,
         string? outputDirectory)
@@ -126,24 +157,45 @@ public static class RenderRequestFactory
             throw new CliUsageException("Use either `--out` or `--out-dir`, not both.");
         }
 
-        if (layout == MarkdownLayout.Single && !string.IsNullOrWhiteSpace(outputDirectory))
+        if (layout == RenderLayout.Single && !string.IsNullOrWhiteSpace(outputDirectory))
         {
             throw new CliUsageException("`--out-dir` is only valid with `--layout tree`.");
         }
 
-        if (layout == MarkdownLayout.Tree && !string.IsNullOrWhiteSpace(outputFile))
+        if (layout == RenderLayout.Tree && !string.IsNullOrWhiteSpace(outputFile))
         {
             throw new CliUsageException("`--out` is only valid with `--layout single`.");
         }
 
-        if (layout == MarkdownLayout.Tree && string.IsNullOrWhiteSpace(outputDirectory))
+        if (layout == RenderLayout.Tree && string.IsNullOrWhiteSpace(outputDirectory))
         {
             throw new CliUsageException("`--layout tree` requires `--out-dir`.");
         }
 
-        if (outputMode == ResolvedOutputMode.Json && layout == MarkdownLayout.Single && string.IsNullOrWhiteSpace(outputFile))
+        if (outputMode == ResolvedOutputMode.Json && layout == RenderLayout.Single && string.IsNullOrWhiteSpace(outputFile))
         {
             throw new CliUsageException("Machine output requires `--out` for single-file rendering.");
+        }
+    }
+
+    private static void ValidateHtmlOutputCombination(
+        string? layoutValue,
+        string? outputFile,
+        string? outputDirectory)
+    {
+        if (!string.IsNullOrWhiteSpace(layoutValue))
+        {
+            throw new CliUsageException("`--layout` is not supported for HTML output. HTML always renders as an app bundle.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(outputFile))
+        {
+            throw new CliUsageException("`--out` is not supported for HTML output. Use `--out-dir`.");
+        }
+
+        if (string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            throw new CliUsageException("HTML output requires `--out-dir`.");
         }
     }
 

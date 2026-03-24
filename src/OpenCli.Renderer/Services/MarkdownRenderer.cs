@@ -1,6 +1,5 @@
 using System.Text;
 using OpenCli.Renderer.Models;
-using OpenCli.Renderer.Runtime;
 
 namespace OpenCli.Renderer.Services;
 
@@ -10,10 +9,8 @@ public sealed class MarkdownRenderer(
     MarkdownMetadataRenderer metadataRenderer,
     CommandPathResolver pathResolver,
     RenderModelFormatter formatter,
-    OverviewFormatter overviewFormatter) : IDocumentRenderer
+    OverviewFormatter overviewFormatter)
 {
-    public DocumentFormat Format => DocumentFormat.Markdown;
-
     public string RenderSingle(NormalizedCliDocument document, bool includeMetadata)
     {
         var builder = new StringBuilder();

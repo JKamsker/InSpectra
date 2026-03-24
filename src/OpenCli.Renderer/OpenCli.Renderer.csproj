@@ -6,6 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>opencli-renderer</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>opencli-renderer</ToolCommandName>
+    <PackageId>OpenCli.Renderer</PackageId>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +21,19 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Schema\OpenCli.draft.json" />
-    <EmbeddedResource Include="Templates\HtmlRenderer.css" />
-    <EmbeddedResource Include="Templates\HtmlRenderer.js" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\InSpectreUI\dist\**\*"
+          Pack="true"
+          PackagePath="tools\$(TargetFramework)\any\InSpectreUI\dist\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="InSpectreUI\dist\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <Target Name="EnsureInSpectreUiDistForPackOrPublish" BeforeTargets="Pack;Publish">
+    <Error Condition="!Exists('..\InSpectreUI\dist\index.html')"
+           Text="InSpectreUI dist is missing. Run `npm ci` and `npm run build` in `src/InSpectreUI` before `dotnet pack` or `dotnet publish`." />
+  </Target>
 
 </Project>

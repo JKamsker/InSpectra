@@ -4,11 +4,11 @@ using Spectre.Console.Cli;
 
 namespace OpenCli.Renderer.Commands.Render;
 
-public sealed class FileMarkdownCommand(DocumentRenderService renderService, MarkdownRenderer renderer) : AsyncCommand<FileRenderSettings>
+public sealed class FileMarkdownCommand(MarkdownRenderService renderService) : AsyncCommand<FileRenderSettings>
 {
     public override Task<int> ExecuteAsync(CommandContext context, FileRenderSettings settings, CancellationToken cancellationToken)
     {
-        var options = RenderRequestFactory.CreateOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, timeoutSeconds: null, hasTimeoutSupport: false);
+        var options = RenderRequestFactory.CreateMarkdownOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, timeoutSeconds: null, hasTimeoutSupport: false);
         var request = new FileRenderRequest(
             settings.OpenCliJsonPath,
             settings.XmlDocPath,
@@ -17,7 +17,7 @@ public sealed class FileMarkdownCommand(DocumentRenderService renderService, Mar
         return CommandOutputHandler.ExecuteAsync(
             options.OutputMode,
             options.Verbose,
-            () => renderService.RenderFromFileAsync(request, renderer, cancellationToken));
+            () => renderService.RenderFromFileAsync(request, cancellationToken));
     }
 }
 

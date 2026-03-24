@@ -43,7 +43,12 @@ public static class CommandOutputHandler
                 Data = new
                 {
                     format = result.Format == DocumentFormat.Html ? "html" : "markdown",
-                    layout = result.Layout == MarkdownLayout.Tree ? "tree" : "single",
+                    layout = result.Layout switch
+                    {
+                        RenderLayout.Tree => "tree",
+                        RenderLayout.App => "app",
+                        _ => "single",
+                    },
                     dryRun = result.IsDryRun,
                     source = new
                     {

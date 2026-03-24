@@ -11,7 +11,6 @@ public class OpenCliEnrichmentAndRenderingTests
     private readonly OpenCliXmlEnricher _enricher = new();
     private readonly OpenCliNormalizer _normalizer = new();
     private readonly MarkdownRenderer _renderer = RendererFactory.CreateMarkdownRenderer();
-    private readonly HtmlRenderer _htmlRenderer = RendererFactory.CreateHtmlRenderer();
 
     [Fact]
     public async Task Xml_enrichment_restores_missing_command_descriptions()
@@ -138,41 +137,6 @@ public class OpenCliEnrichmentAndRenderingTests
         Assert.Contains("Argument `NAME`", markdown);
         Assert.Contains("`Settings`: `Demo.Profile`", markdown);
         Assert.Contains("`ClrType`: `System.String`", markdown);
-    }
-
-    [Fact]
-    public async Task Single_html_uses_viewer_inspired_shell()
-    {
-        var document = await _loader.LoadFromFileAsync(FixturePaths.OpenCliJson, CancellationToken.None);
-        var normalized = _normalizer.Normalize(document, includeHidden: false);
-
-        var html = _htmlRenderer.RenderSingle(normalized, includeMetadata: true);
-
-        Assert.Contains("<aside class=\"sidebar\">", html);
-        Assert.Contains("Filter commands", html);
-        Assert.Contains("Command-line reference for `jdr`.", html);
-        Assert.Contains("stat-card", html);
-        Assert.Contains("command-card", html);
-        Assert.Contains("option-card", html);
-        Assert.Contains("Metadata appendix", html);
-    }
-
-    [Fact]
-    public async Task Tree_html_creates_expected_command_pages()
-    {
-        var document = await _loader.LoadFromFileAsync(FixturePaths.OpenCliJson, CancellationToken.None);
-        var normalized = _normalizer.Normalize(document, includeHidden: false);
-
-        var files = _htmlRenderer.RenderTree(normalized, includeMetadata: false);
-        var loginPage = files.Single(file => file.RelativePath == "auth/login.html").Content;
-
-        Assert.Contains(files, file => file.RelativePath == "index.html");
-        Assert.Contains(files, file => file.RelativePath == "auth/index.html");
-        Assert.Contains(files, file => file.RelativePath == "auth/login.html");
-        Assert.Contains("Available commands", files.Single(file => file.RelativePath == "index.html").Content);
-        Assert.Contains("Store encrypted auth material for a profile.", loginPage);
-        Assert.Contains("Filter command tree", loginPage);
-        Assert.Contains("Ctrl F", loginPage);
     }
 
     [Fact]
