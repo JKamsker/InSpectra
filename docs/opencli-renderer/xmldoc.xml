@@ -48,7 +48,7 @@ Kind="scalar" ClrType="System.String" />
       <!--HTML-->
       <Command Name="html" IsBranch="false" 
 ClrType="OpenCli.Renderer.Commands.Render.FileHtmlCommand" 
-Settings="OpenCli.Renderer.Commands.Render.FileRenderSettings">
+Settings="OpenCli.Renderer.Commands.Render.FileHtmlSettings">
         <Description>Render an HTML app bundle from an OpenCLI JSON file and 
 optional XML enrichment file.</Description>
         <Parameters>
@@ -135,7 +135,7 @@ Kind="vector" ClrType="System.String[]" />
       <!--HTML-->
       <Command Name="html" IsBranch="false" 
 ClrType="OpenCli.Renderer.Commands.Render.ExecHtmlCommand" 
-Settings="OpenCli.Renderer.Commands.Render.ExecRenderSettings">
+Settings="OpenCli.Renderer.Commands.Render.ExecHtmlSettings">
         <Description>Render an HTML app bundle from a live CLI process and 
 optional `cli xmldoc` enrichment.</Description>
         <Parameters>
