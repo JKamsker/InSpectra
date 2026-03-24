@@ -248,6 +248,7 @@ section{padding:6rem 0}
   background:var(--bg-card);border:1px solid var(--border);border-radius:14px;
   padding:2rem;position:relative;overflow:hidden;
   transition:border-color .3s, transform .2s, box-shadow .3s;
+  display:flex;flex-direction:column;
 }
 .example-card:hover{
   border-color:rgba(34,211,238,.3);transform:translateY(-2px);
@@ -271,7 +272,7 @@ section{padding:6rem 0}
   color:var(--teal);background:rgba(94,234,212,.08);
   padding:.15rem .5rem;border-radius:4px;margin-bottom:.8rem;
 }
-.card-desc{font-size:.88rem;color:var(--text-dim);line-height:1.65;margin-bottom:1.5rem}
+.card-desc{font-size:.88rem;color:var(--text-dim);line-height:1.65;margin-bottom:1.5rem;flex:1}
 .card-link{
   display:inline-flex;align-items:center;gap:.4rem;
   font-size:.85rem;font-weight:600;color:var(--cyan);
