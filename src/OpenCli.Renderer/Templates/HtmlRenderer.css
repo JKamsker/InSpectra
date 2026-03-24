@@ -210,6 +210,7 @@ code, pre { font-family: var(--mono); }
   padding: .6rem .6rem .4rem;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .search span {
@@ -223,6 +224,7 @@ code, pre { font-family: var(--mono); }
 .search input {
   width: 100%;
   padding: .45rem .65rem;
+  padding-right: 3.5rem;
   border: 1px solid var(--border);
   border-radius: .4rem;
   background: var(--surface);
@@ -238,6 +240,26 @@ code, pre { font-family: var(--mono); }
 .search input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search input:focus + kbd { opacity: 0; }
+
+.search kbd {
+  position: absolute;
+  right: 1rem;
+  bottom: calc(.4rem + .45rem);
+  /* .4rem = label bottom padding, .45rem = input vertical padding */
+  font-family: var(--mono);
+  font-size: .58rem;
+  font-weight: 500;
+  color: var(--soft);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: .2rem;
+  padding: .12rem .35rem;
+  line-height: 1;
+  pointer-events: none;
+  transition: opacity .15s var(--ease);
 }
 
 .sidebar-nav {

@@ -54,7 +54,7 @@ public sealed class HtmlShellRenderer(
                 </header>
                 <div class="layout">
                   <aside class="sidebar">
-                    <label class="search"><span>Filter commands</span><input type="search" placeholder="Search command tree" data-nav-search /></label>
+                    <label class="search"><span>Filter commands</span><input type="search" placeholder="Filter command tree" data-nav-search /><kbd>Ctrl F</kbd></label>
                     {{sidebar}}
                   </aside>
                   <main class="content"><div class="content-inner">{{content}}</div></main>

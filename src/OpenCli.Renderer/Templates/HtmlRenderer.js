@@ -425,6 +425,10 @@
       e.preventDefault();
       cmdPalette && !cmdPalette.hidden ? cmdClose() : cmdOpen();
     }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+      var navSearch = document.querySelector('[data-nav-search]');
+      if (navSearch) { e.preventDefault(); navSearch.focus(); navSearch.select(); }
+    }
   });
 
   var cmdTrigger = document.querySelector('[data-cmd-trigger]');
