@@ -6,6 +6,12 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+    inputs:
+      run_live_nuget_probe:
+        description: Run the opt-in live NuGet probe verification
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -57,6 +63,12 @@ jobs:
 
       - name: Test
         run: dotnet test InSpectra.Gen.sln --configuration Release --no-build
+
+      - name: Live NuGet probe verification
+        if: github.event_name == 'workflow_dispatch' && inputs.run_live_nuget_probe
+        env:
+          INSPECTRA_RUN_LIVE_NUGET_TESTS: 1
+        run: dotnet test tests/InSpectra.Gen.Tests/InSpectra.Gen.Tests.csproj --configuration Release --no-build --filter LivePackageProbeTests
 
       - name: Pack tool
         run: dotnet pack src/InSpectra.Gen/InSpectra.Gen.csproj --configuration Release --no-build -p:Version=0.0.${{ github.run_number }}

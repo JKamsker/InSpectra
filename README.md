@@ -220,6 +220,7 @@ Coverage includes:
 ## CI
 
 CI builds the frontend before running the .NET test and packaging flow. Each build produces a versioned NuGet package (`0.0.<build-number>`) uploaded as a CI artifact. GitHub Pages publishes HTML examples as bundle directories.
+Manual `workflow_dispatch` runs can opt into the live NuGet probe verification step.
 
 ## Examples
 
