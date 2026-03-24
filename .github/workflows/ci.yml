@@ -90,6 +90,113 @@ jobs:
             src/OpenCli.Renderer/bin/Release/*.nupkg
             artifacts/publish/
 
+  package-pages-preview:
+    needs: build-test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/InSpectreUI/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: src/InSpectreUI
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: src/InSpectreUI
+        run: npm run build
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore OpenCli.Renderer.sln
+
+      - name: Build renderer
+        run: dotnet build OpenCli.Renderer.sln --configuration Release --no-restore
+
+      - name: Install .NET tool - JDownloader-RemoteCli
+        run: dotnet tool install --global JDownloader-RemoteCli
+
+      - name: Install .NET tool - JellyfinCli
+        run: dotnet tool install -g JellyfinCli
+
+      - name: Prepare site directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          site="_site"
+          mkdir -p "$site/examples"
+
+          cp docs/index.html "$site/index.html"
+          echo "opencli.kamsker.at" > "$site/CNAME"
+          touch "$site/.nojekyll"
+
+      - name: Render - OpenCLI Renderer
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project src/OpenCli.Renderer --configuration Release --no-build -- \
+            render file html \
+            docs/opencli-renderer/opencli.json \
+            --xmldoc docs/opencli-renderer/xmldoc.xml \
+            --out-dir _site/examples/opencli-renderer
+
+      - name: Render - Jellyfin CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project src/OpenCli.Renderer --configuration Release --no-build -- \
+            render exec html jf \
+            --with-xmldoc \
+            --out-dir _site/examples/jellyfin-cli
+
+      - name: Render - JDownloader RemoteCli
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project src/OpenCli.Renderer --configuration Release --no-build -- \
+            render exec html jdr \
+            --with-xmldoc \
+            --out-dir _site/examples/jdownloader-remotecli
+
+      - name: Verify preview bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for example in opencli-renderer jellyfin-cli jdownloader-remotecli; do
+            index_path="_site/examples/$example/index.html"
+            test -f "$index_path"
+            grep -q './assets/' "$index_path"
+          done
+
+      - name: Zip preview site
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f gh-pages-preview.zip
+          (
+            cd _site
+            zip -r ../gh-pages-preview.zip .
+          )
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gh-pages-preview
+          path: gh-pages-preview.zip
+
   deploy-pages:
     needs: build-test
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
