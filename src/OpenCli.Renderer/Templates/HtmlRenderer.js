@@ -34,21 +34,30 @@
   function staggerCards(page) {
     var cards = page.querySelectorAll('.command-card, .option-card');
     if (!cards.length) return;
+    /* Cap stagger to first 20 cards; reveal rest instantly */
+    var cap = 20;
     cards.forEach(function(c) { c.classList.add('card-enter'); });
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
         cards.forEach(function(c, i) {
-          setTimeout(function() {
-            c.style.transition = 'opacity .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1), border-color .2s, box-shadow .2s';
+          if (i < cap) {
+            setTimeout(function() {
+              c.style.transition = 'opacity .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1), border-color .2s, box-shadow .2s';
+              c.classList.remove('card-enter');
+            }, i * 30);
+          } else {
             c.classList.remove('card-enter');
-          }, i * 30);
+          }
         });
       });
     });
   }
 
+  var activePage = document.querySelector('.page.active');
+  var activeNav = document.querySelector('.nav-link.active');
+
   function showPage(pageId) {
-    pages.forEach(function(p) { p.classList.remove('active'); });
+    if (activePage) activePage.classList.remove('active');
     var target = document.querySelector('[data-page="' + pageId + '"]');
     var scrollToEl = null;
 
@@ -64,14 +73,16 @@
 
     if (target) {
       target.classList.add('active');
+      activePage = target;
       staggerCards(target);
     }
 
-    navLinks.forEach(function(l) { l.classList.remove('active'); });
+    if (activeNav) activeNav.classList.remove('active');
     var href = pageId === 'overview' ? '#overview' : '#' + pageId;
     var active = document.querySelector('.nav-link[href="' + href + '"]');
     if (active) {
       active.classList.add('active');
+      activeNav = active;
       expandParents(active);
       active.scrollIntoView({ block: 'nearest' });
     }
