@@ -4,11 +4,11 @@ using Spectre.Console.Cli;
 
 namespace OpenCli.Renderer.Commands.Render;
 
-public sealed class ExecHtmlCommand(HtmlRenderService renderService) : AsyncCommand<ExecRenderSettings>
+public sealed class ExecHtmlCommand(HtmlRenderService renderService) : AsyncCommand<ExecHtmlSettings>
 {
-    public override Task<int> ExecuteAsync(CommandContext context, ExecRenderSettings settings, CancellationToken cancellationToken)
+    public override Task<int> ExecuteAsync(CommandContext context, ExecHtmlSettings settings, CancellationToken cancellationToken)
     {
-        var options = RenderRequestFactory.CreateHtmlOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true);
+        var options = RenderRequestFactory.CreateHtmlOptions(settings, null, null, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true);
         var workingDirectory = RenderRequestFactory.ResolveWorkingDirectory(settings.WorkingDirectory);
         var request = new ExecRenderRequest(
             settings.Source,
@@ -25,4 +25,28 @@ public sealed class ExecHtmlCommand(HtmlRenderService renderService) : AsyncComm
             options.Verbose,
             () => renderService.RenderFromExecAsync(request, cancellationToken));
     }
+}
+
+public sealed class ExecHtmlSettings : HtmlCommandSettingsBase
+{
+    [CommandArgument(0, "<SOURCE>")]
+    public string Source { get; init; } = string.Empty;
+
+    [CommandOption("--source-arg <ARG>")]
+    public string[] SourceArguments { get; init; } = [];
+
+    [CommandOption("--opencli-arg <ARG>")]
+    public string[] OpenCliArguments { get; init; } = [];
+
+    [CommandOption("--with-xmldoc")]
+    public bool IncludeXmlDoc { get; init; }
+
+    [CommandOption("--xmldoc-arg <ARG>")]
+    public string[] XmlDocArguments { get; init; } = [];
+
+    [CommandOption("--cwd <PATH>")]
+    public string? WorkingDirectory { get; init; }
+
+    [CommandOption("--timeout <SECONDS>")]
+    public int? TimeoutSeconds { get; init; }
 }

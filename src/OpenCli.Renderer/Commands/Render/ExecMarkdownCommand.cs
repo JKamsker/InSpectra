@@ -27,7 +27,7 @@ public sealed class ExecMarkdownCommand(MarkdownRenderService renderService) : A
     }
 }
 
-public sealed class ExecRenderSettings : DocumentCommandSettingsBase
+public sealed class ExecRenderSettings : MarkdownCommandSettingsBase
 {
     [CommandArgument(0, "<SOURCE>")]
     public string Source { get; init; } = string.Empty;

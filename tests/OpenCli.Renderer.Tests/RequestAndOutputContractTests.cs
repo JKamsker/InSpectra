@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using OpenCli.Renderer.Commands.Render;
 using OpenCli.Renderer.Runtime;
 
 namespace OpenCli.Renderer.Tests;
@@ -33,13 +34,10 @@ public class RequestAndOutputContractTests
     [Fact]
     public void Html_output_rejects_out_file()
     {
-        var settings = new TestHtmlSettings
-        {
-            OutputFile = "docs.html",
-        };
+        var settings = new TestHtmlSettings();
 
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestFactory.CreateHtmlOptions(settings, null, settings.OutputFile, null, timeoutSeconds: null, hasTimeoutSupport: false));
+            RenderRequestFactory.CreateHtmlOptions(settings, null, "docs.html", null, timeoutSeconds: null, hasTimeoutSupport: false));
 
         Assert.Contains("`--out` is not supported", exception.Message);
     }
@@ -49,14 +47,28 @@ public class RequestAndOutputContractTests
     {
         var settings = new TestHtmlSettings
         {
-            Layout = "tree",
             OutputDirectory = "docs",
         };
 
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestFactory.CreateHtmlOptions(settings, settings.Layout, null, settings.OutputDirectory, timeoutSeconds: null, hasTimeoutSupport: false));
+            RenderRequestFactory.CreateHtmlOptions(settings, "tree", null, settings.OutputDirectory, timeoutSeconds: null, hasTimeoutSupport: false));
 
         Assert.Contains("`--layout` is not supported", exception.Message);
+    }
+
+    [Fact]
+    public void Html_command_settings_do_not_expose_markdown_output_flags()
+    {
+        var fileProperties = typeof(FileHtmlSettings).GetProperties().Select(property => property.Name).ToArray();
+        var execProperties = typeof(ExecHtmlSettings).GetProperties().Select(property => property.Name).ToArray();
+
+        Assert.DoesNotContain(nameof(MarkdownCommandSettingsBase.Layout), fileProperties);
+        Assert.DoesNotContain(nameof(MarkdownCommandSettingsBase.OutputFile), fileProperties);
+        Assert.Contains(nameof(HtmlCommandSettingsBase.OutputDirectory), fileProperties);
+
+        Assert.DoesNotContain(nameof(MarkdownCommandSettingsBase.Layout), execProperties);
+        Assert.DoesNotContain(nameof(MarkdownCommandSettingsBase.OutputFile), execProperties);
+        Assert.Contains(nameof(HtmlCommandSettingsBase.OutputDirectory), execProperties);
     }
 
     [Fact]
@@ -107,7 +119,7 @@ public class RequestAndOutputContractTests
     {
     }
 
-    private sealed class TestHtmlSettings : DocumentCommandSettingsBase
+    private sealed class TestHtmlSettings : HtmlCommandSettingsBase
     {
     }
 }

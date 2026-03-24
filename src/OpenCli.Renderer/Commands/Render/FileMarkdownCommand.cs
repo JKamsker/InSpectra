@@ -21,7 +21,7 @@ public sealed class FileMarkdownCommand(MarkdownRenderService renderService) : A
     }
 }
 
-public sealed class FileRenderSettings : DocumentCommandSettingsBase
+public sealed class FileRenderSettings : MarkdownCommandSettingsBase
 {
     [CommandArgument(0, "<OPENCLI_JSON>")]
     public string OpenCliJsonPath { get; init; } = string.Empty;
