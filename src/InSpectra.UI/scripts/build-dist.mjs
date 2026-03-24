@@ -11,15 +11,16 @@ const distRoot = resolve(uiRoot, "dist");
 const distProbe = resolve(distRoot, "probe");
 
 run("npx", ["tsc", "--noEmit"]);
-run("dotnet", ["workload", "restore", probeProject]);
-run("dotnet", ["publish", probeProject, "-c", "Release", "-o", probeOutput]);
+rmSync(probeOutput, { recursive: true, force: true });
+run("dotnet", ["workload", "restore", probeProject], "The browser probe requires the .NET wasm-tools workload.");
+run("dotnet", ["publish", probeProject, "-c", "Release", "-o", probeOutput], "The browser probe publish failed.");
 run("npx", ["vite", "build"]);
 
 rmSync(distProbe, { recursive: true, force: true });
 mkdirSync(distRoot, { recursive: true });
 cpSync(probeOutput, distProbe, { recursive: true });
 
-function run(command, args) {
+function run(command, args, failureHint = null) {
   const executable = process.platform === "win32" && command === "npx" ? "npx.cmd" : command;
   const result = spawnSync(executable, args, {
     cwd: uiRoot,
@@ -28,6 +29,11 @@ function run(command, args) {
   });
 
   if (result.status !== 0) {
+    if (failureHint) {
+      console.error(failureHint);
+      console.error("Install the workload manually with `dotnet workload install wasm-tools` if automatic restore fails.");
+    }
+
     process.exit(result.status ?? 1);
   }
 }

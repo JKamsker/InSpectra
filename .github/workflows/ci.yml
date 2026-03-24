@@ -42,6 +42,13 @@ jobs:
         working-directory: src/InSpectra.UI
         run: npm run build
 
+      - name: Verify frontend probe assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f src/InSpectra.UI/dist/index.html
+          test -f src/InSpectra.UI/dist/probe/main.js
+
       - name: Restore
         run: dotnet restore InSpectra.Gen.sln
 
