@@ -1,5 +1,9 @@
 # opencli-renderer
 
+- Browse the tree docs: [tree/index.md](tree/index.md)
+- OpenCLI snapshot: [opencli.json](opencli.json)
+- XML snapshot: [xmldoc.xml](xmldoc.xml)
+
 - Version: `0.1.0`
 - OpenCLI: `0.1-draft`
 
