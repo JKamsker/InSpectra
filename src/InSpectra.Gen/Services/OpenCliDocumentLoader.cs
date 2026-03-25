@@ -28,6 +28,8 @@ public sealed class OpenCliDocumentLoader(OpenCliSchemaProvider schemaProvider)
     public OpenCliDocument LoadFromJson(string json, string sourceLabel)
     {
         JsonNode rootNode;
+        JsonNode sanitizedNode;
+        string sanitizedJson;
 
         try
         {
@@ -38,11 +40,14 @@ public sealed class OpenCliDocumentLoader(OpenCliSchemaProvider schemaProvider)
             throw new CliDataException($"OpenCLI source `{sourceLabel}` is not valid JSON.", [exception.Message], exception);
         }
 
-        ValidateSchema(rootNode, sourceLabel);
+        sanitizedNode = OpenCliCompatibilitySanitizer.Sanitize(rootNode);
+        sanitizedJson = sanitizedNode.ToJsonString();
+
+        ValidateSchema(sanitizedNode, sourceLabel);
 
         try
         {
-            return JsonSerializer.Deserialize<OpenCliDocument>(json, SerializerOptions)
+            return JsonSerializer.Deserialize<OpenCliDocument>(sanitizedJson, SerializerOptions)
                 ?? throw new CliDataException($"OpenCLI source `{sourceLabel}` could not be deserialized.");
         }
         catch (JsonException exception)

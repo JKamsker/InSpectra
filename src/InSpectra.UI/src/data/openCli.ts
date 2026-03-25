@@ -170,14 +170,14 @@ function coerceCommand(value: unknown): OpenCliCommand {
 
   return {
     name: readString(value.name),
-    aliases: readArray(value.aliases).map(readString),
+    aliases: readStringArray(value.aliases),
     options: readArray(value.options).map(coerceOption),
     arguments: readArray(value.arguments).map(coerceArgument),
     commands: readArray(value.commands).map(coerceCommand),
     exitCodes: readArray(value.exitCodes).map(coerceExitCode),
     description: readOptionalString(value.description),
     hidden: readBoolean(value.hidden),
-    examples: readArray(value.examples).map(readString),
+    examples: readStringArray(value.examples),
     interactive: readBoolean(value.interactive),
     metadata: readArray(value.metadata).map(coerceMetadata),
   };
@@ -191,7 +191,7 @@ function coerceOption(value: unknown): OpenCliOption {
   return {
     name: readString(value.name),
     required: readBoolean(value.required),
-    aliases: readArray(value.aliases).map(readString),
+    aliases: readStringArray(value.aliases),
     arguments: readArray(value.arguments).map(coerceArgument),
     group: readOptionalString(value.group),
     description: readOptionalString(value.description),
@@ -210,7 +210,7 @@ function coerceArgument(value: unknown): OpenCliArgument {
     name: readString(value.name),
     required: readBoolean(value.required),
     arity: isRecord(value.arity) ? coerceArity(value.arity) : undefined,
-    acceptedValues: readArray(value.acceptedValues).map(readString),
+    acceptedValues: readStringArray(value.acceptedValues),
     group: readOptionalString(value.group),
     description: readOptionalString(value.description),
     hidden: readBoolean(value.hidden),
@@ -249,6 +249,15 @@ function coerceMetadata(value: unknown): OpenCliMetadata {
 
 function readArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
+}
+
+function readStringArray(value: unknown): string[] {
+  if (typeof value === "string") {
+    return [value];
+  }
+
+  return readArray(value)
+    .filter((item): item is string => typeof item === "string");
 }
 
 function readString(value: unknown): string {
