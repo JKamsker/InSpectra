@@ -288,6 +288,11 @@ code {
   overflow: hidden;
 }
 
+/* Sidebar header — hidden on desktop, shown on mobile */
+.sidebar-header {
+  display: none;
+}
+
 .sidebar-search {
   padding: 0.6rem 0.6rem 0.4rem;
   position: relative;
@@ -522,6 +527,15 @@ code {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes composer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
 
@@ -1474,36 +1488,45 @@ code {
   height: 14px;
 }
 
-/* ── Responsive ─────────────────────────────── */
+/* ── Mobile menu button (hidden on desktop) ── */
+
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s var(--ease);
+}
+
+.mobile-menu-btn:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.mobile-menu-btn svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* ── Mobile drawer overlay (hidden on desktop) */
+
+.mobile-drawer-overlay {
+  display: none;
+}
+
+/* ── Responsive: Tablet ────────────────────── */
 
 @media (max-width: 960px) {
-  .composer {
-    display: none;
-  }
-
-  .app-grid {
-    flex-direction: column;
-    height: auto;
-    min-height: calc(100vh - 3.25rem);
-  }
-
-  .sidebar {
-    width: auto;
-    flex: none;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    max-height: 45vh;
-  }
-
   .content-stack {
     padding: 1.5rem 1rem 3rem;
-  }
-
-  .topbar {
-    height: auto;
-    padding: 0.6rem 1rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
   }
 
   .import-facts {
@@ -1511,33 +1534,431 @@ code {
   }
 }
 
-@media (max-width: 720px) {
+/* Hide composer inline between 769–960px (tablet: too narrow for inline panel) */
+@media (min-width: 769px) and (max-width: 960px) {
+  .composer {
+    display: none;
+  }
+
+  .toolbar-button.composer-toggle {
+    display: none;
+  }
+}
+
+/* ── Responsive: Mobile ────────────────────── */
+
+@media (max-width: 768px) {
+  /* Hamburger visible */
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  /* Compact topbar */
+  .topbar {
+    height: auto;
+    min-height: 3rem;
+    padding: 0.45rem 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .brand-info {
+    min-width: 0;
+  }
+
+  .brand-title {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  /* Compact toolbar — icons only */
+  .toolbar {
+    gap: 0.25rem;
+  }
+
+  .toolbar-button {
+    padding: 0.35rem;
+    border: none;
+    background: transparent;
+  }
+
+  .toolbar-button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .toolbar-button .kbd-hint {
+    display: none;
+  }
+
+  .toolbar-button svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  /* Sidebar becomes a slide-out drawer */
+  .app-grid {
+    position: relative;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    width: 17rem;
+    flex: none;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    max-height: none;
+    transform: translateX(-100%);
+    transition: transform 0.25s var(--ease);
+    box-shadow: none;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+    box-shadow:
+      4px 0 24px rgba(0, 0, 0, 0.12),
+      1px 0 4px rgba(0, 0, 0, 0.06);
+  }
+
+  [data-theme="dark"] .sidebar.sidebar-open {
+    box-shadow:
+      4px 0 24px rgba(0, 0, 0, 0.4),
+      1px 0 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Sidebar header — visible on mobile */
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .sidebar-header-icon {
+    color: var(--accent);
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header-title {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sidebar-header-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: 0.3rem;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.12s var(--ease);
+  }
+
+  .sidebar-header-btn:hover {
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .sidebar-header-btn svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Inline search replaces header */
+  .sidebar-header-search {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+  }
+
+  .sidebar-header-search input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    outline: none;
+  }
+
+  .sidebar-header-search input::placeholder {
+    color: var(--soft);
+  }
+
+  /* Hide the desktop search bar on mobile */
+  .sidebar-search {
+    display: none;
+  }
+
+  /* Overlay behind any open drawer */
+  .mobile-drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: cmdFadeIn 0.2s var(--ease-out);
+  }
+
+  [data-theme="dark"] .mobile-drawer-overlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  /* Composer becomes a slide-from-right drawer */
+  .composer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    width: min(20rem, 85vw);
+    max-width: none;
+    min-width: 0;
+    border-left: 1px solid var(--border);
+    border-right: none;
+    box-shadow:
+      -4px 0 24px rgba(0, 0, 0, 0.12),
+      -1px 0 4px rgba(0, 0, 0, 0.06);
+    animation: composer-slide-in 0.25s var(--ease);
+  }
+
+  [data-theme="dark"] .composer {
+    box-shadow:
+      -4px 0 24px rgba(0, 0, 0, 0.4),
+      -1px 0 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .composer-resize {
+    display: none;
+  }
+
+  /* Hide kbd hints — no keyboard on mobile */
+  .kbd-hint,
+  .sidebar-kbd {
+    display: none;
+  }
+
+  .sidebar-search input {
+    padding-right: 0.65rem;
+  }
+
+  /* Content fills viewport */
+  .content-stack {
+    padding: 1.25rem 0.75rem 3rem;
+  }
+
+  /* Panels & sections */
+  .panel {
+    border-radius: 0.55rem;
+  }
+
+  .hero-band,
+  .command-hero {
+    padding: 1.25rem;
+  }
+
+  .section-card {
+    padding: 1.25rem;
+  }
+
+  /* Breadcrumbs wrap */
+  .breadcrumb-row {
+    width: auto;
+    max-width: 100%;
+    flex-wrap: wrap;
+    font-size: 0.72rem;
+  }
+
+  /* Stat grid stacks */
+  .hero-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+
+  .stat-card {
+    padding: 0.6rem 0.4rem;
+  }
+
+  .stat-card span {
+    font-size: 0.62rem;
+  }
+
+  .stat-card strong {
+    font-size: 1.35rem;
+  }
+
+  /* Command cards */
+  .command-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Detail cards */
+  .detail-card strong {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .detail-card p {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .detail-card small {
+    padding: 0 0.7rem 0.5rem;
+  }
+
+  /* Touch-friendly tree rows */
+  .tree-row {
+    padding: 0.4rem 0.5rem;
+    min-height: 2.25rem;
+  }
+
+  .overview-row {
+    padding: 0.4rem 0.5rem;
+    min-height: 2.25rem;
+  }
+
+  /* Code blocks scroll properly */
+  .example-block {
+    font-size: 0.72rem;
+    padding: 0.75rem 2.2rem 0.75rem 0.75rem;
+  }
+
+  /* Import screen */
   .import-screen {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
+  }
+
+  .import-hero {
+    padding: 1.25rem;
+  }
+
+  .import-hero h1 {
+    font-size: clamp(1.15rem, 5vw, 1.5rem);
   }
 
   .import-dropzone {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: 0.75rem;
+    padding: 1rem;
   }
 
-  .toolbar {
-    width: 100%;
+  .dropzone-icon {
+    margin: 0 auto;
+  }
+
+  /* Chips wrap better */
+  .chip-row {
+    gap: 0.25rem;
+  }
+
+  .info-chip {
+    font-size: 0.6rem;
+    padding: 0.12rem 0.4rem;
+  }
+
+  /* Command palette full width on mobile */
+  .cmd-dialog {
+    width: calc(100vw - 1rem);
+    max-height: 70vh;
+  }
+
+  .cmd-palette {
+    padding-top: min(8vh, 3rem);
+  }
+
+  .cmd-footer {
+    display: none;
+  }
+}
+
+/* ── Responsive: Small phones ──────────────── */
+
+@media (max-width: 380px) {
+  .topbar {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .brand-block {
+    gap: 0.4rem;
+  }
+
+  .brand-title {
+    font-size: 0.72rem;
   }
 
   .toolbar-button {
-    flex: 1;
-    justify-content: center;
+    padding: 0.3rem;
   }
 
-  .hero-grid {
-    grid-template-columns: 1fr;
+  .stat-card strong {
+    font-size: 1.1rem;
   }
 
-  .command-card-grid {
-    grid-template-columns: 1fr;
+  .hero-band h1,
+  .command-hero h1 {
+    font-size: 1.1rem;
   }
 }
+
+/* ── Safe area insets (iOS notch) ──────────── */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .content-stack {
+      padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+    }
+
+    .sidebar {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .composer {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .topbar {
+      padding-left: max(0.75rem, env(safe-area-inset-left));
+      padding-right: max(0.75rem, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* ── Reduced motion ────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   *,

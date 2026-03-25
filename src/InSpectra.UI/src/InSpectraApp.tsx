@@ -2,10 +2,12 @@ import {
   Eye,
   EyeOff,
   FileUp,
+  Menu,
   PanelRight,
   PanelRightClose,
   Search,
   Sparkles,
+  X,
 } from "lucide-react";
 import { startTransition, useDeferredValue, useEffect, useRef, useState } from "react";
 import { resolveStartupRequest } from "./boot/bootstrap";
@@ -54,6 +56,9 @@ export function InSpectraApp() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [composerOpen, setComposerOpen] = useState(() => readBool("inspectra-composer-open", true));
   const [composerWidth, setComposerWidth] = useState(() => readNumber("inspectra-composer-width", 304));
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileSidebarSearch, setMobileSidebarSearch] = useState(false);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -167,6 +172,7 @@ export function InSpectraApp() {
     setComposerOpen((prev) => {
       const next = !prev;
       localStorage.setItem("inspectra-composer-open", String(next));
+      if (next) setMobileSidebarOpen(false);
       return next;
     });
   }
@@ -178,6 +184,11 @@ export function InSpectraApp() {
 
   function handlePaletteSelect(path: string) {
     window.location.hash = buildCommandHash(path);
+  }
+
+  function handleMobileCommandSelect(path: string) {
+    window.location.hash = buildCommandHash(path);
+    setMobileSidebarOpen(false);
   }
 
   if (loadState.status !== "ready" || !document) {
@@ -195,6 +206,20 @@ export function InSpectraApp() {
   return (
     <div className="app-shell">
       <header className="topbar">
+        <button
+          type="button"
+          className="mobile-menu-btn"
+          onClick={() => {
+            setMobileSidebarOpen((o) => {
+              if (!o) setComposerOpen(false);
+              return !o;
+            });
+          }}
+          aria-label={mobileSidebarOpen ? "Close navigation" : "Open navigation"}
+        >
+          {mobileSidebarOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+        </button>
+
         <div className="brand-block">
           <span className="brand-mark">{">_"}</span>
           <div className="brand-info">
@@ -241,7 +266,7 @@ export function InSpectraApp() {
 
           <button
             type="button"
-            className={`toolbar-button${composerOpen ? " active" : ""}`}
+            className={`toolbar-button composer-toggle${composerOpen ? " active" : ""}`}
             onClick={toggleComposer}
             title="Toggle Composer"
           >
@@ -254,7 +279,71 @@ export function InSpectraApp() {
       </header>
 
       <div className="app-grid">
-        <aside className="sidebar">
+        {(mobileSidebarOpen || composerOpen) && (
+          <div
+            className="mobile-drawer-overlay"
+            onClick={() => {
+              setMobileSidebarOpen(false);
+              setMobileSidebarSearch(false);
+              setSearchTerm("");
+              setComposerOpen(false);
+            }}
+            aria-hidden="true"
+          />
+        )}
+
+        <aside className={`sidebar${mobileSidebarOpen ? " sidebar-open" : ""}`}>
+          <div className="sidebar-header">
+            {mobileSidebarSearch ? (
+              <div className="sidebar-header-search">
+                <input
+                  ref={mobileSearchInputRef}
+                  type="search"
+                  placeholder="Filter commands…"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  className="sidebar-header-btn"
+                  onClick={() => {
+                    setMobileSidebarSearch(false);
+                    setSearchTerm("");
+                  }}
+                  aria-label="Close search"
+                >
+                  <X aria-hidden="true" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <Menu aria-hidden="true" className="sidebar-header-icon" />
+                <span className="sidebar-header-title">Navigation</span>
+                <button
+                  type="button"
+                  className="sidebar-header-btn"
+                  onClick={() => setMobileSidebarSearch(true)}
+                  aria-label="Search commands"
+                >
+                  <Search aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="sidebar-header-btn"
+                  onClick={() => {
+                    setMobileSidebarOpen(false);
+                    setMobileSidebarSearch(false);
+                    setSearchTerm("");
+                  }}
+                  aria-label="Close navigation"
+                >
+                  <X aria-hidden="true" />
+                </button>
+              </>
+            )}
+          </div>
+
           <div className="sidebar-search">
             <input
               ref={searchInputRef}
@@ -271,6 +360,7 @@ export function InSpectraApp() {
               className={`overview-row ${!activeCommand ? "selected" : ""}`}
               onClick={() => {
                 window.location.hash = "#/";
+                setMobileSidebarOpen(false);
               }}
             >
               Overview
@@ -280,9 +370,7 @@ export function InSpectraApp() {
               commands={document.commands}
               searchTerm={deferredSearch}
               selectedPath={activeCommand?.path}
-              onSelect={(path) => {
-                window.location.hash = buildCommandHash(path);
-              }}
+              onSelect={handleMobileCommandSelect}
             />
           </nav>
         </aside>
