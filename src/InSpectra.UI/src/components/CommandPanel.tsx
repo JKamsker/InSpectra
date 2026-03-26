@@ -13,7 +13,7 @@ interface CommandPanelProps {
   command: NormalizedCommand;
   cliTitle: string;
   includeMetadata: boolean;
-  onCommandSelect: (path: string) => void;
+  onCommandSelect: (path: string | undefined) => void;
   deepLinkHash?: string;
 }
 
@@ -41,20 +41,33 @@ export function CommandPanel({ command, cliTitle, includeMetadata, onCommandSele
     ...(command.command.aliases.length > 0 ? [`Aliases: ${command.command.aliases.join(", ")}`] : []),
   ];
 
+  const displayPath = cliTitle ? `${cliTitle} ${command.path}` : command.path;
+
   return (
     <>
       <section className="panel command-hero">
         <div className="breadcrumb-row">
-          {command.path.split(" ").map((segment, index, all) => (
-            <span key={`${segment}-${index}`} className="crumb">
-              {index > 0 ? <ChevronRight aria-hidden="true" /> : null}
-              {index === all.length - 1 ? <strong>{segment}</strong> : <span>{segment}</span>}
-            </span>
-          ))}
+          {displayPath.split(" ").map((segment, index, all) => {
+            const isLast = index === all.length - 1;
+            const titleOffset = cliTitle ? 1 : 0;
+            const commandPath = index < titleOffset ? undefined : all.slice(titleOffset, index + 1).join(" ");
+            return (
+              <span key={`${segment}-${index}`} className="crumb">
+                {index > 0 ? <ChevronRight aria-hidden="true" /> : null}
+                {isLast ? (
+                  <strong>{segment}</strong>
+                ) : (
+                  <button type="button" className="crumb-link" onClick={() => onCommandSelect(commandPath)}>
+                    {segment}
+                  </button>
+                )}
+              </span>
+            );
+          })}
         </div>
 
         <div className="eyebrow">Command</div>
-        <h1>{command.path}</h1>
+        <h1>{command.command.name}</h1>
         <p className="lede">{command.command.description ?? "No description available for this command."}</p>
 
         <div className="chip-row">

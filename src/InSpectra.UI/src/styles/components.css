@@ -164,6 +164,17 @@
   transition: color 0.12s;
 }
 
+.crumb-link {
+  all: unset;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.12s;
+}
+
+.crumb-link:hover {
+  color: var(--accent);
+}
+
 .crumb strong {
   color: var(--accent);
   font-weight: 600;
