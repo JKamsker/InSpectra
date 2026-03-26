@@ -159,15 +159,17 @@ jobs:
 
           cp -r src/InSpectra.UI/dist/* "$site/try/"
 
-      - name: Render - InSpectraGen
+      - name: Render - InSpectra (self-doc)
         shell: bash
         run: |
           set -euo pipefail
+          tmp_dir="$(mktemp -d)"
           dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render file html \
-            docs/inspectra-gen/opencli.json \
-            --xmldoc docs/inspectra-gen/xmldoc.xml \
-            --out-dir _site/examples/inspectra-gen
+            render self \
+            --skip-markdown \
+            --out-dir "$tmp_dir"
+          mkdir -p _site/examples/inspectra
+          cp -r "$tmp_dir/html/"* _site/examples/inspectra/
 
       - name: Render - Jellyfin CLI
         shell: bash
@@ -192,7 +194,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          for example in inspectra-gen jellyfin-cli jdownloader-remotecli; do
+          for example in inspectra jellyfin-cli jdownloader-remotecli; do
             index_path="_site/examples/$example/index.html"
             test -f "$index_path"
             grep -q './assets/' "$index_path"
@@ -270,15 +272,17 @@ jobs:
 
           cp -r src/InSpectra.UI/dist/* "$site/try/"
 
-      - name: Render - InSpectraGen
+      - name: Render - InSpectra (self-doc)
         shell: bash
         run: |
           set -euo pipefail
+          tmp_dir="$(mktemp -d)"
           dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render file html \
-            docs/inspectra-gen/opencli.json \
-            --xmldoc docs/inspectra-gen/xmldoc.xml \
-            --out-dir _site/examples/inspectra-gen
+            render self \
+            --skip-markdown \
+            --out-dir "$tmp_dir"
+          mkdir -p _site/examples/inspectra
+          cp -r "$tmp_dir/html/"* _site/examples/inspectra/
 
       - name: Render - Jellyfin CLI
         shell: bash
@@ -303,7 +307,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          for example in inspectra-gen jellyfin-cli jdownloader-remotecli; do
+          for example in inspectra jellyfin-cli jdownloader-remotecli; do
             index_path="_site/examples/$example/index.html"
             test -f "$index_path"
             grep -q './assets/' "$index_path"
