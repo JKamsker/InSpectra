@@ -56,6 +56,9 @@ app.Configure(config =>
             exec.AddCommand<ExecHtmlCommand>("html")
                 .WithDescription("Render an HTML app bundle from a live CLI process and optional `cli xmldoc` enrichment.");
         });
+
+        render.AddCommand<SelfDocCommand>("self")
+            .WithDescription("Render documentation for InSpectra itself. Exports opencli.json, xmldoc.xml, Markdown tree, and HTML bundle.");
     });
 });
 

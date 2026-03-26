@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, TerminalSquare } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NormalizedCommand } from "../data/normalize";
 
 interface CommandTreeProps {
@@ -40,7 +40,17 @@ function TreeNode({
   selectedPath?: string;
   onSelect: (path: string) => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [manualExpanded, setManualExpanded] = useState(false);
+  const [autoCollapsed, setAutoCollapsed] = useState(false);
+  const prevSelectedPath = useRef(selectedPath);
+
+  useEffect(() => {
+    if (prevSelectedPath.current !== selectedPath) {
+      setAutoCollapsed(false);
+      prevSelectedPath.current = selectedPath;
+    }
+  }, [selectedPath]);
+
   const normalizedSearch = searchTerm.trim().toLowerCase();
   const matches = matchesCommand(command, normalizedSearch);
 
@@ -49,15 +59,23 @@ function TreeNode({
   }
 
   const hasChildren = command.commands.length > 0;
-  const isExpanded = normalizedSearch.length > 0 || expanded;
   const isSelected = selectedPath === command.path;
+  const isAncestorOfSelected = hasChildren && selectedPath !== undefined &&
+    (isSelected || selectedPath.startsWith(command.path + " "));
+  const isExpanded = normalizedSearch.length > 0 || manualExpanded || (isAncestorOfSelected && !autoCollapsed);
 
   return (
     <div className="tree-node">
       <button
         type="button"
         className={`tree-row ${isSelected ? "selected" : ""}`}
-        onClick={() => onSelect(command.path)}
+        onClick={() => {
+          if (isSelected && hasChildren) {
+            setAutoCollapsed((value) => !value);
+          } else {
+            onSelect(command.path);
+          }
+        }}
       >
         <span
           className="tree-toggle"
@@ -67,7 +85,11 @@ function TreeNode({
             }
 
             event.stopPropagation();
-            setExpanded((value) => !value);
+            if (isAncestorOfSelected && !manualExpanded) {
+              setAutoCollapsed((value) => !value);
+            } else {
+              setManualExpanded((value) => !value);
+            }
           }}
         >
           {hasChildren ? (

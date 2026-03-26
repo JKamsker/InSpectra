@@ -96,6 +96,35 @@ HTML uses bundle-directory output only:
 - `--layout` is rejected
 - machine-readable JSON reports `layout: "app"`
 
+### Self-Documentation
+
+```bash
+render self --out-dir <DIR> [OPTIONS]
+```
+
+Generates InSpectra's own documentation by self-invoking `cli opencli` and `cli xmldoc`, then rendering all formats into a single output directory. This is the canonical way to regenerate `docs/inspectra-gen/`.
+
+The output directory will contain:
+
+- `opencli.json` — the raw OpenCLI export (clean JSON, free of Spectre.Console line-wrapping artifacts)
+- `xmldoc.xml` — the raw XML documentation export
+- `tree/` — Markdown tree layout
+- `html/` — HTML app bundle
+
+Additional options:
+
+| Option | Description |
+| --- | --- |
+| `--skip-markdown` | Skip Markdown tree generation |
+| `--skip-html` | Skip HTML bundle generation |
+
+All HTML feature flags (`--show-home`, `--no-composer`, etc.) and common options (`--include-hidden`, `--include-metadata`, `--overwrite`) are supported.
+
+```bash
+# Regenerate docs/inspectra-gen
+inspectra render self --out-dir docs/inspectra-gen --overwrite
+```
+
 ### Common Options
 
 | Option | Description |

@@ -11,8 +11,8 @@ Command-line reference for `inspectra`. Available command areas include render.
 ### CLI Scope
 
 - Top-level command groups: `1`
-- Documented commands: `7`
-- Leaf commands: `4`
+- Documented commands: `8`
+- Leaf commands: `5`
 
 ### Available Commands
 

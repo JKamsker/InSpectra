@@ -205,5 +205,52 @@ Kind="vector" ClrType="System.String[]" />
         </Parameters>
       </Command>
     </Command>
+    <!--SELF-->
+    <Command Name="self" IsBranch="false" 
+ClrType="InSpectra.Gen.Commands.Render.SelfDocCommand" 
+Settings="InSpectra.Gen.Commands.Render.SelfDocSettings">
+      <Description>Render documentation for InSpectra itself. Exports 
+opencli.json, xmldoc.xml, Markdown tree, and HTML bundle.</Description>
+      <Parameters>
+        <Option Short="" Long="dry-run" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="enable-nuget-browser" Value="NULL" 
+Required="false" Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="enable-package-upload" Value="NULL" 
+Required="false" Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="enable-url" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="include-hidden" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="include-metadata" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="json" Value="NULL" Required="false" Kind="flag" 
+ClrType="System.Boolean" />
+        <Option Short="" Long="no-color" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="no-composer" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="no-dark" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="no-light" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="out-dir" Value="DIR" Required="false" 
+Kind="scalar" ClrType="System.String" />
+        <Option Short="" Long="output" Value="MODE" Required="false" 
+Kind="scalar" ClrType="System.String" />
+        <Option Short="" Long="overwrite" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="q" Long="quiet" Value="NULL" Required="false" Kind="flag"
+ClrType="System.Boolean" />
+        <Option Short="" Long="show-home" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="skip-html" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="skip-markdown" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+        <Option Short="" Long="verbose" Value="NULL" Required="false" 
+Kind="flag" ClrType="System.Boolean" />
+      </Parameters>
+    </Command>
   </Command>
 </Model>
