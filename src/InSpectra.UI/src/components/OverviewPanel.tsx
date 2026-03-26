@@ -49,26 +49,28 @@ export function OverviewPanel({ document, includeMetadata, onCommandSelect }: Ov
         </div>
       </section>
 
-      <section className="panel section-card">
-        <div className="section-heading">
-          <Boxes aria-hidden="true" />
-          <h2>Command surface</h2>
-        </div>
-        <div className="command-card-grid">
-          {document.commands.map((command) => (
-            <button
-              key={command.path}
-              type="button"
-              className="command-card"
-              onClick={() => onCommandSelect(command.path)}
-            >
-              <strong>{command.command.name}</strong>
-              <span>{command.command.description ?? "No description"}</span>
-              <small>{command.commands.length > 0 ? `${command.commands.length} subcommands` : "Leaf command"}</small>
-            </button>
-          ))}
-        </div>
-      </section>
+      {document.commands.length > 0 && (
+        <section className="panel section-card">
+          <div className="section-heading">
+            <Boxes aria-hidden="true" />
+            <h2>Command surface</h2>
+          </div>
+          <div className="command-card-grid">
+            {document.commands.map((command) => (
+              <button
+                key={command.path}
+                type="button"
+                className="command-card"
+                onClick={() => onCommandSelect(command.path)}
+              >
+                <strong>{command.command.name}</strong>
+                <span>{command.command.description ?? "No description"}</span>
+                <small>{command.commands.length > 0 ? `${command.commands.length} subcommands` : "Leaf command"}</small>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <DetailList
         icon={<Layers3 aria-hidden="true" />}
