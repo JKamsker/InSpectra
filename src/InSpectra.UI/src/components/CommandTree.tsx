@@ -99,7 +99,7 @@ export function CommandTree({ commands, searchTerm, selectedPath, onSelect }: Co
   return (
     <ExpansionContext.Provider value={{ manualExpanded, autoExpanded, toggleManual, toggleAuto }}>
       <div className="command-tree">
-        {commands.map((command) => (
+        {sortCommands(commands).map((command) => (
           <TreeNode
             key={command.path}
             command={command}
@@ -176,7 +176,7 @@ function TreeNode({
 
       {hasChildren && isExpanded ? (
         <div className="tree-children">
-          {command.commands.map((child) => (
+          {sortCommands(command.commands).map((child) => (
             <TreeNode
               key={child.path}
               command={child}
@@ -189,6 +189,15 @@ function TreeNode({
       ) : null}
     </div>
   );
+}
+
+function sortCommands(commands: NormalizedCommand[]): NormalizedCommand[] {
+  return [...commands].sort((a, b) => {
+    const aHasChildren = a.commands.length > 0 ? 0 : 1;
+    const bHasChildren = b.commands.length > 0 ? 0 : 1;
+    if (aHasChildren !== bHasChildren) return aHasChildren - bHasChildren;
+    return a.command.name.localeCompare(b.command.name);
+  });
 }
 
 function matchesCommand(command: NormalizedCommand, searchTerm: string): boolean {
