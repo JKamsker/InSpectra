@@ -241,6 +241,10 @@ export function InSpectraApp() {
   }
 
   const activeCommand = findCommandByPath(document.commands, route.kind === "command" ? route.commandPath : undefined);
+  const isEmptyPackage =
+    document.commands.length === 0 &&
+    document.rootArguments.length === 0 &&
+    document.rootOptions.length === 0;
 
   return (
     <div className="app-shell">
@@ -313,15 +317,17 @@ export function InSpectraApp() {
             <kbd className="kbd-hint">Ctrl K</kbd>
           </button>
 
-          <button
-            type="button"
-            className={`toolbar-button composer-toggle${composerOpen ? " active" : ""}`}
-            onClick={toggleComposer}
-            title="Toggle Composer"
-          >
-            {composerOpen ? <PanelRightClose aria-hidden="true" /> : <PanelRight aria-hidden="true" />}
-            <span>Composer</span>
-          </button>
+          {!isEmptyPackage && (
+            <button
+              type="button"
+              className={`toolbar-button composer-toggle${composerOpen ? " active" : ""}`}
+              onClick={toggleComposer}
+              title="Toggle Composer"
+            >
+              {composerOpen ? <PanelRightClose aria-hidden="true" /> : <PanelRight aria-hidden="true" />}
+              <span>Composer</span>
+            </button>
+          )}
 
           <ThemeToggle />
         </div>
@@ -460,7 +466,7 @@ export function InSpectraApp() {
           </div>
         </main>
 
-        {composerOpen && (
+        {composerOpen && !isEmptyPackage && (
           <ComposerPanel
             command={activeCommand}
             cliTitle={document.source.info.title || "cli"}

@@ -1,4 +1,4 @@
-import { Boxes, Layers3, Sparkles, Wand2 } from "lucide-react";
+import { Boxes, Layers3, PackageOpen, Sparkles, Wand2 } from "lucide-react";
 import { type ReactNode } from "react";
 import { buildFacts, buildSummary } from "../data/overview";
 import { NormalizedCliDocument, formatOptionValue } from "../data/normalize";
@@ -12,6 +12,25 @@ interface OverviewPanelProps {
 export function OverviewPanel({ document, includeMetadata, onCommandSelect }: OverviewPanelProps) {
   const facts = buildFacts(document);
   const summary = buildSummary(document);
+
+  const isEmpty =
+    document.commands.length === 0 &&
+    document.rootArguments.length === 0 &&
+    document.rootOptions.length === 0;
+
+  if (isEmpty) {
+    return (
+      <section className="hero-band panel empty-package">
+        <PackageOpen aria-hidden="true" className="empty-package-icon" />
+        <div className="eyebrow">Overview</div>
+        <h1>{document.source.info.title || "Untitled CLI"}</h1>
+        <p className="lede">
+          This package doesn't declare any commands, arguments, or options.
+          It may not include an OpenCLI manifest, or the manifest is empty.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -54,7 +73,6 @@ export function OverviewPanel({ document, includeMetadata, onCommandSelect }: Ov
       <DetailList
         icon={<Layers3 aria-hidden="true" />}
         title="Root arguments"
-        empty="No root arguments."
         items={document.rootArguments.map((argument) => ({
           key: argument.name,
           title: argument.name,
@@ -69,7 +87,6 @@ export function OverviewPanel({ document, includeMetadata, onCommandSelect }: Ov
       <DetailList
         icon={<Wand2 aria-hidden="true" />}
         title="Root options"
-        empty="No root options."
         items={document.rootOptions.map((option) => ({
           key: option.name,
           title: option.name,
@@ -82,7 +99,6 @@ export function OverviewPanel({ document, includeMetadata, onCommandSelect }: Ov
         <DetailList
           icon={<Sparkles aria-hidden="true" />}
           title="Metadata"
-          empty="No metadata."
           items={document.source.metadata.map((item) => ({
             key: item.name,
             title: item.name,
@@ -97,33 +113,29 @@ export function OverviewPanel({ document, includeMetadata, onCommandSelect }: Ov
 function DetailList({
   icon,
   title,
-  empty,
   items,
 }: {
   icon: ReactNode;
   title: string;
-  empty: string;
   items: Array<{ key: string; title: string; body: string; footnote?: string }>;
 }) {
+  if (items.length === 0) return null;
+
   return (
     <section className="panel section-card">
       <div className="section-heading">
         {icon}
         <h2>{title}</h2>
       </div>
-      {items.length === 0 ? (
-        <p className="muted">{empty}</p>
-      ) : (
-        <div className="detail-grid">
-          {items.map((item) => (
-            <article key={item.key} className="detail-card">
-              <strong>{item.title}</strong>
-              <p>{item.body}</p>
-              {item.footnote ? <small>{item.footnote}</small> : null}
-            </article>
-          ))}
-        </div>
-      )}
+      <div className="detail-grid">
+        {items.map((item) => (
+          <article key={item.key} className="detail-card">
+            <strong>{item.title}</strong>
+            <p>{item.body}</p>
+            {item.footnote ? <small>{item.footnote}</small> : null}
+          </article>
+        ))}
+      </div>
     </section>
   );
 }

@@ -50,7 +50,6 @@ export function CommandPanel({ command, includeMetadata, onCommandSelect }: Comm
       <CommandGroup
         icon={<CornerDownRight aria-hidden="true" />}
         title="Subcommands"
-        empty="No subcommands."
         items={command.commands.map((child) => ({
           key: child.path,
           title: child.command.name,
@@ -64,7 +63,6 @@ export function CommandPanel({ command, includeMetadata, onCommandSelect }: Comm
       <CommandGroup
         icon={<SquareTerminal aria-hidden="true" />}
         title="Arguments"
-        empty="No arguments."
         items={command.arguments.map((argument) => ({
           key: argument.name,
           title: argument.name,
@@ -76,7 +74,6 @@ export function CommandPanel({ command, includeMetadata, onCommandSelect }: Comm
       <CommandGroup
         icon={<Shield aria-hidden="true" />}
         title="Declared options"
-        empty="No declared options."
         items={command.declaredOptions.map((option) => ({
           key: option.name,
           title: option.name,
@@ -88,7 +85,6 @@ export function CommandPanel({ command, includeMetadata, onCommandSelect }: Comm
       <CommandGroup
         icon={<Fingerprint aria-hidden="true" />}
         title="Inherited options"
-        empty="No inherited options."
         items={command.inheritedOptions.map((option) => ({
           key: option.option.name,
           title: option.option.name,
@@ -156,12 +152,10 @@ export function CommandPanel({ command, includeMetadata, onCommandSelect }: Comm
 function CommandGroup({
   icon,
   title,
-  empty,
   items,
 }: {
   icon: ReactNode;
   title: string;
-  empty: string;
   items: Array<{
     key: string;
     title: string;
@@ -171,32 +165,30 @@ function CommandGroup({
     actionLabel?: string;
   }>;
 }) {
+  if (items.length === 0) return null;
+
   return (
     <section className="panel section-card">
       <div className="section-heading">
         {icon}
         <h2>{title}</h2>
       </div>
-      {items.length === 0 ? (
-        <p className="muted">{empty}</p>
-      ) : (
-        <div className="detail-grid">
-          {items.map((item) => (
-            <article
-              key={item.key}
-              className={`detail-card${item.action ? " clickable" : ""}`}
-              onClick={item.action}
-              role={item.action ? "button" : undefined}
-              tabIndex={item.action ? 0 : undefined}
-              onKeyDown={item.action ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); item.action!(); } } : undefined}
-            >
-              <strong>{item.title}</strong>
-              <p>{item.body}</p>
-              <small>{item.footnote}</small>
-            </article>
-          ))}
-        </div>
-      )}
+      <div className="detail-grid">
+        {items.map((item) => (
+          <article
+            key={item.key}
+            className={`detail-card${item.action ? " clickable" : ""}`}
+            onClick={item.action}
+            role={item.action ? "button" : undefined}
+            tabIndex={item.action ? 0 : undefined}
+            onKeyDown={item.action ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); item.action!(); } } : undefined}
+          >
+            <strong>{item.title}</strong>
+            <p>{item.body}</p>
+            <small>{item.footnote}</small>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
