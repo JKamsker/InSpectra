@@ -1,0 +1,133 @@
+import { AlertTriangle, ArrowLeft, CheckCircle2, ExternalLink, LoaderCircle, Package } from "lucide-react";
+import { useState } from "react";
+import { DiscoveryPackage, resolvePackageUrls } from "../data/nugetDiscovery";
+
+interface PackageDetailProps {
+  pkg: DiscoveryPackage;
+  selectedVersion?: string;
+  onLoadPackage: (opencliUrl: string, xmldocUrl: string, label: string, packageId: string, version: string | undefined) => void;
+}
+
+export function PackageDetail({ pkg, selectedVersion, onLoadPackage }: PackageDetailProps) {
+  const [loadingSpec, setLoadingSpec] = useState(false);
+  const activeVersion = selectedVersion || pkg.latestVersion;
+  const versionInfo = pkg.versions.find((v) => v.version === activeVersion) || pkg.versions[0];
+
+  function handleLoad(ver?: string) {
+    const resolvedVersion = ver || pkg.latestVersion;
+    const isLatest = resolvedVersion === pkg.latestVersion;
+    const urls = resolvePackageUrls(pkg, resolvedVersion);
+    const label = `${pkg.packageId} v${resolvedVersion}`;
+    setLoadingSpec(true);
+    onLoadPackage(urls.opencliUrl, urls.xmldocUrl, label, pkg.packageId, isLatest ? undefined : resolvedVersion);
+  }
+
+  return (
+    <main className="import-screen">
+      <section className="import-hero panel">
+        <div className="browse-header-row">
+          <div>
+            <div className="eyebrow">NuGet Browser</div>
+            <h1>{pkg.packageId}</h1>
+          </div>
+          <button type="button" className="secondary-button" onClick={() => history.back()}>
+            <ArrowLeft aria-hidden="true" size={14} />
+            All packages
+          </button>
+        </div>
+
+        <div className="browse-detail-meta">
+          {versionInfo.command && (
+            <div className="browse-detail-field">
+              <span className="browse-detail-label">Command</span>
+              <code>{versionInfo.command}</code>
+            </div>
+          )}
+          <div className="browse-detail-field">
+            <span className="browse-detail-label">Latest version</span>
+            <span>{pkg.latestVersion}</span>
+          </div>
+          <div className="browse-detail-field">
+            <span className="browse-detail-label">Status</span>
+            <StatusBadge status={pkg.latestStatus} />
+          </div>
+          <div className="browse-detail-field">
+            <span className="browse-detail-label">NuGet</span>
+            <a
+              href={`https://www.nuget.org/packages/${pkg.packageId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="browse-nuget-link"
+            >
+              View on nuget.org <ExternalLink aria-hidden="true" size={12} />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="browse-versions panel section-card">
+        <div className="section-heading">
+          <Package aria-hidden="true" />
+          <h2>Versions</h2>
+        </div>
+
+        <div className="browse-version-list">
+          {pkg.versions.map((ver) => (
+            <div key={ver.version} className={`browse-version-row ${ver.version === activeVersion ? "active" : ""}`}>
+              <div className="browse-version-info">
+                <strong>v{ver.version}</strong>
+                {ver.version === pkg.latestVersion && (
+                  <span className="browse-badge browse-badge-latest">Latest</span>
+                )}
+                <StatusBadge status={ver.status} />
+                {ver.paths.opencliSource && (
+                  <span className="browse-badge browse-badge-synth">Synthesized</span>
+                )}
+              </div>
+              <div className="browse-version-dates">
+                <span>Published {formatDate(ver.publishedAt)}</span>
+              </div>
+              <button
+                type="button"
+                className="secondary-button"
+                disabled={loadingSpec}
+                onClick={() => handleLoad(ver.version)}
+              >
+                {loadingSpec ? (
+                  <><LoaderCircle className="spin" aria-hidden="true" size={14} /> Loading...</>
+                ) : (
+                  "Inspect"
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export function StatusBadge({ status }: { status: "ok" | "partial" }) {
+  if (status === "ok") {
+    return (
+      <span className="browse-badge browse-badge-ok">
+        <CheckCircle2 aria-hidden="true" size={12} />
+        Full
+      </span>
+    );
+  }
+  return (
+    <span className="browse-badge browse-badge-partial">
+      <AlertTriangle aria-hidden="true" size={12} />
+      Partial
+    </span>
+  );
+}
+
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+    return iso;
+  }
+}
