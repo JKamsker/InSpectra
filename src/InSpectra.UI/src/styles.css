@@ -1160,7 +1160,7 @@ code {
 
 .browse-search input {
   width: 100%;
-  padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+  padding: 0.65rem 4rem 0.65rem 2.4rem;
   border: 1px solid var(--border);
   border-radius: 0.55rem;
   background: var(--bg);
@@ -1173,6 +1173,19 @@ code {
 
 .browse-search input:focus {
   border-color: var(--accent);
+}
+
+.browse-kbd {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 0.15s var(--ease);
+}
+
+.browse-search input:focus ~ .browse-kbd {
+  opacity: 0;
 }
 
 .browse-search-icon {
