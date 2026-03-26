@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronRight, TerminalSquare } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { NormalizedCommand } from "../data/normalize";
 
 interface CommandTreeProps {
@@ -9,23 +9,107 @@ interface CommandTreeProps {
   onSelect: (path: string) => void;
 }
 
+const ExpansionContext = createContext<{
+  manualExpanded: Set<string>;
+  autoExpanded: Set<string>;
+  toggleManual: (path: string) => void;
+  toggleAuto: (path: string) => void;
+}>({
+  manualExpanded: new Set(),
+  autoExpanded: new Set(),
+  toggleManual: () => {},
+  toggleAuto: () => {},
+});
+
 export function CommandTree({ commands, searchTerm, selectedPath, onSelect }: CommandTreeProps) {
+  const [manualExpanded, setManualExpanded] = useState<Set<string>>(new Set());
+  const [autoExpanded, setAutoExpanded] = useState<Set<string>>(new Set());
+  const prevSelectedPath = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (prevSelectedPath.current === selectedPath) return;
+
+    const oldPath = prevSelectedPath.current;
+    const newPath = selectedPath;
+    prevSelectedPath.current = selectedPath;
+
+    setAutoExpanded((prev) => {
+      const next = new Set(prev);
+
+      // Auto-expand ancestors of the new selected path
+      if (newPath) {
+        const parts = newPath.split(" ");
+        for (let i = 1; i <= parts.length; i++) {
+          next.add(parts.slice(0, i).join(" "));
+        }
+      }
+
+      // Only collapse the first divergent ancestor of the old path
+      if (oldPath) {
+        const oldParts = oldPath.split(" ");
+        const newParts = newPath ? newPath.split(" ") : [];
+
+        let commonLen = 0;
+        while (
+          commonLen < oldParts.length &&
+          commonLen < newParts.length &&
+          oldParts[commonLen] === newParts[commonLen]
+        ) {
+          commonLen++;
+        }
+
+        if (commonLen < oldParts.length) {
+          const divergentPath = oldParts.slice(0, commonLen + 1).join(" ");
+          next.delete(divergentPath);
+        }
+      }
+
+      return next;
+    });
+  }, [selectedPath]);
+
+  const toggleManual = useCallback((path: string) => {
+    setManualExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleAuto = useCallback((path: string) => {
+    setAutoExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  }, []);
+
   if (commands.length === 0) {
     return <p className="sidebar-empty">No commands are available in this snapshot.</p>;
   }
 
   return (
-    <div className="command-tree">
-      {commands.map((command) => (
-        <TreeNode
-          key={command.path}
-          command={command}
-          searchTerm={searchTerm}
-          selectedPath={selectedPath}
-          onSelect={onSelect}
-        />
-      ))}
-    </div>
+    <ExpansionContext.Provider value={{ manualExpanded, autoExpanded, toggleManual, toggleAuto }}>
+      <div className="command-tree">
+        {commands.map((command) => (
+          <TreeNode
+            key={command.path}
+            command={command}
+            searchTerm={searchTerm}
+            selectedPath={selectedPath}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    </ExpansionContext.Provider>
   );
 }
 
@@ -40,17 +124,7 @@ function TreeNode({
   selectedPath?: string;
   onSelect: (path: string) => void;
 }) {
-  const [manualExpanded, setManualExpanded] = useState(false);
-  const [autoCollapsed, setAutoCollapsed] = useState(false);
-  const prevSelectedPath = useRef(selectedPath);
-
-  useEffect(() => {
-    if (prevSelectedPath.current !== selectedPath) {
-      setAutoCollapsed(false);
-      prevSelectedPath.current = selectedPath;
-    }
-  }, [selectedPath]);
-
+  const { manualExpanded, autoExpanded, toggleManual, toggleAuto } = useContext(ExpansionContext);
   const normalizedSearch = searchTerm.trim().toLowerCase();
   const matches = matchesCommand(command, normalizedSearch);
 
@@ -60,9 +134,9 @@ function TreeNode({
 
   const hasChildren = command.commands.length > 0;
   const isSelected = selectedPath === command.path;
-  const isAncestorOfSelected = hasChildren && selectedPath !== undefined &&
-    (isSelected || selectedPath.startsWith(command.path + " "));
-  const isExpanded = normalizedSearch.length > 0 || manualExpanded || (isAncestorOfSelected && !autoCollapsed);
+  const isManualExpanded = manualExpanded.has(command.path);
+  const isAutoExpanded = autoExpanded.has(command.path);
+  const isExpanded = normalizedSearch.length > 0 || isManualExpanded || (hasChildren && isAutoExpanded);
 
   return (
     <div className="tree-node">
@@ -71,7 +145,7 @@ function TreeNode({
         className={`tree-row ${isSelected ? "selected" : ""}`}
         onClick={() => {
           if (isSelected && hasChildren) {
-            setAutoCollapsed((value) => !value);
+            toggleAuto(command.path);
           } else {
             onSelect(command.path);
           }
@@ -80,15 +154,12 @@ function TreeNode({
         <span
           className="tree-toggle"
           onClick={(event) => {
-            if (!hasChildren) {
-              return;
-            }
-
+            if (!hasChildren) return;
             event.stopPropagation();
-            if (isAncestorOfSelected && !manualExpanded) {
-              setAutoCollapsed((value) => !value);
+            if (isAutoExpanded && !isManualExpanded) {
+              toggleAuto(command.path);
             } else {
-              setManualExpanded((value) => !value);
+              toggleManual(command.path);
             }
           }}
         >
