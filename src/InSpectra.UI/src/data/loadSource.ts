@@ -58,6 +58,24 @@ export async function loadFromFiles(files: File[], options: ViewerOptions): Prom
   });
 }
 
+export async function loadFromUrls(
+  opencliUrl: string,
+  xmldocUrl: string,
+  options: ViewerOptions,
+  label: string,
+): Promise<LoadedSource> {
+  const openCliText = await fetchRequiredText(opencliUrl);
+  const xmlDocText = await fetchText(xmldocUrl, true);
+
+  return buildLoadedSource({
+    document: parseOpenCliDocument(openCliText),
+    xmlDoc: xmlDocText,
+    options,
+    label,
+    mode: "links",
+  });
+}
+
 export function validateFiles(files: File[]): { openCli: File; xmlDoc?: File } {
   if (files.length === 0) {
     throw new Error("Choose opencli.json, with optional xmldoc.xml.");

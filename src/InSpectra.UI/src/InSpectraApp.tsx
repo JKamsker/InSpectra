@@ -3,6 +3,7 @@ import {
   EyeOff,
   FileUp,
   Menu,
+  Package,
   PanelRight,
   PanelRightClose,
   Search,
@@ -17,10 +18,11 @@ import { CommandPanel } from "./components/CommandPanel";
 import { CommandTree } from "./components/CommandTree";
 import { ComposerPanel } from "./components/ComposerPanel";
 import { ImportScreen } from "./components/ImportScreen";
+import { NugetBrowser } from "./components/NugetBrowser";
 import { OverviewPanel } from "./components/OverviewPanel";
 import { ThemeToggle } from "./components/ThemeToggle";
-import { loadFromFiles, loadFromStartupRequest, LoadedSource } from "./data/loadSource";
-import { buildCommandHash, parseHashRoute } from "./data/navigation";
+import { loadFromFiles, loadFromStartupRequest, loadFromUrls, LoadedSource } from "./data/loadSource";
+import { buildBrowseHash, buildCommandHash, HashRoute, parseHashRoute } from "./data/navigation";
 import { findCommandByPath, normalizeOpenCliDocument, NormalizedCliDocument } from "./data/normalize";
 
 interface LoadState {
@@ -50,7 +52,7 @@ export function InSpectraApp() {
   const [viewerOptions, setViewerOptions] = useState<ViewerOptions>(defaultViewerOptions());
   const [document, setDocument] = useState<NormalizedCliDocument | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [routePath, setRoutePath] = useState<string | undefined>(parseHashRoute(window.location.hash).commandPath);
+  const [route, setRoute] = useState<HashRoute>(() => parseHashRoute(window.location.hash));
   const deferredSearch = useDeferredValue(searchTerm);
 
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -72,8 +74,7 @@ export function InSpectraApp() {
 
   useEffect(() => {
     function handleHashChange() {
-      const route = parseHashRoute(window.location.hash);
-      setRoutePath(route.commandPath);
+      setRoute(parseHashRoute(window.location.hash));
     }
 
     window.addEventListener("hashchange", handleHashChange);
@@ -85,11 +86,21 @@ export function InSpectraApp() {
       return;
     }
 
-    const route = parseHashRoute(window.location.hash);
     if (route.kind === "command" && !findCommandByPath(document.commands, route.commandPath)) {
       window.location.hash = "#/";
     }
   }, [document]);
+
+  // Entering browse mode clears the loaded document so the viewer resets.
+  useEffect(() => {
+    if (route.kind === "browse") {
+      setDocument(null);
+      setLoadState({ status: "empty" });
+      setError(null);
+      setWarnings([]);
+      setSourceLabel("");
+    }
+  }, [route.kind]);
 
   // Keyboard shortcuts: Ctrl+F (focus search), Ctrl+K (palette)
   useEffect(() => {
@@ -194,6 +205,31 @@ export function InSpectraApp() {
     setMobileSidebarOpen(false);
   }
 
+  async function handleLoadPackage(opencliUrl: string, xmldocUrl: string, label: string) {
+    try {
+      setLoadState({ status: "loading", message: `Loading ${label}` });
+      const loaded = await loadFromUrls(opencliUrl, xmldocUrl, viewerOptions, label);
+      applyLoadedSource(loaded);
+      window.location.hash = "#/";
+    } catch (loadError) {
+      setError(toMessage(loadError));
+      setLoadState(document ? { status: "ready" } : { status: "empty" });
+    }
+  }
+
+  if (route.kind === "browse") {
+    return (
+      <NugetBrowser
+        packageId={route.packageId}
+        version={route.version}
+        onLoadPackage={handleLoadPackage}
+        onBack={() => {
+          window.location.hash = document ? "#/" : "#/";
+        }}
+      />
+    );
+  }
+
   if (loadState.status !== "ready" || !document) {
     return (
       <ImportScreen
@@ -204,7 +240,7 @@ export function InSpectraApp() {
     );
   }
 
-  const activeCommand = findCommandByPath(document.commands, routePath);
+  const activeCommand = findCommandByPath(document.commands, route.kind === "command" ? route.commandPath : undefined);
 
   return (
     <div className="app-shell">
@@ -248,6 +284,16 @@ export function InSpectraApp() {
           <button type="button" className="toolbar-button" onClick={() => pickerRef.current?.click()}>
             <FileUp aria-hidden="true" />
             <span>Import</span>
+          </button>
+
+          <button
+            type="button"
+            className="toolbar-button"
+            onClick={() => { window.location.hash = buildBrowseHash(); }}
+            title="Browse NuGet tools"
+          >
+            <Package aria-hidden="true" />
+            <span>Browse</span>
           </button>
           <input
             ref={pickerRef}

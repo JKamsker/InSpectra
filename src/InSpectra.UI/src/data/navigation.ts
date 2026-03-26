@@ -1,7 +1,7 @@
-export interface HashRoute {
-  kind: "overview" | "command";
-  commandPath?: string;
-}
+export type HashRoute =
+  | { kind: "overview" }
+  | { kind: "command"; commandPath: string }
+  | { kind: "browse"; packageId?: string; version?: string };
 
 export function buildCommandHash(path: string): string {
   const segments = path
@@ -12,10 +12,32 @@ export function buildCommandHash(path: string): string {
   return `#/command/${segments.join("/")}`;
 }
 
+export function buildBrowseHash(packageId?: string, version?: string): string {
+  if (!packageId) return "#/browse";
+  if (!version) return `#/browse/${encodeURIComponent(packageId)}`;
+  return `#/browse/${encodeURIComponent(packageId)}/${encodeURIComponent(version)}`;
+}
+
 export function parseHashRoute(hash: string): HashRoute {
   const normalized = hash.startsWith("#") ? hash.slice(1) : hash;
   if (normalized.length === 0 || normalized === "/") {
     return { kind: "overview" };
+  }
+
+  if (normalized === "/browse" || normalized.startsWith("/browse/")) {
+    const rest = normalized.slice("/browse".length);
+    if (!rest || rest === "/") {
+      return { kind: "browse" };
+    }
+
+    const segments = rest.slice(1).split("/").filter(Boolean);
+    try {
+      const packageId = decodeURIComponent(segments[0]);
+      const version = segments[1] ? decodeURIComponent(segments[1]) : undefined;
+      return { kind: "browse", packageId, version };
+    } catch {
+      return { kind: "browse" };
+    }
   }
 
   if (!normalized.startsWith("/command/")) {

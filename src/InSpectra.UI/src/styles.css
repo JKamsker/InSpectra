@@ -1061,6 +1061,331 @@ code {
   line-height: 1.6;
 }
 
+/* ── Browse CTA (import screen) ────────────── */
+
+.import-browse-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  margin-top: 1rem;
+  background:
+    radial-gradient(ellipse at 5% 50%, rgba(6, 182, 212, 0.06), transparent 60%),
+    var(--surface);
+}
+
+.browse-cta-content {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.browse-cta-content h2 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.browse-cta-content p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.browse-cta-btn {
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+/* ── NuGet Browser ─────────────────────────── */
+
+.browse-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.browse-loading svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--accent);
+}
+
+.browse-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.browse-header-row .secondary-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.browse-search {
+  position: relative;
+  margin-top: 1.25rem;
+}
+
+.browse-search input {
+  width: 100%;
+  padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.2s var(--ease);
+}
+
+.browse-search input:focus {
+  border-color: var(--accent);
+}
+
+.browse-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1rem;
+  height: 1rem;
+  color: var(--soft);
+  pointer-events: none;
+}
+
+.browse-stats {
+  margin-top: 0.65rem;
+}
+
+.browse-stat {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.browse-card {
+  display: block;
+  padding: 1rem 1.15rem;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+.browse-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-1px);
+}
+
+.browse-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.browse-card-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.browse-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--mono);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.browse-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.browse-card-command code {
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  background: var(--inline-code-bg);
+}
+
+.browse-card-version {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.browse-card-versions {
+  font-size: 0.72rem;
+  color: var(--soft);
+}
+
+/* Browse badges */
+
+.browse-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.browse-badge-ok {
+  color: var(--green);
+  background: var(--green-soft);
+  border: 1px solid var(--green-border);
+}
+
+.browse-badge-partial {
+  color: var(--amber);
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-border);
+}
+
+.browse-badge-synth {
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+/* Browse package detail */
+
+.browse-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.browse-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.browse-detail-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--soft);
+}
+
+.browse-detail-field code {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  background: var(--inline-code-bg);
+  width: fit-content;
+}
+
+.browse-nuget-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.browse-nuget-link:hover {
+  text-decoration: underline;
+}
+
+/* Browse version list */
+
+.browse-versions {
+  margin-top: 0.75rem;
+}
+
+.browse-version-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.browse-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg);
+  transition: border-color 0.15s var(--ease);
+}
+
+.browse-version-row.active {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+.browse-version-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.browse-version-info strong {
+  font-size: 0.85rem;
+  font-family: var(--mono);
+}
+
+.browse-version-dates {
+  font-size: 0.75rem;
+  color: var(--muted);
+  flex: 1;
+  text-align: right;
+}
+
+.browse-version-row .secondary-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.browse-empty {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 /* ── Spinner ────────────────────────────────── */
 
 .spin {
@@ -1531,6 +1856,33 @@ code {
 
   .import-facts {
     grid-template-columns: 1fr;
+  }
+
+  .import-browse-cta {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .browse-cta-content {
+    flex-direction: column;
+  }
+
+  .browse-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .browse-detail-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .browse-version-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .browse-version-dates {
+    text-align: left;
   }
 }
 

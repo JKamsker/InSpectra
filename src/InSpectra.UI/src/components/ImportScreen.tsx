@@ -1,5 +1,6 @@
-import { FileCode2, FileJson2, LoaderCircle, Upload } from "lucide-react";
+import { FileCode2, FileJson2, LoaderCircle, Package, Upload } from "lucide-react";
 import { useRef, useState } from "react";
+import { buildBrowseHash } from "../data/navigation";
 
 interface ImportScreenProps {
   error?: string | null;
@@ -98,6 +99,21 @@ export function ImportScreen({ error, loading, onFilesSelected }: ImportScreenPr
             {error}
           </p>
         ) : null}
+      </section>
+
+      <section className="import-browse-cta panel">
+        <div className="browse-cta-content">
+          <div className="fact-icon">
+            <Package aria-hidden="true" />
+          </div>
+          <div>
+            <h2>Browse NuGet tools</h2>
+            <p>Explore indexed .NET CLI tool packages and inspect their command structure directly.</p>
+          </div>
+        </div>
+        <a href={buildBrowseHash()} className="secondary-button browse-cta-btn">
+          Open browser
+        </a>
       </section>
 
       <section className="import-facts">
