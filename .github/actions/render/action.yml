@@ -27,6 +27,14 @@ inputs:
     description: 'CLI executable name or path (exec mode)'
     required: false
 
+  dotnet-tool:
+    description: 'NuGet package to dotnet tool install -g (exec mode, requires cli-name)'
+    required: false
+
+  dotnet-tool-version:
+    description: 'Version constraint for the dotnet tool install'
+    required: false
+
   opencli-args:
     description: 'Override the OpenCLI export arguments (exec mode, default: cli opencli)'
     required: false
@@ -83,6 +91,32 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Validate inputs
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        CLI_NAME: ${{ inputs.cli-name }}
+        DOTNET_TOOL: ${{ inputs.dotnet-tool }}
+        OPENCLI_JSON: ${{ inputs.opencli-json }}
+      run: |
+        set -euo pipefail
+        if [ "$MODE" = "exec" ] && [ -z "$CLI_NAME" ]; then
+          echo "::error::exec mode requires cli-name"
+          exit 1
+        fi
+        if [ -n "$DOTNET_TOOL" ] && [ -z "$CLI_NAME" ]; then
+          echo "::error::dotnet-tool requires cli-name (the executable name after install)"
+          exit 1
+        fi
+        if [ "$MODE" = "file" ] && [ -z "$OPENCLI_JSON" ]; then
+          echo "::error::file mode requires opencli-json"
+          exit 1
+        fi
+        if [ "$MODE" = "file" ] && [ -n "$DOTNET_TOOL" ]; then
+          echo "::error::dotnet-tool is not used in file mode"
+          exit 1
+        fi
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
@@ -101,6 +135,20 @@ runs:
           dotnet tool install -g InSpectra.Gen
         fi
         inspectra --version
+
+    - name: Install target CLI
+      if: inputs.dotnet-tool != ''
+      shell: bash
+      env:
+        TOOL_NAME: ${{ inputs.dotnet-tool }}
+        TOOL_VERSION: ${{ inputs.dotnet-tool-version }}
+      run: |
+        set -euo pipefail
+        args=(dotnet tool install -g "$TOOL_NAME")
+        if [ -n "$TOOL_VERSION" ]; then
+          args+=(--version "$TOOL_VERSION")
+        fi
+        "${args[@]}"
 
     - name: Render
       shell: bash

@@ -395,10 +395,9 @@ section{padding:4rem 0}
 <span class="c">steps</span>:
   - <span class="f">uses</span>: <span class="s">actions/checkout@v6</span>
 
-  - <span class="a">run</span>: dotnet tool install -g MyCli.Tool
-
   - <span class="f">uses</span>: <span class="s">JKamsker/InSpectra@v1</span>
     <span class="f">with</span>:
+      <span class="a">dotnet-tool</span>: MyCli.Tool        <span class="comment"># installs the CLI for you</span>
       <span class="a">cli-name</span>: mycli
       <span class="a">output-dir</span>: docs/cli
 
@@ -420,10 +419,9 @@ section{padding:4rem 0}
 <span class="c">steps</span>:
   - <span class="f">uses</span>: <span class="s">actions/checkout@v6</span>
 
-  - <span class="a">run</span>: dotnet tool install -g MyCli.Tool
-
   - <span class="f">uses</span>: <span class="s">JKamsker/InSpectra@v1</span>
     <span class="f">with</span>:
+      <span class="a">dotnet-tool</span>: MyCli.Tool
       <span class="a">cli-name</span>: mycli
       <span class="a">format</span>: markdown               <span class="comment"># or markdown-monolith</span>
       <span class="a">output-dir</span>: docs/cli</div>
@@ -447,10 +445,9 @@ section{padding:4rem 0}
 <span class="c">steps</span>:
   - <span class="f">uses</span>: <span class="s">actions/checkout@v6</span>
 
-  - <span class="a">run</span>: dotnet tool install -g MyCli.Tool
-
   - <span class="f">uses</span>: <span class="s">JKamsker/InSpectra@v1</span>
     <span class="f">with</span>:
+      <span class="a">dotnet-tool</span>: MyCli.Tool
       <span class="a">cli-name</span>: mycli
       <span class="a">output-dir</span>: cli-docs
 
@@ -505,6 +502,16 @@ section{padding:4rem 0}
         <div class="option-name">cli-name</div>
         <div class="option-desc">CLI executable name or path. Required for exec mode.</div>
         <div class="option-default">Required (exec mode)</div>
+      </div>
+      <div class="option-card">
+        <div class="option-name">dotnet-tool</div>
+        <div class="option-desc">NuGet package to <code>dotnet tool install -g</code>. Requires <code>cli-name</code>.</div>
+        <div class="option-default">Optional</div>
+      </div>
+      <div class="option-card">
+        <div class="option-name">dotnet-tool-version</div>
+        <div class="option-desc">Version constraint for the dotnet tool install.</div>
+        <div class="option-default">Optional (latest)</div>
       </div>
       <div class="option-card">
         <div class="option-name">opencli-json</div>
@@ -604,9 +611,9 @@ section{padding:4rem 0}
     <span class="f">runs-on</span>: ubuntu-latest
     <span class="f">steps</span>:
       - <span class="f">uses</span>: <span class="s">actions/checkout@v6</span>
-      - <span class="a">run</span>: dotnet tool install -g MyCli.Tool
       - <span class="f">uses</span>: <span class="s">JKamsker/InSpectra@v1</span>
         <span class="f">with</span>:
+          <span class="a">dotnet-tool</span>: MyCli.Tool
           <span class="a">cli-name</span>: mycli
           <span class="a">output-dir</span>: _site
       - <span class="f">uses</span>: <span class="s">actions/upload-pages-artifact@v3</span>
