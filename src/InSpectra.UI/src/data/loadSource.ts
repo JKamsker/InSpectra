@@ -22,12 +22,14 @@ export async function loadFromStartupRequest(
   }
 
   if (request.kind === "inline") {
+    const doc = parseOpenCliDocument(JSON.stringify(request.openCli));
+    const version = doc?.info?.version;
     return buildLoadedSource({
-      document: parseOpenCliDocument(JSON.stringify(request.openCli)),
+      document: doc,
       xmlDoc: request.xmlDoc,
       options: request.options,
       features: request.features,
-      label: "Injected bootstrap",
+      label: version ? `v${version}` : "",
       mode: "inline",
     });
   }
