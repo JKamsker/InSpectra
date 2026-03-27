@@ -33,72 +33,84 @@
                       ]
                     }
                   ],
+                  "description": "Working directory to use when invoking the  source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--dry-run",
                   "required": false,
+                  "description": "Preview the resolved render plan without  writing files.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--enable-nuget-browser",
                   "required": false,
+                  "description": "Enable the NuGet package browser on the viewer home screen.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--enable-package-upload",
                   "required": false,
+                  "description": "Enable local package upload on the viewer home screen.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--enable-url",
                   "required": false,
+                  "description": "Allow the viewer to load OpenCLI inputs from  URL query parameters.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-hidden",
                   "required": false,
+                  "description": "Include commands and options marked hidden by  the source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-metadata",
                   "required": false,
+                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--json",
                   "required": false,
+                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-color",
                   "required": false,
+                  "description": "Disable ANSI color sequences in human-readable console output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-composer",
                   "required": false,
+                  "description": "Hide the interactive command composer from the generated HTML app.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-dark",
                   "required": false,
+                  "description": "Disable dark mode in the generated HTML app.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-light",
                   "required": false,
+                  "description": "Disable light mode in the generated HTML  app.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -121,6 +133,7 @@
                       ]
                     }
                   ],
+                  "description": "Override the arguments used to invoke the  source CLI\u0027s OpenCLI export command.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -143,6 +156,7 @@
                       ]
                     }
                   ],
+                  "description": "Directory where the HTML app bundle should be  written.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -165,12 +179,14 @@
                       ]
                     }
                   ],
+                  "description": "Override the output mode. Supported values are human and json.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--overwrite",
                   "required": false,
+                  "description": "Allow existing output files or directories to  be replaced.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -180,12 +196,14 @@
                   "aliases": [
                     "-q"
                   ],
+                  "description": "Suppress non-essential console output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--show-home",
                   "required": false,
+                  "description": "Show the viewer home screen button in the  generated HTML app.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -208,6 +226,7 @@
                       ]
                     }
                   ],
+                  "description": "Additional arguments passed directly to the  source executable before the export command.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -230,18 +249,21 @@
                       ]
                     }
                   ],
+                  "description": "Timeout in seconds for each export command  executed against the source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--verbose",
                   "required": false,
+                  "description": "Increase diagnostic detail in the rendered  summary output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--with-xmldoc",
                   "required": false,
+                  "description": "Also invoke the source CLI\u0027s cli xmldoc  command for XML enrichment.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -264,6 +286,7 @@
                       ]
                     }
                   ],
+                  "description": "Override the arguments used to invoke the  source CLI\u0027s XML documentation export command.",
                   "recursive": false,
                   "hidden": false
                 }
@@ -276,6 +299,7 @@
                     "minimum": 1,
                     "maximum": 1
                   },
+                  "description": "CLI executable or script to invoke for cli  opencli exports.",
                   "hidden": false,
                   "metadata": [
                     {
@@ -311,30 +335,35 @@
                       ]
                     }
                   ],
+                  "description": "Working directory to use when invoking the  source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--dry-run",
                   "required": false,
+                  "description": "Preview the resolved render plan without  writing files.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-hidden",
                   "required": false,
+                  "description": "Include commands and options marked hidden by  the source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-metadata",
                   "required": false,
+                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--json",
                   "required": false,
+                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -357,12 +386,14 @@
                       ]
                     }
                   ],
+                  "description": "Markdown layout mode. Supported values are  single and tree.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-color",
                   "required": false,
+                  "description": "Disable ANSI color sequences in human-readable console output.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -385,6 +416,7 @@
                       ]
                     }
                   ],
+                  "description": "Override the arguments used to invoke the  source CLI\u0027s OpenCLI export command.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -407,6 +439,7 @@
                       ]
                     }
                   ],
+                  "description": "Single Markdown file to write when using the  single layout.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -429,6 +462,7 @@
                       ]
                     }
                   ],
+                  "description": "Output directory to write when using the tree  layout.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -451,12 +485,14 @@
                       ]
                     }
                   ],
+                  "description": "Override the output mode. Supported values are human and json.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--overwrite",
                   "required": false,
+                  "description": "Allow existing output files or directories to  be replaced.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -466,6 +502,7 @@
                   "aliases": [
                     "-q"
                   ],
+                  "description": "Suppress non-essential console output.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -488,6 +525,7 @@
                       ]
                     }
                   ],
+                  "description": "Additional arguments passed directly to the  source executable before the export command.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -510,18 +548,21 @@
                       ]
                     }
                   ],
+                  "description": "Timeout in seconds for each export command  executed against the source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--verbose",
                   "required": false,
+                  "description": "Increase diagnostic detail in the rendered  summary output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--with-xmldoc",
                   "required": false,
+                  "description": "Also invoke the source CLI\u0027s cli xmldoc  command for XML enrichment.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -544,6 +585,7 @@
                       ]
                     }
                   ],
+                  "description": "Override the arguments used to invoke the  source CLI\u0027s XML documentation export command.",
                   "recursive": false,
                   "hidden": false
                 }
@@ -556,6 +598,7 @@
                     "minimum": 1,
                     "maximum": 1
                   },
+                  "description": "CLI executable or script to invoke for cli  opencli exports.",
                   "hidden": false,
                   "metadata": [
                     {
@@ -583,66 +626,77 @@
                 {
                   "name": "--dry-run",
                   "required": false,
+                  "description": "Preview the resolved render plan without  writing files.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--enable-nuget-browser",
                   "required": false,
+                  "description": "Enable the NuGet package browser on the viewer home screen.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--enable-package-upload",
                   "required": false,
+                  "description": "Enable local package upload on the viewer home screen.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--enable-url",
                   "required": false,
+                  "description": "Allow the viewer to load OpenCLI inputs from  URL query parameters.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-hidden",
                   "required": false,
+                  "description": "Include commands and options marked hidden by  the source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-metadata",
                   "required": false,
+                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--json",
                   "required": false,
+                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-color",
                   "required": false,
+                  "description": "Disable ANSI color sequences in human-readable console output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-composer",
                   "required": false,
+                  "description": "Hide the interactive command composer from the generated HTML app.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-dark",
                   "required": false,
+                  "description": "Disable dark mode in the generated HTML app.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-light",
                   "required": false,
+                  "description": "Disable light mode in the generated HTML  app.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -665,6 +719,7 @@
                       ]
                     }
                   ],
+                  "description": "Directory where the HTML app bundle should be  written.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -687,12 +742,14 @@
                       ]
                     }
                   ],
+                  "description": "Override the output mode. Supported values are human and json.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--overwrite",
                   "required": false,
+                  "description": "Allow existing output files or directories to  be replaced.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -702,18 +759,21 @@
                   "aliases": [
                     "-q"
                   ],
+                  "description": "Suppress non-essential console output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--show-home",
                   "required": false,
+                  "description": "Show the viewer home screen button in the  generated HTML app.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--verbose",
                   "required": false,
+                  "description": "Increase diagnostic detail in the rendered  summary output.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -736,6 +796,7 @@
                       ]
                     }
                   ],
+                  "description": "Optional XML documentation file used to enrich missing descriptions.",
                   "recursive": false,
                   "hidden": false
                 }
@@ -748,6 +809,7 @@
                     "minimum": 1,
                     "maximum": 1
                   },
+                  "description": "Path to the OpenCLI JSON export file to  render.",
                   "hidden": false,
                   "metadata": [
                     {
@@ -767,24 +829,28 @@
                 {
                   "name": "--dry-run",
                   "required": false,
+                  "description": "Preview the resolved render plan without  writing files.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-hidden",
                   "required": false,
+                  "description": "Include commands and options marked hidden by  the source CLI.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--include-metadata",
                   "required": false,
+                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--json",
                   "required": false,
+                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -807,12 +873,14 @@
                       ]
                     }
                   ],
+                  "description": "Markdown layout mode. Supported values are  single and tree.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--no-color",
                   "required": false,
+                  "description": "Disable ANSI color sequences in human-readable console output.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -835,6 +903,7 @@
                       ]
                     }
                   ],
+                  "description": "Single Markdown file to write when using the  single layout.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -857,6 +926,7 @@
                       ]
                     }
                   ],
+                  "description": "Output directory to write when using the tree  layout.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -879,12 +949,14 @@
                       ]
                     }
                   ],
+                  "description": "Override the output mode. Supported values are human and json.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--overwrite",
                   "required": false,
+                  "description": "Allow existing output files or directories to  be replaced.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -894,12 +966,14 @@
                   "aliases": [
                     "-q"
                   ],
+                  "description": "Suppress non-essential console output.",
                   "recursive": false,
                   "hidden": false
                 },
                 {
                   "name": "--verbose",
                   "required": false,
+                  "description": "Increase diagnostic detail in the rendered  summary output.",
                   "recursive": false,
                   "hidden": false
                 },
@@ -922,6 +996,7 @@
                       ]
                     }
                   ],
+                  "description": "Optional XML documentation file used to enrich missing descriptions.",
                   "recursive": false,
                   "hidden": false
                 }
@@ -934,6 +1009,7 @@
                     "minimum": 1,
                     "maximum": 1
                   },
+                  "description": "Path to the OpenCLI JSON export file to  render.",
                   "hidden": false,
                   "metadata": [
                     {
@@ -956,68 +1032,58 @@
           "name": "self",
           "options": [
             {
-              "name": "--dry-run",
-              "required": false,
-              "recursive": false,
-              "hidden": false
-            },
-            {
               "name": "--enable-nuget-browser",
               "required": false,
+              "description": "Enable the NuGet package browser on the  self-documentation viewer home screen.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--enable-package-upload",
               "required": false,
+              "description": "Enable local package upload on the  self-documentation viewer home screen.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--enable-url",
               "required": false,
+              "description": "Allow the viewer to load alternate OpenCLI inputs  from URL query parameters.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--include-hidden",
               "required": false,
+              "description": "Include hidden commands and options from  InSpectra\u0027s own CLI surface.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--include-metadata",
               "required": false,
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--json",
-              "required": false,
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--no-color",
-              "required": false,
+              "description": "Include metadata sections in the generated  Markdown tree and HTML bundle.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--no-composer",
               "required": false,
+              "description": "Hide the interactive command composer from the  generated self-documentation app.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--no-dark",
               "required": false,
+              "description": "Disable dark mode in the generated  self-documentation app.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--no-light",
               "required": false,
+              "description": "Disable light mode in the generated  self-documentation app.",
               "recursive": false,
               "hidden": false
             },
@@ -1040,67 +1106,35 @@
                   ]
                 }
               ],
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--output",
-              "required": false,
-              "arguments": [
-                {
-                  "name": "MODE",
-                  "required": true,
-                  "arity": {
-                    "minimum": 1,
-                    "maximum": 1
-                  },
-                  "metadata": [
-                    {
-                      "name": "ClrType",
-                      "value": "System.String"
-                    }
-                  ]
-                }
-              ],
+              "description": "Directory where the self-documentation bundle  should be written.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--overwrite",
               "required": false,
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--quiet",
-              "required": false,
-              "aliases": [
-                "-q"
-              ],
+              "description": "Allow existing self-documentation output to be  replaced.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--show-home",
               "required": false,
+              "description": "Show the viewer home screen button in the  generated self-documentation app.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--skip-html",
               "required": false,
+              "description": "Skip generating the HTML app bundle under html/.",
               "recursive": false,
               "hidden": false
             },
             {
               "name": "--skip-markdown",
               "required": false,
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--verbose",
-              "required": false,
+              "description": "Skip generating the Markdown tree output under  tree/.",
               "recursive": false,
               "hidden": false
             }
