@@ -19,6 +19,11 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
   const activeVersion = selectedVersion || pkg.latestVersion;
   const versionInfo = pkg.versions.find((v) => v.version === activeVersion) || pkg.versions[0];
   const iconUrl = summary?.packageIconUrl || DEFAULT_PACKAGE_ICON_URL;
+  const nugetUrl = pkg.links?.nuget || `https://www.nuget.org/packages/${pkg.packageId}`;
+  const projectUrl = pkg.links?.project;
+  const sourceUrl = pkg.links?.source;
+  const showProjectLink = !!projectUrl;
+  const showSourceLink = !!sourceUrl && sourceUrl !== projectUrl;
 
   function handleLoad(ver?: string) {
     const resolvedVersion = ver || pkg.latestVersion;
@@ -92,7 +97,7 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
           <div className="browse-detail-field">
             <span className="browse-detail-label">NuGet</span>
             <a
-              href={`https://www.nuget.org/packages/${pkg.packageId}`}
+              href={nugetUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="browse-nuget-link"
@@ -100,6 +105,32 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
               View on nuget.org <ExternalLink aria-hidden="true" size={12} />
             </a>
           </div>
+          {showProjectLink && (
+            <div className="browse-detail-field">
+              <span className="browse-detail-label">Website</span>
+              <a
+                href={projectUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="browse-nuget-link"
+              >
+                Open project site <ExternalLink aria-hidden="true" size={12} />
+              </a>
+            </div>
+          )}
+          {showSourceLink && (
+            <div className="browse-detail-field">
+              <span className="browse-detail-label">Repository</span>
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="browse-nuget-link"
+              >
+                Open source repo <ExternalLink aria-hidden="true" size={12} />
+              </a>
+            </div>
+          )}
         </div>
       </section>
 

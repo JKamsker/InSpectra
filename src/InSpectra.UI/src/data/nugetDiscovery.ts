@@ -31,10 +31,17 @@ export interface DiscoveryPackageDetail {
   packageId: string;
   trusted: boolean;
   totalDownloads: number;
+  links?: DiscoveryPackageLinks;
   latestVersion: string;
   latestStatus: DiscoveryStatus;
   latestPaths: DiscoveryPaths;
   versions: DiscoveryVersion[];
+}
+
+export interface DiscoveryPackageLinks {
+  nuget?: string;
+  project?: string;
+  source?: string;
 }
 
 export interface DiscoveryVersion {

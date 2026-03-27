@@ -236,7 +236,7 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
             <label className="browse-order-control">
               <span className="browse-order-label">Order by</span>
               <select value={orderBy} onChange={(e) => setOrderBy(e.target.value as BrowseOrder)}>
-                <option value="index">Discovery order</option>
+                <option value="index">Suggested</option>
                 <option value="updated">Recently updated</option>
                 <option value="created">Recently created</option>
                 <option value="downloads">Downloads</option>

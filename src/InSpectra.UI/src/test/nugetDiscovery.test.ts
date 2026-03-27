@@ -55,6 +55,11 @@ describe("nuget discovery", () => {
       packageId: "JellyfinCli",
       trusted: false,
       totalDownloads: 740,
+      links: {
+        nuget: "https://www.nuget.org/packages/JellyfinCli",
+        project: "https://example.test/jellyfincli",
+        source: "https://github.com/example/jellyfincli",
+      },
       latestVersion: "0.1.19",
       latestStatus: "ok",
       latestPaths: {
@@ -138,6 +143,11 @@ describe("nuget discovery", () => {
       packageId: "JellyfinCli",
       trusted: false,
       totalDownloads: 740,
+      links: {
+        nuget: "https://www.nuget.org/packages/JellyfinCli",
+        project: "https://example.test/jellyfincli",
+        source: "https://github.com/example/jellyfincli",
+      },
       latestVersion: "0.1.19",
       latestStatus: "ok",
       latestPaths: {
