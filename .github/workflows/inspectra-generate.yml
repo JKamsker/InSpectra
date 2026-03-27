@@ -11,7 +11,7 @@
 #   # 1) .NET global tool → HTML artifact
 #   jobs:
 #     docs:
-#       uses: JKamsker/OpenCLI-Renderer/.github/workflows/inspectra-generate.yml@main
+#       uses: JKamsker/InSpectra/.github/workflows/inspectra-generate.yml@v1
 #       with:
 #         dotnet-tool: JellyfinCli
 #         cli-name: jf
@@ -19,7 +19,7 @@
 #   # 2) Markdown tree output
 #   jobs:
 #     docs:
-#       uses: JKamsker/OpenCLI-Renderer/.github/workflows/inspectra-generate.yml@main
+#       uses: JKamsker/InSpectra/.github/workflows/inspectra-generate.yml@v1
 #       with:
 #         dotnet-tool: JellyfinCli
 #         cli-name: jf
@@ -28,7 +28,7 @@
 #   # 3) Pre-exported opencli.json
 #   jobs:
 #     docs:
-#       uses: JKamsker/OpenCLI-Renderer/.github/workflows/inspectra-generate.yml@main
+#       uses: JKamsker/InSpectra/.github/workflows/inspectra-generate.yml@v1
 #       with:
 #         mode: file
 #         opencli-json: docs/opencli.json
@@ -37,7 +37,7 @@
 #   # 4) HTML artifact → GitHub Pages (caller handles deploy)
 #   jobs:
 #     generate:
-#       uses: JKamsker/OpenCLI-Renderer/.github/workflows/inspectra-generate.yml@main
+#       uses: JKamsker/InSpectra/.github/workflows/inspectra-generate.yml@v1
 #       with:
 #         dotnet-tool: JellyfinCli
 #         cli-name: jf
@@ -178,7 +178,7 @@ jobs:
 
       # ── render ──────────────────────────────────────────────────
       - name: Render with InSpectra
-        uses: JKamsker/OpenCLI-Renderer/.github/actions/render@main
+        uses: JKamsker/InSpectra@v1
         with:
           mode: ${{ inputs.mode }}
           format: ${{ inputs.format }}
