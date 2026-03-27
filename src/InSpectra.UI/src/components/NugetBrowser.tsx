@@ -1,11 +1,13 @@
-import { ArrowLeft, LoaderCircle, Package, Search } from "lucide-react";
-import { useDeferredValue, useEffect, useRef, useState } from "react";
+import { ArrowLeft, LoaderCircle, Search } from "lucide-react";
+import { SyntheticEvent, useDeferredValue, useEffect, useRef, useState } from "react";
 import {
+  DEFAULT_PACKAGE_ICON_URL,
   DiscoveryPackageDetail,
   DiscoveryPackageSummary,
   DiscoverySummaryIndex,
   fetchDiscoveryIndex,
   fetchDiscoveryPackage,
+  findPackageSummaryById,
   getPackageStatus,
   searchPackages,
 } from "../data/nugetDiscovery";
@@ -103,6 +105,8 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
   ) : null;
 
   if (packageId) {
+    const packageSummary = index ? findPackageSummaryById(index, packageId) : undefined;
+
     if (packageError) {
       return (
         <>
@@ -139,7 +143,12 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
 
     return (
       <>
-        <PackageDetail pkg={packageDetail} selectedVersion={version} onLoadPackage={onLoadPackage} />
+        <PackageDetail
+          pkg={packageDetail}
+          summary={packageSummary}
+          selectedVersion={version}
+          onLoadPackage={onLoadPackage}
+        />
         {browsePalette}
       </>
     );
@@ -232,10 +241,18 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
 }
 
 function PackageCard({ pkg }: { pkg: DiscoveryPackageSummary }) {
+  const iconUrl = pkg.packageIconUrl || DEFAULT_PACKAGE_ICON_URL;
+
   return (
     <a className="browse-card panel" href={buildBrowseHash(pkg.packageId)}>
       <div className="browse-card-header">
-        <Package aria-hidden="true" className="browse-card-icon" />
+        <img
+          className="browse-package-icon"
+          src={iconUrl}
+          alt=""
+          loading="lazy"
+          onError={handlePackageIconError}
+        />
         <div className="browse-card-title">{pkg.packageId}</div>
         <StatusBadge status={getPackageStatus(pkg)} />
       </div>
@@ -248,6 +265,16 @@ function PackageCard({ pkg }: { pkg: DiscoveryPackageSummary }) {
           <span className="browse-card-versions">{pkg.versionCount} versions</span>
         )}
       </div>
+      <div className="browse-card-stats">
+        <span>{pkg.commandCount} commands</span>
+        <span>{pkg.commandGroupCount} groups</span>
+      </div>
     </a>
   );
+}
+
+function handlePackageIconError(event: SyntheticEvent<HTMLImageElement>) {
+  const img = event.currentTarget;
+  if (img.src === DEFAULT_PACKAGE_ICON_URL) return;
+  img.src = DEFAULT_PACKAGE_ICON_URL;
 }

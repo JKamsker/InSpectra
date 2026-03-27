@@ -1,17 +1,24 @@
 import { AlertTriangle, ArrowLeft, CheckCircle2, ExternalLink, LoaderCircle, Package } from "lucide-react";
-import { useState } from "react";
-import { DiscoveryPackageDetail, resolvePackageUrls } from "../data/nugetDiscovery";
+import { SyntheticEvent, useState } from "react";
+import {
+  DEFAULT_PACKAGE_ICON_URL,
+  DiscoveryPackageDetail,
+  DiscoveryPackageSummary,
+  resolvePackageUrls,
+} from "../data/nugetDiscovery";
 
 interface PackageDetailProps {
   pkg: DiscoveryPackageDetail;
+  summary?: DiscoveryPackageSummary;
   selectedVersion?: string;
   onLoadPackage: (opencliUrl: string, xmldocUrl: string, label: string, packageId: string, version: string | undefined) => void;
 }
 
-export function PackageDetail({ pkg, selectedVersion, onLoadPackage }: PackageDetailProps) {
+export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: PackageDetailProps) {
   const [loadingSpec, setLoadingSpec] = useState(false);
   const activeVersion = selectedVersion || pkg.latestVersion;
   const versionInfo = pkg.versions.find((v) => v.version === activeVersion) || pkg.versions[0];
+  const iconUrl = summary?.packageIconUrl || DEFAULT_PACKAGE_ICON_URL;
 
   function handleLoad(ver?: string) {
     const resolvedVersion = ver || pkg.latestVersion;
@@ -26,9 +33,18 @@ export function PackageDetail({ pkg, selectedVersion, onLoadPackage }: PackageDe
     <main className="import-screen">
       <section className="import-hero panel">
         <div className="browse-header-row">
-          <div>
-            <div className="eyebrow">NuGet Browser</div>
-            <h1>{pkg.packageId}</h1>
+          <div className="browse-detail-title-row">
+            <img
+              className="browse-package-icon browse-package-icon-lg"
+              src={iconUrl}
+              alt=""
+              loading="lazy"
+              onError={handlePackageIconError}
+            />
+            <div>
+              <div className="eyebrow">NuGet Browser</div>
+              <h1>{pkg.packageId}</h1>
+            </div>
           </div>
           <button type="button" className="secondary-button" onClick={() => history.back()}>
             <ArrowLeft aria-hidden="true" size={14} />
@@ -51,6 +67,12 @@ export function PackageDetail({ pkg, selectedVersion, onLoadPackage }: PackageDe
             <span className="browse-detail-label">Status</span>
             <StatusBadge status={pkg.latestStatus} />
           </div>
+          {summary && (
+            <div className="browse-detail-field">
+              <span className="browse-detail-label">Coverage</span>
+              <span>{summary.commandCount} commands across {summary.commandGroupCount} groups</span>
+            </div>
+          )}
           <div className="browse-detail-field">
             <span className="browse-detail-label">NuGet</span>
             <a
@@ -105,6 +127,12 @@ export function PackageDetail({ pkg, selectedVersion, onLoadPackage }: PackageDe
       </section>
     </main>
   );
+}
+
+function handlePackageIconError(event: SyntheticEvent<HTMLImageElement>) {
+  const img = event.currentTarget;
+  if (img.src === DEFAULT_PACKAGE_ICON_URL) return;
+  img.src = DEFAULT_PACKAGE_ICON_URL;
 }
 
 export function StatusBadge({ status }: { status: "ok" | "partial" }) {

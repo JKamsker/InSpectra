@@ -1,5 +1,6 @@
 const BASE_URL = "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/";
 const SUMMARY_INDEX_URL = `${BASE_URL}index/index.json`;
+export const DEFAULT_PACKAGE_ICON_URL = "https://nuget.org/Content/gallery/img/default-package-icon-256x256.png";
 
 export type DiscoveryStatus = "ok" | "partial";
 export type DiscoveryCompleteness = "full" | "partial";
