@@ -25,7 +25,7 @@ public sealed class ExecHtmlCommand(HtmlRenderService renderService) : AsyncComm
         return CommandOutputHandler.ExecuteAsync(
             options.OutputMode,
             options.Verbose,
-            () => renderService.RenderFromExecAsync(request, features, cancellationToken));
+            () => renderService.RenderFromExecAsync(request, features, cancellationToken, settings.Label));
     }
 }
 

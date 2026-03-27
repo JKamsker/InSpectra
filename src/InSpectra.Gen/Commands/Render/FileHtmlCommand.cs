@@ -19,7 +19,7 @@ public sealed class FileHtmlCommand(HtmlRenderService renderService) : AsyncComm
         return CommandOutputHandler.ExecuteAsync(
             options.OutputMode,
             options.Verbose,
-            () => renderService.RenderFromFileAsync(request, features, cancellationToken));
+            () => renderService.RenderFromFileAsync(request, features, cancellationToken, settings.Label));
     }
 }
 

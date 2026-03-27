@@ -3,6 +3,7 @@ import { OpenCliDocument } from "../data/openCli";
 export interface ViewerOptions {
   includeHidden: boolean;
   includeMetadata: boolean;
+  label?: string;
 }
 
 export interface FeatureFlags {

@@ -15,25 +15,28 @@ public sealed class HtmlRenderService(
     public async Task<RenderExecutionResult> RenderFromFileAsync(
         FileRenderRequest request,
         HtmlFeatureFlags features,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? label = null)
     {
         var prepared = await documentService.LoadFromFileAsync(request, cancellationToken);
-        return await RenderAsync(prepared, request.Options, features, cancellationToken);
+        return await RenderAsync(prepared, request.Options, features, label, cancellationToken);
     }
 
     public async Task<RenderExecutionResult> RenderFromExecAsync(
         ExecRenderRequest request,
         HtmlFeatureFlags features,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? label = null)
     {
         var prepared = await documentService.LoadFromExecAsync(request, cancellationToken);
-        return await RenderAsync(prepared, request.Options, features, cancellationToken);
+        return await RenderAsync(prepared, request.Options, features, label, cancellationToken);
     }
 
     private async Task<RenderExecutionResult> RenderAsync(
         AcquiredRenderDocument prepared,
         RenderExecutionOptions options,
         HtmlFeatureFlags features,
+        string? label,
         CancellationToken cancellationToken)
     {
         var outputDirectory = options.OutputDirectory
@@ -65,7 +68,7 @@ public sealed class HtmlRenderService(
 
         OutputPathHelper.PrepareDirectory(outputDirectory, options.Overwrite);
 
-        var bootstrapJson = BuildInlineBootstrap(prepared, options.IncludeHidden, options.IncludeMetadata, features);
+        var bootstrapJson = BuildInlineBootstrap(prepared, options.IncludeHidden, options.IncludeMetadata, features, label);
         var writtenFiles = new List<RenderedFile>();
         foreach (var file in bundleFiles)
         {
@@ -120,7 +123,8 @@ public sealed class HtmlRenderService(
         AcquiredRenderDocument prepared,
         bool includeHidden,
         bool includeMetadata,
-        HtmlFeatureFlags features)
+        HtmlFeatureFlags features,
+        string? label)
     {
         var payload = new InlineBootstrap
         {
@@ -131,6 +135,7 @@ public sealed class HtmlRenderService(
             {
                 IncludeHidden = includeHidden,
                 IncludeMetadata = includeMetadata,
+                Label = label,
             },
             Features = new FeatureFlagsPayload
             {
@@ -166,6 +171,8 @@ public sealed class HtmlRenderService(
         public required bool IncludeHidden { get; init; }
 
         public required bool IncludeMetadata { get; init; }
+
+        public string? Label { get; init; }
     }
 
     private sealed class FeatureFlagsPayload

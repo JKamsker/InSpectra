@@ -132,6 +132,13 @@ public abstract class HtmlCommandSettingsBase : CommonCommandSettings
     [Description("Enable local package upload on the viewer home screen.")]
     [CommandOption("--enable-package-upload")]
     public bool EnablePackageUpload { get; init; }
+
+    /// <summary>
+    /// Custom label shown in the viewer header (e.g. a version string).
+    /// </summary>
+    [Description("Custom label shown in the viewer header (e.g. a version string).")]
+    [CommandOption("--label <TEXT>")]
+    public string? Label { get; init; }
 }
 
 /// <summary>
@@ -248,4 +255,11 @@ public abstract class SelfDocHtmlCommandSettingsBase : SelfDocCommandSettingsBas
     [Description("Enable local package upload on the self-documentation viewer home screen.")]
     [CommandOption("--enable-package-upload")]
     public bool EnablePackageUpload { get; init; }
+
+    /// <summary>
+    /// Custom label shown in the viewer header (e.g. a version string).
+    /// </summary>
+    [Description("Custom label shown in the viewer header (e.g. a version string).")]
+    [CommandOption("--label <TEXT>")]
+    public string? Label { get; init; }
 }

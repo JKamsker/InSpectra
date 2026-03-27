@@ -23,13 +23,13 @@ export async function loadFromStartupRequest(
 
   if (request.kind === "inline") {
     const doc = parseOpenCliDocument(JSON.stringify(request.openCli));
-    const version = doc?.info?.version;
+    const label = request.options.label || (doc?.info?.version ? `v${doc.info.version}` : "");
     return buildLoadedSource({
       document: doc,
       xmlDoc: request.xmlDoc,
       options: request.options,
       features: request.features,
-      label: version ? `v${version}` : "",
+      label,
       mode: "inline",
     });
   }

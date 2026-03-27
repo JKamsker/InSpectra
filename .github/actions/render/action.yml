@@ -54,6 +54,10 @@ inputs:
     required: false
     default: 'inspectra-output'
 
+  label:
+    description: 'Custom label shown in the viewer header (e.g. "v1.2.3")'
+    required: false
+
   extra-args:
     description: 'Additional flags forwarded to the inspectra CLI'
     required: false
@@ -109,6 +113,7 @@ runs:
         OPENCLI_ARGS: ${{ inputs.opencli-args }}
         XMLDOC_ARGS: ${{ inputs.xmldoc-args }}
         TIMEOUT: ${{ inputs.timeout }}
+        LABEL: ${{ inputs.label }}
         OUTPUT_DIR: ${{ inputs.output-dir }}
         EXTRA_ARGS: ${{ inputs.extra-args }}
       run: |
@@ -170,6 +175,10 @@ runs:
         fi
 
         args+=("${format_args[@]}")
+
+        if [ -n "$LABEL" ]; then
+          args+=(--label "$LABEL")
+        fi
 
         if [ -n "${EXTRA_ARGS:-}" ]; then
           # shellcheck disable=SC2206
