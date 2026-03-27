@@ -1,4 +1,4 @@
-import { ArrowLeft, LoaderCircle, Search } from "lucide-react";
+import { ArrowLeft, Layers3, LoaderCircle, Search, Terminal } from "lucide-react";
 import { SyntheticEvent, useDeferredValue, useEffect, useRef, useState } from "react";
 import {
   DEFAULT_PACKAGE_ICON_URL,
@@ -246,28 +246,49 @@ function PackageCard({ pkg }: { pkg: DiscoveryPackageSummary }) {
   return (
     <a className="browse-card panel" href={buildBrowseHash(pkg.packageId)}>
       <div className="browse-card-header">
-        <img
-          className="browse-package-icon"
-          src={iconUrl}
-          alt=""
-          loading="lazy"
-          onError={handlePackageIconError}
-        />
-        <div className="browse-card-title">{pkg.packageId}</div>
+        <div className="browse-card-title-group">
+          <img
+            className="browse-package-icon"
+            src={iconUrl}
+            alt=""
+            loading="lazy"
+            onError={handlePackageIconError}
+          />
+          <div className="browse-card-title">{pkg.packageId}</div>
+        </div>
         <StatusBadge status={getPackageStatus(pkg)} />
       </div>
-      <div className="browse-card-meta">
+
+      <div className="browse-card-body">
         {pkg.commandName && (
-          <span className="browse-card-command"><code>{pkg.commandName}</code></span>
-        )}
-        <span className="browse-card-version">v{pkg.latestVersion}</span>
-        {pkg.versionCount > 1 && (
-          <span className="browse-card-versions">{pkg.versionCount} versions</span>
+          <div className="browse-card-command" aria-label={`Command alias ${pkg.commandName}`}>
+            <span className="browse-card-command-prefix">&gt;</span>
+            <code>{pkg.commandName}</code>
+          </div>
         )}
       </div>
-      <div className="browse-card-stats">
-        <span>{pkg.commandCount} commands</span>
-        <span>{pkg.commandGroupCount} groups</span>
+
+      <div className="browse-card-footer">
+        <div className="browse-card-meta">
+          <span className="browse-card-version">v{pkg.latestVersion}</span>
+          {pkg.versionCount > 1 && (
+            <>
+              <span className="browse-card-meta-separator" aria-hidden="true">•</span>
+              <span className="browse-card-versions">{pkg.versionCount} versions</span>
+            </>
+          )}
+        </div>
+
+        <div className="browse-card-stats">
+          <span className="browse-card-stat" aria-label={`${pkg.commandCount} commands`}>
+            <Terminal aria-hidden="true" size={13} />
+            <span>{pkg.commandCount}</span>
+          </span>
+          <span className="browse-card-stat" aria-label={`${pkg.commandGroupCount} command groups`}>
+            <Layers3 aria-hidden="true" size={13} />
+            <span>{pkg.commandGroupCount}</span>
+          </span>
+        </div>
       </div>
     </a>
   );
