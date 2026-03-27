@@ -72,6 +72,24 @@ public class RequestAndOutputContractTests
     }
 
     [Fact]
+    public void Self_doc_settings_only_expose_supported_self_doc_flags()
+    {
+        var properties = typeof(SelfDocSettings).GetProperties().Select(property => property.Name).ToArray();
+
+        Assert.DoesNotContain(nameof(CommonCommandSettings.Json), properties);
+        Assert.DoesNotContain(nameof(CommonCommandSettings.Output), properties);
+        Assert.DoesNotContain(nameof(CommonCommandSettings.Quiet), properties);
+        Assert.DoesNotContain(nameof(CommonCommandSettings.Verbose), properties);
+        Assert.DoesNotContain(nameof(CommonCommandSettings.NoColor), properties);
+        Assert.DoesNotContain(nameof(CommonCommandSettings.DryRun), properties);
+
+        Assert.Contains(nameof(SelfDocHtmlCommandSettingsBase.OutputDirectory), properties);
+        Assert.Contains(nameof(SelfDocCommandSettingsBase.Overwrite), properties);
+        Assert.Contains(nameof(SelfDocCommandSettingsBase.IncludeHidden), properties);
+        Assert.Contains(nameof(SelfDocCommandSettingsBase.IncludeMetadata), properties);
+    }
+
+    [Fact]
     public async Task Json_output_writer_emits_versioned_success_envelope()
     {
         var original = Console.Out;

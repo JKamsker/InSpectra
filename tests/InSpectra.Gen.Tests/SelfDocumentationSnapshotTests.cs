@@ -32,6 +32,23 @@ public class SelfDocumentationSnapshotTests
         AssertHtmlOptions(execHtml);
     }
 
+    [Fact]
+    public void Xmldoc_snapshot_documents_every_cli_parameter()
+    {
+        var path = Path.Combine(FixturePaths.RepoRoot, "docs", "inspectra-gen", "xmldoc.xml");
+        var model = XDocument.Load(path);
+
+        var undocumented = model.Descendants()
+            .Where(element => element.Name.LocalName is "Argument" or "Option")
+            .Where(element => string.IsNullOrWhiteSpace(element.Element("Description")?.Value))
+            .Select(DescribeParameter)
+            .ToArray();
+
+        Assert.True(
+            undocumented.Length == 0,
+            "Undocumented CLI parameters:" + Environment.NewLine + string.Join(Environment.NewLine, undocumented));
+    }
+
     private static void AssertHtmlCommand(JsonObject document, string branchName)
     {
         var render = document["commands"]!.AsArray()
@@ -75,5 +92,24 @@ public class SelfDocumentationSnapshotTests
         Assert.Contains("out-dir", optionNames);
         Assert.DoesNotContain("out", optionNames);
         Assert.DoesNotContain("layout", optionNames);
+    }
+
+    private static string DescribeParameter(XElement parameter)
+    {
+        var commandPath = string.Join(
+            " ",
+            parameter.Ancestors("Command")
+                .Reverse()
+                .Select(command => command.Attribute("Name")?.Value)
+                .Where(name => !string.IsNullOrWhiteSpace(name)));
+
+        var label = parameter.Name.LocalName switch
+        {
+            "Argument" => parameter.Attribute("Name")?.Value,
+            "Option" => "--" + parameter.Attribute("Long")?.Value,
+            _ => parameter.Attribute("Name")?.Value,
+        };
+
+        return $"{commandPath} {label}".Trim();
     }
 }
