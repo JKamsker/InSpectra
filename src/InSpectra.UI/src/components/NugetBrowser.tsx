@@ -47,10 +47,13 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
   const [packageLoading, setPackageLoading] = useState(false);
   const [packageError, setPackageError] = useState<string | null>(null);
   const [packageDetail, setPackageDetail] = useState<DiscoveryPackageDetail | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(() => sessionStorage.getItem("browse:search") ?? "");
   const deferredSearch = useDeferredValue(searchTerm);
-  const [orderBy, setOrderBy] = useState<BrowseOrder>("index");
+  const [orderBy, setOrderBy] = useState<BrowseOrder>(() => (sessionStorage.getItem("browse:order") as BrowseOrder) || "index");
   const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => { sessionStorage.setItem("browse:search", searchTerm); }, [searchTerm]);
+  useEffect(() => { sessionStorage.setItem("browse:order", orderBy); }, [orderBy]);
 
   useEffect(() => {
     const controller = new AbortController();
