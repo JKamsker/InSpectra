@@ -257,13 +257,6 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
           </div>
 
           <div className="browse-toolbar">
-            <span className="browse-stat">
-              {results.length === index.packages.length
-                ? `${index.packageCount} packages`
-                : `${results.length} of ${index.packageCount} packages`}
-              {hasMore && ` (showing first ${DISPLAY_LIMIT})`}
-            </span>
-
             <label className="browse-order-control">
               <span className="browse-order-label">Framework</span>
               <select value={frameworkFilter} onChange={(e) => setFrameworkFilter(e.target.value)}>
@@ -287,6 +280,15 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
                 <option value="versions">Versions</option>
               </select>
             </label>
+          </div>
+
+          <div className="browse-stat-row">
+            <span className="browse-stat">
+              {results.length === index.packages.length
+                ? `${index.packageCount} packages`
+                : `${results.length} of ${index.packageCount} packages`}
+              {hasMore && ` (showing first ${DISPLAY_LIMIT})`}
+            </span>
           </div>
         </section>
 

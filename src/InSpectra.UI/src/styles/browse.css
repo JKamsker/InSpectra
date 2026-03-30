@@ -85,6 +85,10 @@
   flex-wrap: wrap;
 }
 
+.browse-stat-row {
+  margin-top: 0.35rem;
+}
+
 .browse-stat {
   font-size: 0.78rem;
   color: var(--muted);
