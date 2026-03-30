@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "set \"PATH=.\\node_modules\\.bin;C:\\Progra~1\\nodejs;%SystemRoot%\\System32\" && vite",
-    "build": "set \"PATH=.\\node_modules\\.bin;C:\\Progra~1\\nodejs;%SystemRoot%\\System32\" && tsc --noEmit && vite build",
-    "preview": "set \"PATH=.\\node_modules\\.bin;C:\\Progra~1\\nodejs;%SystemRoot%\\System32\" && vite preview",
-    "test": "set \"PATH=.\\node_modules\\.bin;C:\\Progra~1\\nodejs;%SystemRoot%\\System32\" && vitest run"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
