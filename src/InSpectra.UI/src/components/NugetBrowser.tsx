@@ -201,6 +201,9 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
   }
 
   const results = sortPackages(searchPackages(index, deferredSearch), orderBy);
+  const DISPLAY_LIMIT = 200;
+  const displayedResults = results.slice(0, DISPLAY_LIMIT);
+  const hasMore = results.length > DISPLAY_LIMIT;
 
   return (
     <>
@@ -238,6 +241,7 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
               {results.length === index.packages.length
                 ? `${index.packageCount} packages`
                 : `${results.length} of ${index.packageCount} packages`}
+              {hasMore && ` (showing first ${DISPLAY_LIMIT})`}
             </span>
 
             <label className="browse-order-control">
@@ -257,7 +261,7 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
         </section>
 
         <div className="browse-grid">
-          {results.map((pkg) => (
+          {displayedResults.map((pkg) => (
             <PackageCard key={pkg.packageId} pkg={pkg} />
           ))}
           {results.length === 0 && (

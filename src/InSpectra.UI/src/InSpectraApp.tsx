@@ -9,7 +9,7 @@ import { PackageLoadingScreen } from "./components/PackageLoadingScreen";
 import { OverviewPanel } from "./components/OverviewPanel";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { useAppState } from "./hooks/useAppState";
-import { useSwipeDrawers } from "./hooks/useSwipeDrawers";
+
 import { findCommandByPath } from "./data/normalize";
 
 export function InSpectraApp() {
@@ -25,7 +25,6 @@ export function InSpectraApp() {
     handleLoadPackage, buildCurrentHash, resetToHome,
   } = useAppState();
 
-  useSwipeDrawers({ mobileSidebarOpen, composerOpen, setMobileSidebarOpen, setComposerOpen });
 
   if (route.kind === "browse") {
     if (!featureFlags.nugetBrowser) {
