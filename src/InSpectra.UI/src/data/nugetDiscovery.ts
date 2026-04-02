@@ -1,5 +1,6 @@
-const BASE_URL = "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/";
-const SUMMARY_INDEX_URL = `${BASE_URL}index/index.json`;
+const DISCOVERY_DATA_BASE_URL = "https://inspectra-data.kamsker.at/";
+const SUMMARY_INDEX_URL = `${DISCOVERY_DATA_BASE_URL}index.json`;
+const SUMMARY_INDEX_MIN_URL = `${DISCOVERY_DATA_BASE_URL}index.min.json`;
 export const DEFAULT_PACKAGE_ICON_URL = "https://nuget.org/Content/gallery/img/default-package-icon-256x256.png";
 
 export type DiscoveryStatus = "ok" | "partial";
@@ -9,6 +10,7 @@ export interface DiscoverySummaryIndex {
   schemaVersion: number;
   generatedAt: string;
   packageCount: number;
+  includedPackageCount?: number;
   packages: DiscoveryPackageSummary[];
 }
 
@@ -69,6 +71,7 @@ export interface DiscoveryPaths {
 }
 
 let cachedIndex: DiscoverySummaryIndex | null = null;
+let cachedIndexPreview: DiscoverySummaryIndex | null = null;
 const cachedPackageDetails = new Map<string, DiscoveryPackageDetail>();
 
 export async function fetchDiscoveryIndex(signal?: AbortSignal): Promise<DiscoverySummaryIndex> {
@@ -80,7 +83,21 @@ export async function fetchDiscoveryIndex(signal?: AbortSignal): Promise<Discove
   }
 
   cachedIndex = (await response.json()) as DiscoverySummaryIndex;
+  cachedIndexPreview = cachedIndex;
   return cachedIndex;
+}
+
+export async function fetchDiscoveryIndexPreview(signal?: AbortSignal): Promise<DiscoverySummaryIndex> {
+  if (cachedIndex) return cachedIndex;
+  if (cachedIndexPreview) return cachedIndexPreview;
+
+  const response = await fetch(SUMMARY_INDEX_MIN_URL, { signal });
+  if (!response.ok) {
+    throw new Error(`Failed to load discovery index preview: ${response.status} ${response.statusText}`);
+  }
+
+  cachedIndexPreview = (await response.json()) as DiscoverySummaryIndex;
+  return cachedIndexPreview;
 }
 
 export async function fetchDiscoveryPackage(packageId: string, signal?: AbortSignal): Promise<DiscoveryPackageDetail> {
@@ -125,14 +142,14 @@ export function resolvePackageUrls(
 
   if (ver) {
     return {
-      opencliUrl: `${BASE_URL}${ver.paths.opencliPath}`,
-      xmldocUrl: `${BASE_URL}${ver.paths.xmldocPath}`,
+      opencliUrl: buildDiscoveryAssetUrl(ver.paths.opencliPath),
+      xmldocUrl: buildDiscoveryAssetUrl(ver.paths.xmldocPath),
     };
   }
 
   return {
-    opencliUrl: `${BASE_URL}${pkg.latestPaths.opencliPath}`,
-    xmldocUrl: `${BASE_URL}${pkg.latestPaths.xmldocPath}`,
+    opencliUrl: buildDiscoveryAssetUrl(pkg.latestPaths.opencliPath),
+    xmldocUrl: buildDiscoveryAssetUrl(pkg.latestPaths.xmldocPath),
   };
 }
 
@@ -141,10 +158,23 @@ export function getPackageStatus(pkg: DiscoveryPackageSummary): DiscoveryStatus 
 }
 
 export function buildPackageIndexUrl(packageId: string): string {
-  return `${BASE_URL}index/packages/${encodeURIComponent(packageId.toLowerCase())}/index.json`;
+  return `${DISCOVERY_DATA_BASE_URL}packages/${encodeURIComponent(packageId.toLowerCase())}/index.json`;
 }
 
 export function resetDiscoveryCacheForTests() {
   cachedIndex = null;
+  cachedIndexPreview = null;
   cachedPackageDetails.clear();
+}
+
+function buildDiscoveryAssetUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const normalizedPath = path
+    .replace(/^\/+/, "")
+    .replace(/^index\//i, "");
+
+  return `${DISCOVERY_DATA_BASE_URL}${normalizedPath}`;
 }

@@ -3,6 +3,7 @@ import {
   DiscoveryPackageDetail,
   DiscoverySummaryIndex,
   fetchDiscoveryIndex,
+  fetchDiscoveryIndexPreview,
   fetchDiscoveryPackage,
   resetDiscoveryCacheForTests,
   resolvePackageUrls,
@@ -15,7 +16,42 @@ describe("nuget discovery", () => {
     vi.unstubAllGlobals();
   });
 
-  it("loads and caches the summary index from index/index.json", async () => {
+  it("loads and caches the summary preview index from index.min.json", async () => {
+    const payload = {
+      schemaVersion: 1,
+      generatedAt: "2026-03-27T11:43:21Z",
+      packageCount: 1,
+      includedPackageCount: 1,
+      packages: [{
+        packageId: "JellyfinCli",
+        commandName: "jf",
+        versionCount: 10,
+        latestVersion: "0.1.19",
+        createdAt: "2026-03-13T11:49:23.673+01:00",
+        updatedAt: "2026-03-27T02:40:52.81+01:00",
+        completeness: "full",
+        totalDownloads: 740,
+        commandCount: 153,
+        commandGroupCount: 40,
+      }],
+    };
+
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(payload), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const first = await fetchDiscoveryIndexPreview();
+    const second = await fetchDiscoveryIndexPreview();
+
+    expect(first).toEqual(payload);
+    expect(second).toBe(first);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://inspectra-data.kamsker.at/index.min.json",
+      { signal: undefined },
+    );
+  });
+
+  it("loads and caches the full summary index from index.json", async () => {
     const payload = {
       schemaVersion: 1,
       generatedAt: "2026-03-27T11:43:21Z",
@@ -44,7 +80,7 @@ describe("nuget discovery", () => {
     expect(second).toBe(first);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/index.json",
+      "https://inspectra-data.kamsker.at/index.json",
       { signal: undefined },
     );
   });
@@ -176,12 +212,12 @@ describe("nuget discovery", () => {
     };
 
     expect(resolvePackageUrls(pkg)).toEqual({
-      opencliUrl: "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/packages/jellyfincli/latest/opencli.json",
-      xmldocUrl: "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/packages/jellyfincli/latest/xmldoc.xml",
+      opencliUrl: "https://inspectra-data.kamsker.at/packages/jellyfincli/latest/opencli.json",
+      xmldocUrl: "https://inspectra-data.kamsker.at/packages/jellyfincli/latest/xmldoc.xml",
     });
     expect(resolvePackageUrls(pkg, "0.1.19")).toEqual({
-      opencliUrl: "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/packages/jellyfincli/0.1.19/opencli.json",
-      xmldocUrl: "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/packages/jellyfincli/0.1.19/xmldoc.xml",
+      opencliUrl: "https://inspectra-data.kamsker.at/packages/jellyfincli/0.1.19/opencli.json",
+      xmldocUrl: "https://inspectra-data.kamsker.at/packages/jellyfincli/0.1.19/xmldoc.xml",
     });
   });
 });

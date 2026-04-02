@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { InSpectraApp } from "../InSpectraApp";
-import { buildPackageIndexUrl } from "../data/nugetDiscovery";
+import { buildPackageIndexUrl, resetDiscoveryCacheForTests } from "../data/nugetDiscovery";
 import { testDocument, testXmlDoc } from "./fixtures";
 
 async function renderImportInput() {
@@ -17,6 +17,7 @@ describe("InSpectraUI app", () => {
   });
 
   afterEach(() => {
+    resetDiscoveryCacheForTests();
     vi.unstubAllGlobals();
   });
 
@@ -94,8 +95,8 @@ describe("InSpectraUI app", () => {
   });
 
   it("uses the package command token instead of the OpenCLI title on package command routes", async () => {
-    const openCliUrl = "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/packages/dotnet-ef/latest/opencli.json";
-    const xmlDocUrl = "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/packages/dotnet-ef/latest/xmldoc.xml";
+    const openCliUrl = "https://inspectra-data.kamsker.at/packages/dotnet-ef/latest/opencli.json";
+    const xmlDocUrl = "https://inspectra-data.kamsker.at/packages/dotnet-ef/latest/xmldoc.xml";
     const packageDocument = {
       ...testDocument,
       info: {
@@ -179,6 +180,73 @@ describe("InSpectraUI app", () => {
     expect(await screen.findByText("dotnet-ef dbcontext --json")).toBeInTheDocument();
   });
 
+  it("loads the preview index first and hydrates with the full index in the background", async () => {
+    const previewIndex = {
+      schemaVersion: 1,
+      generatedAt: "2026-03-28T00:00:00Z",
+      packageCount: 4851,
+      includedPackageCount: 200,
+      packages: [{
+        packageId: "Alpha.Tool",
+        commandName: "alpha",
+        versionCount: 1,
+        latestVersion: "1.0.0",
+        createdAt: "2026-03-01T00:00:00Z",
+        updatedAt: "2026-03-28T00:00:00Z",
+        completeness: "full",
+        totalDownloads: 100,
+        commandCount: 10,
+        commandGroupCount: 4,
+      }],
+    };
+    const fullIndex = {
+      ...previewIndex,
+      includedPackageCount: undefined,
+      packages: [
+        previewIndex.packages[0],
+        {
+          packageId: "Beta.Tool",
+          commandName: "beta",
+          versionCount: 1,
+          latestVersion: "1.0.0",
+          createdAt: "2026-03-02T00:00:00Z",
+          updatedAt: "2026-03-29T00:00:00Z",
+          completeness: "full",
+          totalDownloads: 200,
+          commandCount: 12,
+          commandGroupCount: 5,
+        },
+      ],
+    };
+
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = input.toString();
+      if (url === "https://inspectra-data.kamsker.at/index.min.json") {
+        return new Response(JSON.stringify(previewIndex), { status: 200 });
+      }
+
+      if (url === "https://inspectra-data.kamsker.at/index.json") {
+        return new Response(JSON.stringify(fullIndex), { status: 200 });
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+    window.history.replaceState({}, "", "https://example.test/viewer/index.html#/browse");
+
+    render(<InSpectraApp />);
+
+    expect(await screen.findByText("Alpha.Tool")).toBeInTheDocument();
+    expect(screen.getByText("4851 packages (showing first 200)")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith("https://inspectra-data.kamsker.at/index.min.json", expect.any(Object));
+      expect(fetchMock).toHaveBeenCalledWith("https://inspectra-data.kamsker.at/index.json", expect.anything());
+    }, { timeout: 5000 });
+    expect(await screen.findByText("Beta.Tool", {}, { timeout: 5000 })).toBeInTheDocument();
+    expect(screen.getByText("4851 packages")).toBeInTheDocument();
+  });
+
   it("hides unreliable coverage counts for partial package analyses", async () => {
     const summaryIndex = {
       schemaVersion: 1,
@@ -230,7 +298,11 @@ describe("InSpectraUI app", () => {
     };
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = input.toString();
-      if (url === "https://raw.githubusercontent.com/JKamsker/InSpectra-Discovery/refs/heads/main/index/index.json") {
+      if (url === "https://inspectra-data.kamsker.at/index.min.json") {
+        return new Response(JSON.stringify(summaryIndex), { status: 200 });
+      }
+
+      if (url === "https://inspectra-data.kamsker.at/index.json") {
         return new Response(JSON.stringify(summaryIndex), { status: 200 });
       }
 

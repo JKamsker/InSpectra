@@ -6,6 +6,7 @@ import {
   DiscoveryPackageSummary,
   DiscoverySummaryIndex,
   fetchDiscoveryIndex,
+  fetchDiscoveryIndexPreview,
   fetchDiscoveryPackage,
   findPackageSummaryById,
   getPackageStatus,
@@ -38,6 +39,8 @@ type BrowseOrder =
   | "commands"
   | "groups"
   | "versions";
+
+const FULL_INDEX_HYDRATION_DELAY_MS = 3000;
 
 export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: NugetBrowserProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -72,19 +75,47 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
-    fetchDiscoveryIndex(controller.signal)
-      .then((data) => {
-        setIndex(data);
+    let previewLoaded = false;
+    let fullIndexTimer = 0;
+
+    async function loadIndex() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const preview = await fetchDiscoveryIndexPreview(controller.signal);
+        if (controller.signal.aborted) return;
+
+        previewLoaded = true;
+        setIndex(preview);
         setLoading(false);
-      })
-      .catch((err) => {
+
+        fullIndexTimer = window.setTimeout(() => {
+          void fetchDiscoveryIndex()
+            .then((fullIndex) => {
+              if (!controller.signal.aborted) {
+                setIndex(fullIndex);
+              }
+            })
+            .catch((err) => {
+              if (!controller.signal.aborted && !previewLoaded) {
+                setError(err instanceof Error ? err.message : "Failed to load index.");
+                setLoading(false);
+              }
+            });
+        }, FULL_INDEX_HYDRATION_DELAY_MS);
+      } catch (err) {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setError(err instanceof Error ? err.message : "Failed to load index.");
         setLoading(false);
-      });
-    return () => controller.abort();
+      }
+    }
+
+    void loadIndex();
+    return () => {
+      controller.abort();
+      window.clearTimeout(fullIndexTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -223,7 +254,11 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
   const results = sortPackages(filtered, orderBy);
   const DISPLAY_LIMIT = 200;
   const displayedResults = results.slice(0, DISPLAY_LIMIT);
-  const hasMore = results.length > DISPLAY_LIMIT;
+  const previewIsTruncated =
+    typeof index.includedPackageCount === "number" &&
+    index.packageCount > index.includedPackageCount &&
+    results.length === index.packages.length;
+  const hasMore = results.length > DISPLAY_LIMIT || previewIsTruncated;
 
   return (
     <>
