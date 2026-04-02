@@ -13,7 +13,7 @@ interface PackageDetailProps {
   selectedVersion?: string;
   onLoadPackage: (
     opencliUrl: string,
-    xmldocUrl: string,
+    xmldocUrl: string | undefined,
     label: string,
     packageId: string,
     version: string | undefined,

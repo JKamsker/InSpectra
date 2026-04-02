@@ -220,4 +220,43 @@ describe("nuget discovery", () => {
       xmldocUrl: "https://inspectra-data.kamsker.at/packages/jellyfincli/0.1.19/xmldoc.xml",
     });
   });
+
+  it("omits the XML URL when the package has no published XML doc", () => {
+    const pkg: DiscoveryPackageDetail = {
+      schemaVersion: 1,
+      packageId: "weikio-cli",
+      trusted: false,
+      totalDownloads: 9154,
+      latestVersion: "2024.1.0-preview.37",
+      latestStatus: "ok",
+      latestPaths: {
+        metadataPath: "index/packages/weikio-cli/latest/metadata.json",
+        opencliPath: "index/packages/weikio-cli/latest/opencli.json",
+        xmldocPath: null,
+      },
+      versions: [{
+        version: "2024.1.0-preview.37",
+        publishedAt: "2024-10-16T11:31:51.5370000+00:00",
+        evaluatedAt: "2026-03-31T01:57:49.7504863+00:00",
+        status: "ok",
+        command: "weikio",
+        timings: {
+          totalMs: 9478,
+          installMs: 6423,
+          opencliMs: null,
+          xmldocMs: null,
+        },
+        paths: {
+          metadataPath: "index/packages/weikio-cli/2024.1.0-preview.37/metadata.json",
+          opencliPath: "index/packages/weikio-cli/2024.1.0-preview.37/opencli.json",
+          xmldocPath: null,
+        },
+      }],
+    };
+
+    expect(resolvePackageUrls(pkg)).toEqual({
+      opencliUrl: "https://inspectra-data.kamsker.at/packages/weikio-cli/latest/opencli.json",
+      xmldocUrl: undefined,
+    });
+  });
 });

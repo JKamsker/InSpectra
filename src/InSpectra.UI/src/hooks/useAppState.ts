@@ -228,7 +228,7 @@ export function useAppState() {
 
   async function handleLoadPackage(
     opencliUrl: string,
-    xmldocUrl: string,
+    xmldocUrl: string | undefined,
     label: string,
     packageId: string,
     version: string | undefined,

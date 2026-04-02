@@ -66,13 +66,15 @@ export async function loadFromFiles(files: File[], options: ViewerOptions, featu
 
 export async function loadFromUrls(
   opencliUrl: string,
-  xmldocUrl: string,
+  xmldocUrl: string | undefined,
   options: ViewerOptions,
   label: string,
   features: FeatureFlags,
 ): Promise<LoadedSource> {
   const openCliText = await fetchRequiredText(opencliUrl);
-  const xmlDocText = await fetchText(xmldocUrl, true);
+  const xmlDocText = xmldocUrl
+    ? await fetchText(xmldocUrl, true)
+    : undefined;
 
   return buildLoadedSource({
     document: parseOpenCliDocument(openCliText),

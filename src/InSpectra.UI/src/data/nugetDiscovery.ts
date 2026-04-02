@@ -56,8 +56,8 @@ export interface DiscoveryVersion {
   timings: {
     totalMs: number;
     installMs: number;
-    opencliMs: number;
-    xmldocMs: number;
+    opencliMs: number | null;
+    xmldocMs: number | null;
   };
   paths: DiscoveryPaths & {
     opencliSource?: string;
@@ -67,7 +67,7 @@ export interface DiscoveryVersion {
 export interface DiscoveryPaths {
   metadataPath: string;
   opencliPath: string;
-  xmldocPath: string;
+  xmldocPath?: string | null;
 }
 
 let cachedIndex: DiscoverySummaryIndex | null = null;
@@ -135,20 +135,20 @@ export function findPackageSummaryById(
 export function resolvePackageUrls(
   pkg: DiscoveryPackageDetail,
   version?: string,
-): { opencliUrl: string; xmldocUrl: string } {
+): { opencliUrl: string; xmldocUrl?: string } {
   const ver = version
     ? pkg.versions.find((candidate) => candidate.version === version)
     : undefined;
 
   if (ver) {
     return {
-      opencliUrl: buildDiscoveryAssetUrl(ver.paths.opencliPath),
+      opencliUrl: buildRequiredDiscoveryAssetUrl(ver.paths.opencliPath),
       xmldocUrl: buildDiscoveryAssetUrl(ver.paths.xmldocPath),
     };
   }
 
   return {
-    opencliUrl: buildDiscoveryAssetUrl(pkg.latestPaths.opencliPath),
+    opencliUrl: buildRequiredDiscoveryAssetUrl(pkg.latestPaths.opencliPath),
     xmldocUrl: buildDiscoveryAssetUrl(pkg.latestPaths.xmldocPath),
   };
 }
@@ -167,7 +167,11 @@ export function resetDiscoveryCacheForTests() {
   cachedPackageDetails.clear();
 }
 
-function buildDiscoveryAssetUrl(path: string): string {
+function buildDiscoveryAssetUrl(path: string | null | undefined): string | undefined {
+  if (!path) {
+    return undefined;
+  }
+
   if (/^https?:\/\//i.test(path)) {
     return path;
   }
@@ -177,4 +181,13 @@ function buildDiscoveryAssetUrl(path: string): string {
     .replace(/^index\//i, "");
 
   return `${DISCOVERY_DATA_BASE_URL}${normalizedPath}`;
+}
+
+function buildRequiredDiscoveryAssetUrl(path: string): string {
+  const url = buildDiscoveryAssetUrl(path);
+  if (!url) {
+    throw new Error("Missing required discovery asset path.");
+  }
+
+  return url;
 }

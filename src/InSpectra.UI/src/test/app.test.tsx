@@ -180,6 +180,91 @@ describe("InSpectraUI app", () => {
     expect(await screen.findByText("dotnet-ef dbcontext --json")).toBeInTheDocument();
   });
 
+  it("loads a package even when no XML doc is published", async () => {
+    const summaryIndex = {
+      schemaVersion: 1,
+      generatedAt: "2026-03-28T00:00:00Z",
+      packageCount: 1,
+      packages: [{
+        packageId: "weikio-cli",
+        commandName: "weikio",
+        versionCount: 1,
+        latestVersion: "2024.1.0-preview.37",
+        createdAt: "2024-10-16T11:31:51.5370000+00:00",
+        updatedAt: "2024-10-16T11:31:51.5370000+00:00",
+        completeness: "full",
+        totalDownloads: 9154,
+        commandCount: 94,
+        commandGroupCount: 37,
+      }],
+    };
+    const packageDetail = {
+      schemaVersion: 1,
+      packageId: "weikio-cli",
+      trusted: false,
+      totalDownloads: 9154,
+      latestVersion: "2024.1.0-preview.37",
+      latestStatus: "ok",
+      latestPaths: {
+        metadataPath: "index/packages/weikio-cli/latest/metadata.json",
+        opencliPath: "index/packages/weikio-cli/latest/opencli.json",
+        xmldocPath: null,
+      },
+      versions: [{
+        version: "2024.1.0-preview.37",
+        publishedAt: "2024-10-16T11:31:51.5370000+00:00",
+        evaluatedAt: "2026-03-31T01:57:49.7504863+00:00",
+        status: "ok",
+        command: "weikio",
+        timings: {
+          totalMs: 9478,
+          installMs: 6423,
+          opencliMs: null,
+          xmldocMs: null,
+        },
+        paths: {
+          metadataPath: "index/packages/weikio-cli/2024.1.0-preview.37/metadata.json",
+          opencliPath: "index/packages/weikio-cli/2024.1.0-preview.37/opencli.json",
+          xmldocPath: null,
+          opencliSource: "startup-hook",
+        },
+      }],
+    };
+    const openCliUrl = "https://inspectra-data.kamsker.at/packages/weikio-cli/2024.1.0-preview.37/opencli.json";
+
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = input.toString();
+      if (url === "https://inspectra-data.kamsker.at/index.min.json") {
+        return new Response(JSON.stringify(summaryIndex), { status: 200 });
+      }
+
+      if (url === "https://inspectra-data.kamsker.at/index.json") {
+        return new Response(JSON.stringify(summaryIndex), { status: 200 });
+      }
+
+      if (url === buildPackageIndexUrl("weikio-cli")) {
+        return new Response(JSON.stringify(packageDetail), { status: 200 });
+      }
+
+      if (url === openCliUrl) {
+        return new Response(JSON.stringify(testDocument), { status: 200 });
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+    window.history.replaceState({}, "", "https://example.test/viewer/index.html#/browse/weikio-cli");
+
+    render(<InSpectraApp />);
+
+    expect(await screen.findByRole("heading", { name: "weikio-cli" })).toBeInTheDocument();
+    await userEvent.setup().click(await screen.findByRole("button", { name: "Inspect" }));
+
+    expect(await screen.findAllByText("demo")).not.toHaveLength(0);
+    expect(fetchMock).toHaveBeenCalledWith(openCliUrl, expect.anything());
+  });
+
   it("loads the preview index first and hydrates with the full index in the background", async () => {
     const previewIndex = {
       schemaVersion: 1,
