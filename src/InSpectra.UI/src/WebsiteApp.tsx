@@ -223,6 +223,7 @@ export function WebsiteApp() {
             commandPath={commandPath}
             onNavigate={handleNavigate}
             onBack={handleBackToBrowser}
+            showThemeToggle={false}
           />
           {featureFlags.packageUpload && <ViewerDropzone onFilesSelected={handleFiles} />}
         </>

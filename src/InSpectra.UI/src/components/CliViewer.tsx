@@ -21,6 +21,7 @@ interface CliViewerProps {
   commandPath: string | undefined;
   onNavigate: (commandPath?: string) => void;
   onBack?: () => void;
+  showThemeToggle?: boolean;
 }
 
 export function CliViewer({
@@ -34,6 +35,7 @@ export function CliViewer({
   commandPath,
   onNavigate,
   onBack,
+  showThemeToggle = true,
 }: CliViewerProps) {
   const {
     searchInputRef,
@@ -120,7 +122,7 @@ export function CliViewer({
             </button>
           )}
 
-          {featureFlags.darkTheme && featureFlags.lightTheme && <ThemeToggle />}
+          {showThemeToggle && featureFlags.darkTheme && featureFlags.lightTheme && <ThemeToggle />}
         </div>
       </header>
 
