@@ -29,7 +29,7 @@ export function ImportScreen({ error, loading, onFilesSelected, showUpload = tru
   return (
     <main className="import-screen">
       <section className="import-hero panel">
-        <div className="eyebrow">InSpectraUI</div>
+        <span className="ds-badge"><span className="ds-badge-dot" />InSpectraUI</span>
         <h1>Inspect a CLI snapshot without rebuilding the viewer.</h1>
         <p className="lede">
           Drop <code>opencli.json</code>, add <code>xmldoc.xml</code> if you have it, and explore the

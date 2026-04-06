@@ -377,7 +377,7 @@
   }
 
   .import-hero h1 {
-    font-size: clamp(1.15rem, 5vw, 1.5rem);
+    font-size: clamp(1.25rem, 5vw, 1.6rem);
   }
 
   .import-dropzone {
@@ -441,7 +441,7 @@
 
   .hero-band h1,
   .command-hero h1 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 }
 

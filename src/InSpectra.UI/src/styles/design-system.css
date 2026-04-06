@@ -1,0 +1,202 @@
+/* ═══════════════════════════════════════════════
+   InSpectraUI — Design System
+   Shared patterns extracted from CI Guide & Quickstart
+   ═══════════════════════════════════════════════ */
+
+/* ── Section typography triad ────────────────── */
+
+.ds-section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+
+.ds-section-title {
+  font-family: var(--font);
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.ds-section-desc {
+  color: var(--muted);
+  font-size: 0.92rem;
+  max-width: 500px;
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Badge with pulsing dot ──────────────────── */
+
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  letter-spacing: 0.02em;
+}
+
+.ds-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: ds-pulse 2s ease-in-out infinite;
+}
+
+/* ── Gradient accent text ────────────────────── */
+
+.ds-accent-gradient {
+  background: linear-gradient(135deg, var(--accent), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card with hover glow ────────────────────── */
+
+.ds-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: border-color 0.2s var(--ease), transform 0.15s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+
+.ds-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 12px var(--accent-glow);
+}
+
+[data-theme="dark"] .ds-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 12px var(--accent-glow);
+}
+
+/* ── Callout (info + warning) ────────────────── */
+
+.ds-callout {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--accent-border);
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  margin-bottom: 1.5rem;
+}
+
+.ds-callout--warn {
+  border-color: var(--amber-border);
+  border-left-color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.ds-callout-icon {
+  flex-shrink: 0;
+  color: var(--accent);
+  margin-top: 0.1rem;
+}
+
+.ds-callout--warn .ds-callout-icon {
+  color: var(--amber);
+}
+
+.ds-callout-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.ds-callout--warn .ds-callout-title {
+  color: var(--amber);
+}
+
+.ds-callout p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Hero glow background ────────────────────── */
+
+.ds-hero-glow-bg {
+  padding: 1.75rem;
+  background:
+    radial-gradient(ellipse at 5% 15%, rgba(6, 182, 212, 0.06), transparent 45%),
+    radial-gradient(ellipse at 95% 85%, rgba(6, 182, 212, 0.03), transparent 45%),
+    var(--surface);
+  overflow: hidden;
+}
+
+/* ── Terminal chrome dots ────────────────────── */
+
+.ds-terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ds-terminal-dot--red    { background: #f87171; }
+.ds-terminal-dot--yellow { background: #fbbf24; }
+.ds-terminal-dot--green  { background: #34d399; }
+
+/* ── Fade-up reveal animation ────────────────── */
+
+.ds-reveal {
+  animation: ds-fade-up 0.55s var(--ease-out) both;
+}
+
+.ds-reveal-1 { animation-delay: 0.05s; }
+.ds-reveal-2 { animation-delay: 0.1s; }
+.ds-reveal-3 { animation-delay: 0.15s; }
+.ds-reveal-4 { animation-delay: 0.2s; }
+.ds-reveal-5 { animation-delay: 0.25s; }
+.ds-reveal-6 { animation-delay: 0.3s; }
+
+/* ── Shared keyframes ────────────────────────── */
+
+@keyframes ds-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ds-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ── Reduced motion ──────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-reveal {
+    animation: none !important;
+  }
+
+  .ds-badge-dot {
+    animation: none !important;
+    opacity: 1;
+  }
+}
