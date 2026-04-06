@@ -363,10 +363,10 @@
 
 .ci-guide-section-desc code {
   font-size: 0.84rem;
-  background: var(--accent-soft);
+  background: var(--inline-code-bg);
   padding: 0.12rem 0.4rem;
   border-radius: 0.25rem;
-  color: var(--accent);
+  color: var(--text-secondary);
 }
 
 /* ── Terminal code blocks ─────────────────────── */
@@ -570,8 +570,8 @@
   font-family: var(--mono);
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-soft);
+  color: var(--text);
+  background: var(--inline-code-bg);
   padding: 0.12rem 0.45rem;
   border-radius: 0.25rem;
 }
@@ -582,10 +582,10 @@
 
 .ci-guide-table-desc code {
   font-size: 0.75rem;
-  background: var(--accent-soft);
+  background: var(--inline-code-bg);
   padding: 0.1rem 0.3rem;
   border-radius: 0.2rem;
-  color: var(--accent);
+  color: var(--text-secondary);
 }
 
 .ci-guide-table-default {
@@ -598,10 +598,10 @@
 
 .ci-guide-table-default code {
   font-size: 0.72rem;
-  background: var(--accent-soft);
+  background: var(--inline-code-bg);
   padding: 0.08rem 0.3rem;
   border-radius: 0.2rem;
-  color: var(--accent);
+  color: var(--text-secondary);
 }
 
 /* ── Callouts ─────────────────────────────────── */
@@ -657,14 +657,14 @@
 
 .ci-guide-callout code {
   font-size: 0.78rem;
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--inline-code-bg);
   padding: 0.1rem 0.3rem;
   border-radius: 0.2rem;
-  color: var(--accent);
+  color: var(--text-secondary);
 }
 
 [data-theme="dark"] .ci-guide-callout code {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--inline-code-bg);
 }
 
 /* ── Prose ────────────────────────────────────── */
@@ -683,10 +683,10 @@
 
 .ci-guide-prose code {
   font-size: 0.8rem;
-  background: var(--accent-soft);
+  background: var(--inline-code-bg);
   padding: 0.12rem 0.4rem;
   border-radius: 0.25rem;
-  color: var(--accent);
+  color: var(--text-secondary);
 }
 
 .ci-guide-prose a,

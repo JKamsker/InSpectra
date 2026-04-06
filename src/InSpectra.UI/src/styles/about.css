@@ -290,10 +290,10 @@
 
 .qs-step-body code {
   font-size: 0.8rem;
-  background: var(--accent-soft);
+  background: var(--inline-code-bg);
   padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
-  color: var(--accent);
+  color: var(--text-secondary);
 }
 
 /* Copyable command block */
