@@ -130,29 +130,12 @@ jobs:
         working-directory: src/InSpectra.UI
         run: npm run build
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 10.0.x
-
-      - name: Restore
-        run: dotnet restore InSpectra.Gen.sln
-
-      - name: Build renderer
-        run: dotnet build InSpectra.Gen.sln --configuration Release --no-restore
-
-      - name: Install .NET tool - JDownloader-RemoteCli
-        run: dotnet tool install --global JDownloader-RemoteCli
-
-      - name: Install .NET tool - JellyfinCli
-        run: dotnet tool install -g JellyfinCli
-
       - name: Prepare site directory
         shell: bash
         run: |
           set -euo pipefail
           site="_site"
-          mkdir -p "$site/examples"
+          mkdir -p "$site"
 
           # Website: React app IS the landing page
           cp -r src/InSpectra.UI/dist/* "$site/"
@@ -167,47 +150,10 @@ jobs:
           mkdir -p "$site/try"
           echo '<meta http-equiv="refresh" content="0;url=/">' > "$site/try/index.html"
 
-      - name: Render - InSpectra (self-doc)
+      - name: Verify preview site
         shell: bash
         run: |
           set -euo pipefail
-          tmp_dir="$(mktemp -d)"
-          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render self \
-            --skip-markdown \
-            --out-dir "$tmp_dir"
-          mkdir -p _site/examples/inspectra
-          cp -r "$tmp_dir/html/"* _site/examples/inspectra/
-
-      - name: Render - Jellyfin CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render exec html jf \
-            --with-xmldoc \
-            --out-dir _site/examples/jellyfin-cli
-
-      - name: Render - JDownloader RemoteCli
-        shell: bash
-        run: |
-          set -euo pipefail
-          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render exec html jdr \
-            --with-xmldoc \
-            --out-dir _site/examples/jdownloader-remotecli
-
-      - name: Verify preview bundles
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          for example in inspectra jellyfin-cli jdownloader-remotecli; do
-            index_path="_site/examples/$example/index.html"
-            test -f "$index_path"
-            grep -q './assets/' "$index_path"
-          done
-
           test -f _site/index.html
 
       - name: Zip preview site
@@ -250,29 +196,12 @@ jobs:
         working-directory: src/InSpectra.UI
         run: npm run build
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 10.0.x
-
-      - name: Restore
-        run: dotnet restore InSpectra.Gen.sln
-
-      - name: Build renderer
-        run: dotnet build InSpectra.Gen.sln --configuration Release --no-restore
-
-      - name: Install .NET tool - JDownloader-RemoteCli
-        run: dotnet tool install --global JDownloader-RemoteCli
-
-      - name: Install .NET tool - JellyfinCli
-        run: dotnet tool install -g JellyfinCli
-
       - name: Prepare site directory
         shell: bash
         run: |
           set -euo pipefail
           site="_site"
-          mkdir -p "$site/examples"
+          mkdir -p "$site"
 
           # Website: React app IS the landing page
           cp -r src/InSpectra.UI/dist/* "$site/"
@@ -287,47 +216,10 @@ jobs:
           mkdir -p "$site/try"
           echo '<meta http-equiv="refresh" content="0;url=/">' > "$site/try/index.html"
 
-      - name: Render - InSpectra (self-doc)
+      - name: Verify published site
         shell: bash
         run: |
           set -euo pipefail
-          tmp_dir="$(mktemp -d)"
-          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render self \
-            --skip-markdown \
-            --out-dir "$tmp_dir"
-          mkdir -p _site/examples/inspectra
-          cp -r "$tmp_dir/html/"* _site/examples/inspectra/
-
-      - name: Render - Jellyfin CLI
-        shell: bash
-        run: |
-          set -euo pipefail
-          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render exec html jf \
-            --with-xmldoc \
-            --out-dir _site/examples/jellyfin-cli
-
-      - name: Render - JDownloader RemoteCli
-        shell: bash
-        run: |
-          set -euo pipefail
-          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render exec html jdr \
-            --with-xmldoc \
-            --out-dir _site/examples/jdownloader-remotecli
-
-      - name: Verify published bundles
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          for example in inspectra jellyfin-cli jdownloader-remotecli; do
-            index_path="_site/examples/$example/index.html"
-            test -f "$index_path"
-            grep -q './assets/' "$index_path"
-          done
-
           test -f _site/index.html
 
       - name: Summarize site
