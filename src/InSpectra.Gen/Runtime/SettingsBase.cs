@@ -147,6 +147,13 @@ public abstract class HtmlCommandSettingsBase : CommonCommandSettings
     [CommandOption("--single-file")]
     public bool SingleFile { get; init; }
 
+    /// <summary>
+    /// Compression level for the output: 0 = none, 1 = compress embedded JSON, 2 = self-extracting bundle (default 2).
+    /// </summary>
+    [Description("Compression level: 0 = none, 1 = compress embedded JSON, 2 = self-extracting bundle (default 2).")]
+    [CommandOption("--compression-level <LEVEL>")]
+    public int? CompressionLevel { get; init; }
+
 }
 
 /// <summary>
@@ -277,5 +284,12 @@ public abstract class SelfDocHtmlCommandSettingsBase : SelfDocCommandSettingsBas
     [Description("Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.")]
     [CommandOption("--single-file")]
     public bool SingleFile { get; init; }
+
+    /// <summary>
+    /// Compression level for the output: 0 = none, 1 = compress embedded JSON, 2 = self-extracting bundle (default 2).
+    /// </summary>
+    [Description("Compression level: 0 = none, 1 = compress embedded JSON, 2 = self-extracting bundle (default 2).")]
+    [CommandOption("--compression-level <LEVEL>")]
+    public int? CompressionLevel { get; init; }
 
 }

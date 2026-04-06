@@ -31,6 +31,7 @@ public static class RenderRequestFactory
             settings.IncludeMetadata,
             settings.Overwrite,
             SingleFile: false,
+            CompressLevel: 0,
             NormalizePath(outputFile),
             NormalizePath(outputDirectory));
     }
@@ -52,6 +53,8 @@ public static class RenderRequestFactory
             throw new CliUsageException("`--timeout` must be greater than zero.");
         }
 
+        var compressLevel = ResolveCompressLevel(settings.CompressionLevel, settings.SingleFile);
+
         return new RenderExecutionOptions(
             RenderLayout.App,
             outputMode,
@@ -62,7 +65,8 @@ public static class RenderRequestFactory
             settings.IncludeHidden,
             settings.IncludeMetadata,
             settings.Overwrite,
-            settings.SingleFile,
+            settings.SingleFile || compressLevel >= 2,
+            compressLevel,
             OutputFile: null,
             NormalizePath(outputDirectory));
     }
@@ -123,6 +127,27 @@ public static class RenderRequestFactory
             UrlLoading: enableUrl,
             NugetBrowser: enableNugetBrowser,
             PackageUpload: enablePackageUpload);
+    }
+
+    private static int ResolveCompressLevel(int? explicitLevel, bool singleFile)
+    {
+        if (explicitLevel is not null)
+        {
+            if (explicitLevel is < 0 or > 2)
+            {
+                throw new CliUsageException("`--compression-level` must be 0, 1, or 2.");
+            }
+
+            if (singleFile && explicitLevel < 1)
+            {
+                throw new CliUsageException("`--single-file` requires `--compression-level` 1 or higher.");
+            }
+
+            return explicitLevel.Value;
+        }
+
+        // Default: 2 (self-extracting), or 2 if --single-file is set
+        return 2;
     }
 
     public static string ResolveWorkingDirectory(string? workingDirectory)

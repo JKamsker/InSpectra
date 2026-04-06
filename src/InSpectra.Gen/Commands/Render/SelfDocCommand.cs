@@ -61,7 +61,8 @@ public sealed class SelfDocCommand(
                 IncludeHidden: settings.IncludeHidden,
                 IncludeMetadata: settings.IncludeMetadata,
                 Overwrite: true,
-                SingleFile: settings.SingleFile,
+                SingleFile: false,
+                CompressLevel: Math.Clamp(settings.CompressionLevel ?? 2, 0, 2),
                 OutputFile: null,
                 OutputDirectory: null));
 

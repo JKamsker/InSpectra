@@ -74,7 +74,7 @@ public sealed class HtmlRenderService(
 
         OutputPathHelper.PrepareDirectory(outputDirectory, options.Overwrite);
 
-        var bootstrapJson = BuildInlineBootstrap(prepared, options.IncludeHidden, options.IncludeMetadata, features, label);
+        var bootstrapJson = BuildInlineBootstrap(prepared, options.IncludeHidden, options.IncludeMetadata, features, label, options.CompressLevel);
         var writtenFiles = new List<RenderedFile>();
         foreach (var file in bundleFiles)
         {
@@ -89,7 +89,7 @@ public sealed class HtmlRenderService(
             {
                 var html = await File.ReadAllTextAsync(file.SourcePath, cancellationToken);
                 html = html.Replace(BootstrapPlaceholder, bootstrapJson, StringComparison.Ordinal);
-                html = MinifyHtml(html);
+                if (options.CompressLevel >= 1) html = MinifyHtml(html);
                 var indexDestination = Path.Combine(outputDirectory, "index.html");
                 await File.WriteAllTextAsync(indexDestination, html, cancellationToken);
                 writtenFiles.Add(new RenderedFile("index.html", indexDestination, html));
@@ -109,7 +109,11 @@ public sealed class HtmlRenderService(
 
         if (options.SingleFile)
         {
-            var selfExtractingHtml = BuildSelfExtractingHtml(prepared, options, features, label, outputDirectory);
+            var selfExtractingHtml = options.CompressLevel >= 2
+                ? BuildSelfExtractingHtml(prepared, options, features, label, outputDirectory)
+                : InlineAssets(
+                    writtenFiles.First(f => f.RelativePath == "index.html").Content!,
+                    outputDirectory);
 
             // Remove all written files — we're replacing with a single self-extracting HTML
             foreach (var file in writtenFiles)
@@ -425,33 +429,18 @@ public sealed class HtmlRenderService(
         bool includeHidden,
         bool includeMetadata,
         HtmlFeatureFlags features,
-        string? label)
+        string? label,
+        int compressLevel)
     {
-        var payload = new InlineBootstrap
-        {
-            Mode = "inline",
-            OpenCli = prepared.RawDocument,
-            XmlDoc = prepared.XmlDocument,
-            Options = new ViewerOptionsPayload
-            {
-                IncludeHidden = includeHidden,
-                IncludeMetadata = includeMetadata,
-                Label = label,
-            },
-            Features = new FeatureFlagsPayload
-            {
-                ShowHome = features.ShowHome,
-                Composer = features.Composer,
-                DarkTheme = features.DarkTheme,
-                LightTheme = features.LightTheme,
-                UrlLoading = features.UrlLoading,
-                NugetBrowser = features.NugetBrowser,
-                PackageUpload = features.PackageUpload,
-            },
-        };
+        var json = BuildRawBootstrapJson(prepared, includeHidden, includeMetadata, features, label);
 
-        var json = JsonSerializer.Serialize(payload, JsonOutput.CompactSerializerOptions);
-        return GzipBase64(json);
+        if (compressLevel >= 1)
+        {
+            return GzipBase64(json);
+        }
+
+        // Level 0: raw JSON, escape </script to avoid breaking out of the tag
+        return json.Replace("</script", "<\\/script", StringComparison.OrdinalIgnoreCase);
     }
 
     private sealed class InlineBootstrap

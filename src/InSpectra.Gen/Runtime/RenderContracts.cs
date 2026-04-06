@@ -39,6 +39,7 @@ public sealed record RenderExecutionOptions(
     bool IncludeMetadata,
     bool Overwrite,
     bool SingleFile,
+    int CompressLevel,
     string? OutputFile,
     string? OutputDirectory);
 
