@@ -262,7 +262,12 @@ jobs:
       - name: Check if action files changed
         id: changed
         run: |
-          if git diff --name-only HEAD~1 HEAD | grep -qE '^\.github/actions/render/action\.yml$|^\.github/workflows/inspectra-generate\.yml$'; then
+          # Compare v1 branch content with main — sync if they differ
+          main_action=$(git show HEAD:.github/actions/render/action.yml 2>/dev/null | sha256sum)
+          v1_action=$(git show origin/v1:action.yml 2>/dev/null | sha256sum)
+          main_workflow=$(git show HEAD:.github/workflows/inspectra-generate.yml 2>/dev/null | sha256sum)
+          v1_workflow=$(git show origin/v1:.github/workflows/inspectra-generate.yml 2>/dev/null | sha256sum)
+          if [ "$main_action" != "$v1_action" ] || [ "$main_workflow" != "$v1_workflow" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
