@@ -222,15 +222,18 @@
   color: var(--muted);
   padding: 0.4rem 0.85rem;
   border-radius: 99px;
-  border: 1px solid transparent;
-  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: color 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .ci-guide-nav-link:hover {
   color: var(--accent);
   background: var(--accent-soft);
   border-color: var(--accent-border);
+  box-shadow: 0 1px 4px var(--accent-glow);
 }
 
 .ci-guide-nav-sep {
