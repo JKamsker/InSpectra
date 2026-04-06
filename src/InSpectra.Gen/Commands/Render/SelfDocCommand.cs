@@ -61,6 +61,7 @@ public sealed class SelfDocCommand(
                 IncludeHidden: settings.IncludeHidden,
                 IncludeMetadata: settings.IncludeMetadata,
                 Overwrite: true,
+                SingleFile: settings.SingleFile,
                 OutputFile: null,
                 OutputDirectory: null));
 

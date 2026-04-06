@@ -38,6 +38,7 @@ public sealed record RenderExecutionOptions(
     bool IncludeHidden,
     bool IncludeMetadata,
     bool Overwrite,
+    bool SingleFile,
     string? OutputFile,
     string? OutputDirectory);
 

@@ -30,12 +30,13 @@ public static class RenderRequestFactory
             settings.IncludeHidden,
             settings.IncludeMetadata,
             settings.Overwrite,
+            SingleFile: false,
             NormalizePath(outputFile),
             NormalizePath(outputDirectory));
     }
 
     public static RenderExecutionOptions CreateHtmlOptions(
-        CommonCommandSettings settings,
+        HtmlCommandSettingsBase settings,
         string? layoutValue,
         string? outputFile,
         string? outputDirectory,
@@ -61,6 +62,7 @@ public static class RenderRequestFactory
             settings.IncludeHidden,
             settings.IncludeMetadata,
             settings.Overwrite,
+            settings.SingleFile,
             OutputFile: null,
             NormalizePath(outputDirectory));
     }

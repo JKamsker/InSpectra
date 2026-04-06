@@ -105,6 +105,34 @@ public sealed class HtmlRenderService(
             writtenFiles.Add(new RenderedFile(file.RelativePath, destinationPath, null));
         }
 
+        if (options.SingleFile)
+        {
+            var indexFile = writtenFiles.FirstOrDefault(f => f.RelativePath == "index.html");
+            if (indexFile?.Content is not null)
+            {
+                var inlinedHtml = InlineAssets(indexFile.Content, outputDirectory);
+                await File.WriteAllTextAsync(indexFile.FullPath, inlinedHtml, cancellationToken);
+
+                // Remove the separate asset files — everything is in index.html now
+                foreach (var file in writtenFiles.Where(f => f.RelativePath != "index.html"))
+                {
+                    if (File.Exists(file.FullPath))
+                    {
+                        File.Delete(file.FullPath);
+                    }
+                }
+
+                // Clean up empty assets directory
+                var assetsDir = Path.Combine(outputDirectory, "assets");
+                if (Directory.Exists(assetsDir) && !Directory.EnumerateFileSystemEntries(assetsDir).Any())
+                {
+                    Directory.Delete(assetsDir);
+                }
+
+                writtenFiles = [new RenderedFile("index.html", indexFile.FullPath, inlinedHtml)];
+            }
+        }
+
         var summary = options.Quiet
             ? null
             : $"Wrote HTML app bundle ({writtenFiles.Count} files) to `{outputDirectory}`.";
@@ -130,6 +158,136 @@ public sealed class HtmlRenderService(
             Summary = summary,
             Stats = statsFactory.Create(normalized, files.Count),
         };
+    }
+
+    private static string InlineAssets(string html, string outputDirectory)
+    {
+        // Inline CSS: <link rel="stylesheet" ... href="./assets/..."> → <style>...</style>
+        html = Regex.Replace(html, @"<link\s[^>]*href=""\./(assets/[^""]+\.css)""[^>]*/?>", match =>
+        {
+            var cssPath = Path.Combine(outputDirectory, match.Groups[1].Value);
+            if (!File.Exists(cssPath)) return match.Value;
+            var css = File.ReadAllText(cssPath);
+            return $"<style>{css}</style>";
+        });
+
+        // Remove modulepreload links (the code will be inlined)
+        html = Regex.Replace(html, @"<link\s[^>]*rel=""modulepreload""[^>]*/?>[\r\n]*", "");
+
+        // Inline JS: <script type="module" ... src="./assets/..."> → single inline <script>
+        // Remove the script tag from <head> and inject before </body> so the DOM is ready
+        string? inlinedScriptBlock = null;
+        html = Regex.Replace(html, @"<script\s[^>]*src=""\./(assets/[^""]+\.js)""[^>]*></script>[\r\n]*", match =>
+        {
+            var entryRelPath = match.Groups[1].Value;
+            var entryPath = Path.Combine(outputDirectory, entryRelPath);
+            if (!File.Exists(entryPath)) return match.Value;
+
+            var entryCode = File.ReadAllText(entryPath);
+            var entryDir = Path.GetDirectoryName(entryPath)!;
+            var inlinedJs = BundleModulesAsIife(entryCode, entryDir);
+            inlinedScriptBlock = $"<script>{inlinedJs}</script>";
+            return ""; // Remove from <head>
+        });
+
+        // Insert the script at the end of <body> where #root already exists
+        if (inlinedScriptBlock is not null)
+        {
+            html = html.Replace("</body>", $"{inlinedScriptBlock}\n</body>");
+        }
+
+        return html;
+    }
+
+    /// <summary>
+    /// Takes an ES module entry script that imports from sibling chunks and produces
+    /// a single IIFE that can run as a classic (non-module) script from file://.
+    /// </summary>
+    private static string BundleModulesAsIife(string entryCode, string entryDirectory)
+    {
+        // Parse: import{X as a, Y as b}from"./chunk.js";
+        // The import path is relative to the entry script, which lives in assets/
+        var importPattern = new Regex(@"import\{([^}]+)\}from""\./([\w.=-]+\.js)"";?");
+        var importMatch = importPattern.Match(entryCode);
+
+        if (!importMatch.Success)
+        {
+            // No imports — just wrap in IIFE
+            return $"(function(){{{entryCode}}})();";
+        }
+
+        var chunkFileName = importMatch.Groups[2].Value;
+        var chunkPath = Path.Combine(entryDirectory, chunkFileName);
+        if (!File.Exists(chunkPath))
+        {
+            return $"(function(){{{entryCode}}})();";
+        }
+
+        var chunkCode = File.ReadAllText(chunkPath);
+
+        // Parse the chunk's export statement: export{localVar as ExportedName, ...};
+        var exportPattern = new Regex(@"export\{([^}]+)\};?\s*$");
+        var exportMatch = exportPattern.Match(chunkCode);
+
+        if (!exportMatch.Success)
+        {
+            return $"(function(){{{chunkCode}\n{entryCode}}})();";
+        }
+
+        // Build export map: ExportedName → localVariable
+        var exportMap = new Dictionary<string, string>();
+        foreach (var pair in exportMatch.Groups[1].Value.Split(','))
+        {
+            var parts = pair.Trim().Split(" as ", 2, StringSplitOptions.TrimEntries);
+            if (parts.Length == 2)
+            {
+                exportMap[parts[1]] = parts[0]; // exportedName → localVar
+            }
+            else if (parts.Length == 1)
+            {
+                exportMap[parts[0]] = parts[0]; // same name
+            }
+        }
+
+        // Parse the entry's import bindings: ExportedName as localAlias
+        var importBindings = new List<(string exportedName, string localAlias)>();
+        foreach (var pair in importMatch.Groups[1].Value.Split(','))
+        {
+            var parts = pair.Trim().Split(" as ", 2, StringSplitOptions.TrimEntries);
+            if (parts.Length == 2)
+            {
+                importBindings.Add((parts[0], parts[1]));
+            }
+            else if (parts.Length == 1)
+            {
+                importBindings.Add((parts[0], parts[0]));
+            }
+        }
+
+        // Remove the export statement from the chunk
+        var cleanedChunk = exportPattern.Replace(chunkCode, "");
+
+        // Remove the import statement from the entry
+        var cleanedEntry = importPattern.Replace(entryCode, "", 1);
+
+        // Build alias assignments: var entryLocal = chunkLocal;
+        var aliases = new System.Text.StringBuilder();
+        foreach (var (exportedName, localAlias) in importBindings)
+        {
+            if (exportMap.TryGetValue(exportedName, out var chunkLocal))
+            {
+                aliases.Append($"var {localAlias}={chunkLocal};");
+            }
+        }
+
+        // Wrap everything in a scoped IIFE to avoid naming conflicts
+        // The chunk runs first (defining its variables), then aliases bridge to the entry's names
+        return $"(function(){{var __M=(function(){{" +
+               $"{cleanedChunk}" +
+               $"return{{{string.Join(",", importBindings.Select(b => exportMap.TryGetValue(b.exportedName, out var v) ? $"{b.exportedName}:{v}" : ""))}}}" +
+               $"}})();" +
+               $"{string.Join("", importBindings.Select(b => $"var {b.localAlias}=__M.{b.exportedName};"))}" +
+               $"{cleanedEntry}}})();";
     }
 
     private static HashSet<string> CollectReferencedAssets(string bundleRoot)

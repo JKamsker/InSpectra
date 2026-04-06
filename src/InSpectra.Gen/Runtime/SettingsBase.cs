@@ -139,6 +139,13 @@ public abstract class HtmlCommandSettingsBase : CommonCommandSettings
     [Description("Custom label shown in the viewer header (e.g. a version string).")]
     [CommandOption("--label <TEXT>")]
     public string? Label { get; init; }
+
+    /// <summary>
+    /// Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.
+    /// </summary>
+    [Description("Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.")]
+    [CommandOption("--single-file")]
+    public bool SingleFile { get; init; }
 }
 
 /// <summary>
@@ -262,4 +269,11 @@ public abstract class SelfDocHtmlCommandSettingsBase : SelfDocCommandSettingsBas
     [Description("Custom label shown in the viewer header (e.g. a version string).")]
     [CommandOption("--label <TEXT>")]
     public string? Label { get; init; }
+
+    /// <summary>
+    /// Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.
+    /// </summary>
+    [Description("Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.")]
+    [CommandOption("--single-file")]
+    public bool SingleFile { get; init; }
 }
