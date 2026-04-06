@@ -272,10 +272,12 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
                 Browse {index.packageCount} indexed .NET tool packages. Select one to inspect its command structure.
               </p>
             </div>
-            <button type="button" className="secondary-button" onClick={onBack}>
-              <ArrowLeft aria-hidden="true" size={14} />
-              Back
-            </button>
+            {packageId && (
+              <button type="button" className="secondary-button" onClick={onBack}>
+                <ArrowLeft aria-hidden="true" size={14} />
+                Back
+              </button>
+            )}
           </div>
 
           <div className="browse-search">
