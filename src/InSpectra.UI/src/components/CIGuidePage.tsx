@@ -255,17 +255,17 @@ const inputs: InputDef[] = [
   {
     name: "mode",
     desc: <>Render mode: <code>exec</code> invokes a live CLI, <code>file</code> reads from saved JSON.</>,
-    defaultVal: <>Default: <code>exec</code></>,
+    defaultVal: <><code>exec</code></>,
   },
   {
     name: "format",
     desc: <>Output format: <code>html</code> (interactive SPA), <code>markdown</code> (tree), or <code>markdown-monolith</code> (single file).</>,
-    defaultVal: <>Default: <code>html</code></>,
+    defaultVal: <><code>html</code></>,
   },
   {
     name: "cli-name",
     desc: <>CLI executable name or path. Required for exec mode.</>,
-    defaultVal: <>Required (exec mode)</>,
+    defaultVal: <>Required</>,
   },
   {
     name: "dotnet-tool",
@@ -275,12 +275,12 @@ const inputs: InputDef[] = [
   {
     name: "dotnet-tool-version",
     desc: <>Version constraint for the dotnet tool install.</>,
-    defaultVal: <>Optional (latest)</>,
+    defaultVal: <>Latest</>,
   },
   {
     name: "opencli-json",
     desc: <>Path to your <code>opencli.json</code> file. Required for file mode.</>,
-    defaultVal: <>Required (file mode)</>,
+    defaultVal: <>Required</>,
   },
   {
     name: "xmldoc",
@@ -290,17 +290,17 @@ const inputs: InputDef[] = [
   {
     name: "output-dir",
     desc: <>Directory where the output is written.</>,
-    defaultVal: <>Default: <code>inspectra-output</code></>,
+    defaultVal: <><code>inspectra-output</code></>,
   },
   {
     name: "opencli-args",
     desc: <>Override the OpenCLI export arguments (exec mode).</>,
-    defaultVal: <>Default: <code>cli opencli</code></>,
+    defaultVal: <><code>cli opencli</code></>,
   },
   {
     name: "xmldoc-args",
     desc: <>Override the xmldoc export arguments (exec mode).</>,
-    defaultVal: <>Default: <code>cli xmldoc</code></>,
+    defaultVal: <><code>cli xmldoc</code></>,
   },
   {
     name: "timeout",
@@ -315,18 +315,27 @@ const inputs: InputDef[] = [
   {
     name: "inspectra-version",
     desc: <>Pin a specific InSpectra.Gen NuGet version.</>,
-    defaultVal: <>Default: latest</>,
+    defaultVal: <>Latest</>,
   },
   {
     name: "dotnet-version",
     desc: <>.NET SDK version to install.</>,
-    defaultVal: <>Default: <code>10.0.x</code></>,
+    defaultVal: <><code>10.0.x</code></>,
   },
   {
     name: "dotnet-quality",
     desc: <>.NET SDK quality channel (<code>preview</code> for pre-release SDKs).</>,
     defaultVal: <>Optional</>,
   },
+];
+
+/* ── Pipeline steps ── */
+
+const pipelineSteps = [
+  { label: "Push", sub: "git push" },
+  { label: "Install", sub: ".NET + tools" },
+  { label: "Generate", sub: "inspectra" },
+  { label: "Deploy", sub: "gh-pages" },
 ];
 
 /* ── Main component ── */
@@ -346,6 +355,7 @@ export function CIGuidePage() {
     <main className="ci-guide-page">
       {/* ── Hero ── */}
       <section className="ci-guide-hero">
+        <div className="ci-guide-hero-glow" aria-hidden="true" />
         <div className="ci-guide-badge">
           <span className="ci-guide-dot" />
           GitHub Actions
@@ -357,215 +367,273 @@ export function CIGuidePage() {
           Generate InSpectraUI documentation in CI and deploy to GitHub Pages, attach as a
           release asset, or download as an artifact. One workflow call, zero config.
         </p>
-      </section>
 
-      {/* ── TOC ── */}
-      <section className="ci-guide-toc-section">
-        <div className="ci-guide-toc">
-          <div className="ci-guide-toc-title">On this page</div>
-          <ol>
-            <li><a href="#usage">Usage</a> &mdash; add one step to your workflow</li>
-            <li><a href="#inputs">Input Reference</a></li>
-            <li><a href="#pages">GitHub Pages Deployment</a></li>
-            <li><a href="#prerequisites">Prerequisites</a></li>
-          </ol>
-        </div>
-      </section>
-
-      {/* ── Usage ── */}
-      <section id="usage" className="ci-guide-section">
-        <div className="ci-guide-section-label">Getting Started</div>
-        <div className="ci-guide-section-title">Add one step to your workflow</div>
-        <p className="ci-guide-section-desc">
-          Install your CLI, then call the InSpectra action. It handles .NET, InSpectra, rendering,
-          and verification. XML documentation is auto-detected and used for enrichment when available.
-        </p>
-
-        <div className="ci-guide-code-block">
-          <div className="ci-guide-tab-bar">
-            {usageTabs.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`ci-guide-tab${activeUsageTab === t.id ? " active" : ""}`}
-                onClick={() => setActiveUsageTab(t.id)}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <CopyButton text={usageSnippets[activeUsageTab]} />
-          <UsagePanel tab={activeUsageTab} />
-        </div>
-
-        <div className="ci-guide-prose">
-          <p>
-            The action installs <strong>.NET</strong> and <strong>InSpectra.Gen</strong> automatically.
-            It does <em>not</em> install your CLI &mdash; add that step before the action.
-          </p>
-        </div>
-      </section>
-
-      <hr className="ci-guide-divider" />
-
-      {/* ── Input Reference ── */}
-      <section id="inputs" className="ci-guide-section">
-        <div className="ci-guide-section-label">Reference</div>
-        <div className="ci-guide-section-title">Inputs</div>
-        <p className="ci-guide-section-desc">
-          All inputs accepted by <code>JKamsker/InSpectra@v1</code>.
-        </p>
-
-        <div className="ci-guide-callout">
-          <div className="ci-guide-callout-title">
-            <Info size={15} aria-hidden="true" />
-            Automatic XML enrichment
-          </div>
-          <p>
-            In exec mode, the action automatically probes for <code>cli xmldoc</code> support and uses it
-            when available. No flag needed &mdash; richer descriptions are included transparently.
-          </p>
-        </div>
-
-        <div className="ci-guide-section-label" style={{ marginTop: "2rem" }}>Inputs</div>
-        <div className="ci-guide-options-grid">
-          {inputs.map((input) => (
-            <div key={input.name} className="ci-guide-option-card">
-              <div className="ci-guide-option-name">{input.name}</div>
-              <div className="ci-guide-option-desc">{input.desc}</div>
-              <div className="ci-guide-option-default">{input.defaultVal}</div>
+        {/* Pipeline visualization */}
+        <div className="ci-guide-pipeline" aria-hidden="true">
+          {pipelineSteps.map((step, i) => (
+            <div key={step.label} className="ci-guide-pipe-group">
+              {i > 0 && (
+                <div className="ci-guide-pipe-line">
+                  <div className="ci-guide-pipe-pulse" />
+                </div>
+              )}
+              <div className="ci-guide-pipe-node">
+                <span className="ci-guide-pipe-ring" />
+                <div className="ci-guide-pipe-text">
+                  <span className="ci-guide-pipe-label">{step.label}</span>
+                  <span className="ci-guide-pipe-sub">{step.sub}</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      <hr className="ci-guide-divider" />
+      {/* ── Quick nav ── */}
+      <nav className="ci-guide-nav" aria-label="Page sections">
+        <a href="#usage" className="ci-guide-nav-link">Usage</a>
+        <span className="ci-guide-nav-sep" aria-hidden="true" />
+        <a href="#inputs" className="ci-guide-nav-link">Input Reference</a>
+        <span className="ci-guide-nav-sep" aria-hidden="true" />
+        <a href="#pages" className="ci-guide-nav-link">GitHub Pages</a>
+        <span className="ci-guide-nav-sep" aria-hidden="true" />
+        <a href="#prerequisites" className="ci-guide-nav-link">Prerequisites</a>
+      </nav>
 
-      {/* ── GitHub Pages ── */}
-      <section id="pages" className="ci-guide-section">
-        <div className="ci-guide-section-label">Deployment</div>
-        <div className="ci-guide-section-title">GitHub Pages</div>
-        <p className="ci-guide-section-desc">
-          Add a deploy job after the generate job. The reusable workflow uploads the artifact;
-          you control when and how it gets deployed.
-        </p>
+      {/* ── Timeline content ── */}
+      <div className="ci-guide-timeline">
 
-        <div className="ci-guide-prose">
-          <p>
-            <strong>1. Configure your repo</strong> &mdash;
-            Go to <strong>Settings &rarr; Pages</strong> and set the source to{" "}
-            <strong>GitHub Actions</strong> (not "Deploy from a branch").
-          </p>
-          <p>
-            <strong>2. Add a deploy job</strong> &mdash;
-            Download the artifact, re-upload as a Pages artifact, and deploy. Grant{" "}
-            <code>pages: write</code> and <code>id-token: write</code> permissions.
-          </p>
-        </div>
+        {/* ── 01 · Usage ── */}
+        <section id="usage" className="ci-guide-section">
+          <div className="ci-guide-step-marker"><span>01</span></div>
+          <div className="ci-guide-section-content">
+            <div className="ci-guide-section-label">Getting Started</div>
+            <h2 className="ci-guide-section-title">Add one step to your workflow</h2>
+            <p className="ci-guide-section-desc">
+              Install your CLI, then call the InSpectra action. It handles .NET, InSpectra, rendering,
+              and verification. XML documentation is auto-detected and used for enrichment when available.
+            </p>
 
-        <div className="ci-guide-code-block">
-          <div className="ci-guide-code-label">.github/workflows/docs.yml</div>
-          <CopyButton text={pagesSnippet} />
-          <div className="ci-guide-code-body">
-            <span className="ci-guide-syn-key">name</span>: Deploy CLI Docs{"\n"}
-            {"\n"}
-            <span className="ci-guide-syn-key">on</span>:{"\n"}
-            {"  "}<span className="ci-guide-syn-arg">push</span>:{"\n"}
-            {"    "}<span className="ci-guide-syn-arg">branches</span>: [main]{"\n"}
-            {"\n"}
-            <span className="ci-guide-syn-key">permissions</span>:{"\n"}
-            {"  "}<span className="ci-guide-syn-arg">contents</span>: read{"\n"}
-            {"  "}<span className="ci-guide-syn-arg">pages</span>: write{"\n"}
-            {"  "}<span className="ci-guide-syn-arg">id-token</span>: write{"\n"}
-            {"\n"}
-            <span className="ci-guide-syn-key">jobs</span>:{"\n"}
-            {"  "}<span className="ci-guide-syn-arg">generate</span>:{"\n"}
-            {"    "}<span className="ci-guide-syn-flag">runs-on</span>: ubuntu-latest{"\n"}
-            {"    "}<span className="ci-guide-syn-flag">steps</span>:{"\n"}
-            {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/checkout@v6</span>{"\n"}
-            {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">JKamsker/InSpectra@v1</span>{"\n"}
-            {"        "}<span className="ci-guide-syn-flag">with</span>:{"\n"}
-            {"          "}<span className="ci-guide-syn-arg">dotnet-tool</span>: MyCli.Tool{"\n"}
-            {"          "}<span className="ci-guide-syn-arg">cli-name</span>: mycli{"\n"}
-            {"          "}<span className="ci-guide-syn-arg">output-dir</span>: _site{"\n"}
-            {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/upload-pages-artifact@v3</span>{"\n"}
-            {"        "}<span className="ci-guide-syn-flag">with</span>: {"{ "}<span className="ci-guide-syn-arg">path</span>: _site{" }"}{"\n"}
-            {"\n"}
-            {"  "}<span className="ci-guide-syn-arg">deploy</span>:{"\n"}
-            {"    "}<span className="ci-guide-syn-flag">needs</span>: generate{"\n"}
-            {"    "}<span className="ci-guide-syn-flag">runs-on</span>: ubuntu-latest{"\n"}
-            {"    "}<span className="ci-guide-syn-flag">environment</span>:{"\n"}
-            {"      "}<span className="ci-guide-syn-arg">name</span>: github-pages{"\n"}
-            {"      "}<span className="ci-guide-syn-arg">url</span>: <span className="ci-guide-syn-str">{"${{ steps.deploy.outputs.page_url }}"}</span>{"\n"}
-            {"    "}<span className="ci-guide-syn-flag">steps</span>:{"\n"}
-            {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/deploy-pages@v4</span>{"\n"}
-            {"        "}<span className="ci-guide-syn-arg">id</span>: deploy
+            <div className="ci-guide-terminal">
+              <div className="ci-guide-terminal-bar">
+                <span className="ci-guide-terminal-dot ci-guide-tdot-red" />
+                <span className="ci-guide-terminal-dot ci-guide-tdot-yellow" />
+                <span className="ci-guide-terminal-dot ci-guide-tdot-green" />
+                <span className="ci-guide-terminal-title">docs.yml</span>
+              </div>
+              <div className="ci-guide-tab-bar">
+                {usageTabs.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={`ci-guide-tab${activeUsageTab === t.id ? " active" : ""}`}
+                    onClick={() => setActiveUsageTab(t.id)}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              <CopyButton text={usageSnippets[activeUsageTab]} />
+              <UsagePanel tab={activeUsageTab} />
+            </div>
+
+            <div className="ci-guide-prose">
+              <p>
+                The action installs <strong>.NET</strong> and <strong>InSpectra.Gen</strong> automatically.
+                It does <em>not</em> install your CLI &mdash; add that step before the action.
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="ci-guide-callout">
-          <div className="ci-guide-callout-title">
-            <AlertCircle size={15} aria-hidden="true" />
-            Custom domain
+        {/* ── 02 · Input Reference ── */}
+        <section id="inputs" className="ci-guide-section">
+          <div className="ci-guide-step-marker"><span>02</span></div>
+          <div className="ci-guide-section-content">
+            <div className="ci-guide-section-label">Reference</div>
+            <h2 className="ci-guide-section-title">Inputs</h2>
+            <p className="ci-guide-section-desc">
+              All inputs accepted by <code>JKamsker/InSpectra@v1</code>.
+            </p>
+
+            <div className="ci-guide-callout">
+              <div className="ci-guide-callout-icon">
+                <Info size={15} aria-hidden="true" />
+              </div>
+              <div className="ci-guide-callout-body">
+                <div className="ci-guide-callout-title">Automatic XML enrichment</div>
+                <p>
+                  In exec mode, the action automatically probes for <code>cli xmldoc</code> support and uses it
+                  when available. No flag needed &mdash; richer descriptions are included transparently.
+                </p>
+              </div>
+            </div>
+
+            <div className="ci-guide-table-wrap">
+              <table className="ci-guide-table">
+                <thead>
+                  <tr>
+                    <th>Input</th>
+                    <th>Description</th>
+                    <th>Default</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inputs.map((input) => (
+                    <tr key={input.name}>
+                      <td className="ci-guide-table-name"><code>{input.name}</code></td>
+                      <td className="ci-guide-table-desc">{input.desc}</td>
+                      <td className="ci-guide-table-default">{input.defaultVal}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-          <p>
-            To use a custom domain, configure it in your repository's Pages settings.
-            GitHub handles the CNAME automatically when deploying via Actions.
-          </p>
-        </div>
-      </section>
+        </section>
 
-      <hr className="ci-guide-divider" />
+        {/* ── 03 · GitHub Pages ── */}
+        <section id="pages" className="ci-guide-section">
+          <div className="ci-guide-step-marker"><span>03</span></div>
+          <div className="ci-guide-section-content">
+            <div className="ci-guide-section-label">Deployment</div>
+            <h2 className="ci-guide-section-title">GitHub Pages</h2>
+            <p className="ci-guide-section-desc">
+              Add a deploy job after the generate job. The reusable workflow uploads the artifact;
+              you control when and how it gets deployed.
+            </p>
 
-      {/* ── Prerequisites ── */}
-      <section id="prerequisites" className="ci-guide-section">
-        <div className="ci-guide-section-label">Requirements</div>
-        <div className="ci-guide-section-title">Prerequisites</div>
-        <p className="ci-guide-section-desc">
-          Your CLI must support the OpenCLI specification for InSpectra to generate documentation from it.
-        </p>
+            <div className="ci-guide-prose">
+              <p>
+                <strong>1. Configure your repo</strong> &mdash;
+                Go to <strong>Settings &rarr; Pages</strong> and set the source to{" "}
+                <strong>GitHub Actions</strong> (not "Deploy from a branch").
+              </p>
+              <p>
+                <strong>2. Add a deploy job</strong> &mdash;
+                Download the artifact, re-upload as a Pages artifact, and deploy. Grant{" "}
+                <code>pages: write</code> and <code>id-token: write</code> permissions.
+              </p>
+            </div>
 
-        <div className="ci-guide-prose">
-          <p>
-            <strong>For exec mode</strong>, your CLI needs to implement the <code>cli opencli</code> command
-            which outputs the OpenCLI JSON spec to stdout. Optionally implement <code>cli xmldoc</code>{" "}
-            for richer descriptions. CLIs built with{" "}
-            <a
-              href="https://github.com/spectreconsole/spectre.console"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ci-guide-link"
-            >
-              Spectre.Console.Cli
-            </a>{" "}
-            get this for free.
-          </p>
-          <p>
-            <strong>For file mode</strong>, export your <code>opencli.json</code> once and check it into your
-            repository. This works with any CLI that can produce an OpenCLI spec, even if it's not available
-            at CI runtime.
-          </p>
-          <p>
-            If your CLI uses custom export arguments (not <code>cli opencli</code>), pass them via{" "}
-            <code>opencli-args</code>. Similarly, use <code>xmldoc-args</code> to override the XML
-            documentation export command.
-          </p>
-        </div>
+            <div className="ci-guide-terminal">
+              <div className="ci-guide-terminal-bar">
+                <span className="ci-guide-terminal-dot ci-guide-tdot-red" />
+                <span className="ci-guide-terminal-dot ci-guide-tdot-yellow" />
+                <span className="ci-guide-terminal-dot ci-guide-tdot-green" />
+                <span className="ci-guide-terminal-title">.github/workflows/docs.yml</span>
+              </div>
+              <CopyButton text={pagesSnippet} />
+              <div className="ci-guide-code-body">
+                <span className="ci-guide-syn-key">name</span>: Deploy CLI Docs{"\n"}
+                {"\n"}
+                <span className="ci-guide-syn-key">on</span>:{"\n"}
+                {"  "}<span className="ci-guide-syn-arg">push</span>:{"\n"}
+                {"    "}<span className="ci-guide-syn-arg">branches</span>: [main]{"\n"}
+                {"\n"}
+                <span className="ci-guide-syn-key">permissions</span>:{"\n"}
+                {"  "}<span className="ci-guide-syn-arg">contents</span>: read{"\n"}
+                {"  "}<span className="ci-guide-syn-arg">pages</span>: write{"\n"}
+                {"  "}<span className="ci-guide-syn-arg">id-token</span>: write{"\n"}
+                {"\n"}
+                <span className="ci-guide-syn-key">jobs</span>:{"\n"}
+                {"  "}<span className="ci-guide-syn-arg">generate</span>:{"\n"}
+                {"    "}<span className="ci-guide-syn-flag">runs-on</span>: ubuntu-latest{"\n"}
+                {"    "}<span className="ci-guide-syn-flag">steps</span>:{"\n"}
+                {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/checkout@v6</span>{"\n"}
+                {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">JKamsker/InSpectra@v1</span>{"\n"}
+                {"        "}<span className="ci-guide-syn-flag">with</span>:{"\n"}
+                {"          "}<span className="ci-guide-syn-arg">dotnet-tool</span>: MyCli.Tool{"\n"}
+                {"          "}<span className="ci-guide-syn-arg">cli-name</span>: mycli{"\n"}
+                {"          "}<span className="ci-guide-syn-arg">output-dir</span>: _site{"\n"}
+                {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/upload-pages-artifact@v3</span>{"\n"}
+                {"        "}<span className="ci-guide-syn-flag">with</span>: {"{ "}<span className="ci-guide-syn-arg">path</span>: _site{" }"}{"\n"}
+                {"\n"}
+                {"  "}<span className="ci-guide-syn-arg">deploy</span>:{"\n"}
+                {"    "}<span className="ci-guide-syn-flag">needs</span>: generate{"\n"}
+                {"    "}<span className="ci-guide-syn-flag">runs-on</span>: ubuntu-latest{"\n"}
+                {"    "}<span className="ci-guide-syn-flag">environment</span>:{"\n"}
+                {"      "}<span className="ci-guide-syn-arg">name</span>: github-pages{"\n"}
+                {"      "}<span className="ci-guide-syn-arg">url</span>: <span className="ci-guide-syn-str">{"${{ steps.deploy.outputs.page_url }}"}</span>{"\n"}
+                {"    "}<span className="ci-guide-syn-flag">steps</span>:{"\n"}
+                {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/deploy-pages@v4</span>{"\n"}
+                {"        "}<span className="ci-guide-syn-arg">id</span>: deploy
+              </div>
+            </div>
 
-        <div className="ci-guide-code-block">
-          <div className="ci-guide-code-label">Custom export arguments</div>
-          <CopyButton text={prerequisitesSnippet} />
-          <div className="ci-guide-code-body">
-            <YamlComment># If your CLI uses different export commands</YamlComment>{"\n"}
-            <span className="ci-guide-syn-key">- uses</span>: <span className="ci-guide-syn-str">JKamsker/InSpectra@v1</span>{"\n"}
-            {"  "}<span className="ci-guide-syn-flag">with</span>:{"\n"}
-            {"    "}<span className="ci-guide-syn-arg">cli-name</span>: mycli{"\n"}
-            {"    "}<span className="ci-guide-syn-arg">opencli-args</span>: <span className="ci-guide-syn-str">'export spec'</span>{"       "}<YamlComment># instead of 'cli opencli'</YamlComment>{"\n"}
-            {"    "}<span className="ci-guide-syn-arg">xmldoc-args</span>: <span className="ci-guide-syn-str">'export xmldoc'</span>{"      "}<YamlComment># instead of 'cli xmldoc'</YamlComment>{"\n"}
-            {"    "}<span className="ci-guide-syn-arg">output-dir</span>: docs
+            <div className="ci-guide-callout ci-guide-callout-warn">
+              <div className="ci-guide-callout-icon">
+                <AlertCircle size={15} aria-hidden="true" />
+              </div>
+              <div className="ci-guide-callout-body">
+                <div className="ci-guide-callout-title">Custom domain</div>
+                <p>
+                  To use a custom domain, configure it in your repository's Pages settings.
+                  GitHub handles the CNAME automatically when deploying via Actions.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* ── 04 · Prerequisites ── */}
+        <section id="prerequisites" className="ci-guide-section">
+          <div className="ci-guide-step-marker"><span>04</span></div>
+          <div className="ci-guide-section-content">
+            <div className="ci-guide-section-label">Requirements</div>
+            <h2 className="ci-guide-section-title">Prerequisites</h2>
+            <p className="ci-guide-section-desc">
+              Your CLI must support the OpenCLI specification for InSpectra to generate documentation from it.
+            </p>
+
+            <div className="ci-guide-prose">
+              <p>
+                <strong>For exec mode</strong>, your CLI needs to implement the <code>cli opencli</code> command
+                which outputs the OpenCLI JSON spec to stdout. Optionally implement <code>cli xmldoc</code>{" "}
+                for richer descriptions. CLIs built with{" "}
+                <a
+                  href="https://github.com/spectreconsole/spectre.console"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ci-guide-link"
+                >
+                  Spectre.Console.Cli
+                </a>{" "}
+                get this for free.
+              </p>
+              <p>
+                <strong>For file mode</strong>, export your <code>opencli.json</code> once and check it into your
+                repository. This works with any CLI that can produce an OpenCLI spec, even if it's not available
+                at CI runtime.
+              </p>
+              <p>
+                If your CLI uses custom export arguments (not <code>cli opencli</code>), pass them via{" "}
+                <code>opencli-args</code>. Similarly, use <code>xmldoc-args</code> to override the XML
+                documentation export command.
+              </p>
+            </div>
+
+            <div className="ci-guide-terminal">
+              <div className="ci-guide-terminal-bar">
+                <span className="ci-guide-terminal-dot ci-guide-tdot-red" />
+                <span className="ci-guide-terminal-dot ci-guide-tdot-yellow" />
+                <span className="ci-guide-terminal-dot ci-guide-tdot-green" />
+                <span className="ci-guide-terminal-title">Custom export arguments</span>
+              </div>
+              <CopyButton text={prerequisitesSnippet} />
+              <div className="ci-guide-code-body">
+                <YamlComment># If your CLI uses different export commands</YamlComment>{"\n"}
+                <span className="ci-guide-syn-key">- uses</span>: <span className="ci-guide-syn-str">JKamsker/InSpectra@v1</span>{"\n"}
+                {"  "}<span className="ci-guide-syn-flag">with</span>:{"\n"}
+                {"    "}<span className="ci-guide-syn-arg">cli-name</span>: mycli{"\n"}
+                {"    "}<span className="ci-guide-syn-arg">opencli-args</span>: <span className="ci-guide-syn-str">'export spec'</span>{"       "}<YamlComment># instead of 'cli opencli'</YamlComment>{"\n"}
+                {"    "}<span className="ci-guide-syn-arg">xmldoc-args</span>: <span className="ci-guide-syn-str">'export xmldoc'</span>{"      "}<YamlComment># instead of 'cli xmldoc'</YamlComment>{"\n"}
+                {"    "}<span className="ci-guide-syn-arg">output-dir</span>: docs
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

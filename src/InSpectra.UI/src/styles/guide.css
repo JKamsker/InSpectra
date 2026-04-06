@@ -1,18 +1,45 @@
-/* ── CI Guide Page ──────────────────────────── */
+/* ══════════════════════════════════════════════════
+   CI Guide Page — "Technical Blueprint" aesthetic
+   ══════════════════════════════════════════════════ */
 
 .ci-guide-page {
   max-width: 56rem;
   margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+  padding: 2rem 1.5rem 5rem;
 }
 
-/* Hero */
+/* ── Hero ─────────────────────────────────────── */
+
 .ci-guide-hero {
+  position: relative;
   text-align: center;
-  padding: 2.5rem 0 2rem;
+  padding: 3.5rem 0 2rem;
+  overflow: hidden;
+}
+
+.ci-guide-hero-glow {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  width: 500px;
+  height: 340px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    var(--accent-glow) 0%,
+    transparent 70%
+  );
+  opacity: 0.7;
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+[data-theme="dark"] .ci-guide-hero-glow {
+  opacity: 1;
 }
 
 .ci-guide-badge {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -25,6 +52,7 @@
   border: 1px solid var(--accent-border);
   margin-bottom: 1.5rem;
   letter-spacing: 0.02em;
+  animation: guideReveal 0.6s var(--ease-out) both;
 }
 
 .ci-guide-dot {
@@ -32,22 +60,24 @@
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  animation: ci-pulse 2s infinite;
+  animation: ciPulse 2s infinite;
 }
 
-@keyframes ci-pulse {
+@keyframes ciPulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.35; }
 }
 
 .ci-guide-hero h1 {
+  position: relative;
   font-family: var(--font);
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   line-height: 1.1;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
   color: var(--text);
+  animation: guideReveal 0.6s var(--ease-out) 0.05s both;
 }
 
 .ci-guide-accent {
@@ -58,79 +88,252 @@
 }
 
 .ci-guide-hero-sub {
+  position: relative;
   font-size: 1rem;
   color: var(--muted);
   max-width: 520px;
   margin: 0 auto;
   line-height: 1.7;
+  animation: guideReveal 0.6s var(--ease-out) 0.1s both;
 }
 
-/* TOC */
-.ci-guide-toc-section {
-  padding: 0;
+/* ── Pipeline diagram ─────────────────────────── */
+
+.ci-guide-pipeline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  margin-top: 2.5rem;
+  position: relative;
+  animation: guideReveal 0.6s var(--ease-out) 0.2s both;
 }
 
-.ci-guide-toc {
-  padding: 1.25rem;
-  border-radius: 0.85rem;
-  border: 1px solid var(--border);
+.ci-guide-pipe-group {
+  display: flex;
+  align-items: flex-start;
+}
+
+.ci-guide-pipe-node {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.85rem;
   background: var(--surface);
-  margin-bottom: 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 
-.ci-guide-toc-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  margin-bottom: 0.6rem;
+.ci-guide-pipe-node:hover {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.ci-guide-pipe-ring {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Sequential glow pulse */
+.ci-guide-pipe-group:nth-child(1) .ci-guide-pipe-ring { animation: ringPulse 4s ease-in-out 0s infinite; }
+.ci-guide-pipe-group:nth-child(2) .ci-guide-pipe-ring { animation: ringPulse 4s ease-in-out 0.6s infinite; }
+.ci-guide-pipe-group:nth-child(3) .ci-guide-pipe-ring { animation: ringPulse 4s ease-in-out 1.2s infinite; }
+.ci-guide-pipe-group:nth-child(4) .ci-guide-pipe-ring { animation: ringPulse 4s ease-in-out 1.8s infinite; }
+
+@keyframes ringPulse {
+  0%, 70%, 100% { box-shadow: 0 0 0 3px var(--accent-glow); opacity: 0.6; }
+  15% { box-shadow: 0 0 10px 4px var(--accent-glow); opacity: 1; }
+  35% { box-shadow: 0 0 0 3px var(--accent-glow); opacity: 1; }
+}
+
+.ci-guide-pipe-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1;
+}
+
+.ci-guide-pipe-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--text);
 }
 
-.ci-guide-toc ol {
-  padding-left: 1.4rem;
-  margin: 0;
+.ci-guide-pipe-sub {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--soft);
+  margin-top: 0.15rem;
 }
 
-.ci-guide-toc li {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 0.3rem;
+.ci-guide-pipe-line {
+  width: 2rem;
+  height: 1px;
+  background: var(--border);
+  align-self: center;
+  margin-top: -0.55rem;
+  position: relative;
+  overflow: hidden;
 }
 
-.ci-guide-toc a {
-  color: var(--accent);
+.ci-guide-pipe-pulse {
+  position: absolute;
+  top: -1px;
+  left: -16px;
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0.45;
+}
+
+/* Sequential flow animation */
+.ci-guide-pipe-group:nth-child(2) .ci-guide-pipe-pulse { animation: pipeFlow 4s ease-in-out 0.3s infinite; }
+.ci-guide-pipe-group:nth-child(3) .ci-guide-pipe-pulse { animation: pipeFlow 4s ease-in-out 0.9s infinite; }
+.ci-guide-pipe-group:nth-child(4) .ci-guide-pipe-pulse { animation: pipeFlow 4s ease-in-out 1.5s infinite; }
+
+@keyframes pipeFlow {
+  0%, 60%, 100% { left: -16px; opacity: 0; }
+  10% { opacity: 0.6; }
+  25% { left: calc(100% + 16px); opacity: 0; }
+}
+
+/* ── Quick navigation ─────────────────────────── */
+
+.ci-guide-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+  animation: guideReveal 0.5s var(--ease-out) 0.3s both;
+}
+
+.ci-guide-nav-link {
+  font-family: var(--mono);
+  font-size: 0.74rem;
   font-weight: 500;
+  color: var(--muted);
+  padding: 0.4rem 0.85rem;
+  border-radius: 99px;
+  border: 1px solid transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
   text-decoration: none;
-  transition: color 0.15s;
 }
 
-.ci-guide-toc a:hover {
-  color: var(--green);
+.ci-guide-nav-link:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
 }
 
-/* Section styling */
+.ci-guide-nav-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── Timeline ─────────────────────────────────── */
+
+.ci-guide-timeline {
+  position: relative;
+  padding-left: 4rem;
+  margin-top: 1.5rem;
+}
+
+/* Vertical connecting line */
+.ci-guide-timeline::before {
+  content: "";
+  position: absolute;
+  left: calc(1.15rem);
+  top: 1.15rem;
+  bottom: 4rem;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    var(--accent-border),
+    var(--border) 20%,
+    var(--border) 80%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* ── Sections ─────────────────────────────────── */
+
 .ci-guide-section {
-  margin-top: 2.5rem;
+  position: relative;
+  padding-bottom: 3.5rem;
+  animation: sectionReveal 0.55s var(--ease-out) both;
 }
 
-.ci-guide-divider {
-  border: none;
-  border-top: 1px solid var(--border-subtle);
-  margin: 2.5rem 0;
+.ci-guide-section:nth-child(1) { animation-delay: 0.35s; }
+.ci-guide-section:nth-child(2) { animation-delay: 0.42s; }
+.ci-guide-section:nth-child(3) { animation-delay: 0.49s; }
+.ci-guide-section:nth-child(4) { animation-delay: 0.56s; }
+
+.ci-guide-section:last-child {
+  padding-bottom: 0;
 }
 
+/* Step marker — sits on the timeline */
+.ci-guide-step-marker {
+  position: absolute;
+  left: -4rem;
+  top: 0.15rem;
+  width: 2.3rem;
+  height: 2.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent-border);
+  z-index: 1;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.ci-guide-section:hover .ci-guide-step-marker {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.ci-guide-step-marker span {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.ci-guide-section-content {
+  min-width: 0;
+}
+
+/* Section typography */
 .ci-guide-section-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--accent);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .ci-guide-section-title {
-  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-family: var(--font);
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   line-height: 1.2;
   margin-bottom: 0.5rem;
   color: var(--text);
@@ -139,7 +342,7 @@
 .ci-guide-section-desc {
   color: var(--muted);
   font-size: 0.92rem;
-  max-width: 480px;
+  max-width: 500px;
   line-height: 1.65;
   margin-bottom: 1.5rem;
 }
@@ -152,7 +355,306 @@
   color: var(--accent);
 }
 
-/* Prose */
+/* ── Terminal code blocks ─────────────────────── */
+
+.ci-guide-terminal {
+  border-radius: 0.85rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  margin-bottom: 1.5rem;
+  position: relative;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .ci-guide-terminal {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+.ci-guide-terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.ci-guide-terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ci-guide-tdot-red { background: #f87171; }
+.ci-guide-tdot-yellow { background: #fbbf24; }
+.ci-guide-tdot-green { background: #34d399; }
+
+.ci-guide-terminal-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--soft);
+  padding-right: 2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tab bar (inside terminal) */
+.ci-guide-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  overflow-x: auto;
+}
+
+.ci-guide-tab {
+  padding: 0.55rem 1rem;
+  font-size: 0.74rem;
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--soft);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.ci-guide-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.ci-guide-tab:hover:not(.active) {
+  color: var(--text-secondary);
+  background: rgba(148, 163, 184, 0.05);
+}
+
+/* Code panels */
+.ci-guide-panel,
+.ci-guide-code-body {
+  padding: 1.25rem 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.9;
+  color: var(--muted);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* Copy button */
+.ci-guide-copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.65rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.4rem;
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  cursor: pointer;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.1s;
+}
+
+.ci-guide-copy-btn:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.ci-guide-copy-btn:active {
+  transform: translateY(0);
+}
+
+.ci-guide-copy-btn.copied {
+  color: var(--green);
+  border-color: var(--green-border);
+}
+
+/* Syntax highlighting */
+.ci-guide-syn-comment { color: var(--soft); font-style: italic; }
+.ci-guide-syn-key     { color: var(--accent); }
+.ci-guide-syn-flag    { color: var(--amber); }
+.ci-guide-syn-arg     { color: var(--green); }
+.ci-guide-syn-str     { color: #f9a8d4; }
+
+/* ── Input reference table ────────────────────── */
+
+.ci-guide-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.ci-guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.ci-guide-table thead {
+  background: var(--surface);
+}
+
+.ci-guide-table th {
+  text-align: left;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.ci-guide-table td {
+  padding: 0.7rem 1.1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--muted);
+  line-height: 1.55;
+  vertical-align: top;
+}
+
+.ci-guide-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ci-guide-table tbody tr {
+  transition: background 0.12s;
+}
+
+.ci-guide-table tbody tr:hover {
+  background: var(--accent-soft);
+}
+
+.ci-guide-table-name {
+  white-space: nowrap;
+  width: 1%;
+}
+
+.ci-guide-table-name code {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.12rem 0.45rem;
+  border-radius: 0.25rem;
+}
+
+.ci-guide-table-desc {
+  font-size: 0.8rem;
+}
+
+.ci-guide-table-desc code {
+  font-size: 0.75rem;
+  background: var(--accent-soft);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.2rem;
+  color: var(--accent);
+}
+
+.ci-guide-table-default {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--soft);
+  white-space: nowrap;
+  width: 1%;
+}
+
+.ci-guide-table-default code {
+  font-size: 0.72rem;
+  background: var(--accent-soft);
+  padding: 0.08rem 0.3rem;
+  border-radius: 0.2rem;
+  color: var(--accent);
+}
+
+/* ── Callouts ─────────────────────────────────── */
+
+.ci-guide-callout {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--accent-border);
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  margin-bottom: 1.5rem;
+}
+
+.ci-guide-callout-warn {
+  border-color: var(--amber-border);
+  border-left-color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.ci-guide-callout-icon {
+  flex-shrink: 0;
+  color: var(--accent);
+  margin-top: 0.1rem;
+}
+
+.ci-guide-callout-warn .ci-guide-callout-icon {
+  color: var(--amber);
+}
+
+.ci-guide-callout-body {
+  min-width: 0;
+}
+
+.ci-guide-callout-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.ci-guide-callout-warn .ci-guide-callout-title {
+  color: var(--amber);
+}
+
+.ci-guide-callout p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.ci-guide-callout code {
+  font-size: 0.78rem;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.2rem;
+  color: var(--accent);
+}
+
+[data-theme="dark"] .ci-guide-callout code {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Prose ────────────────────────────────────── */
+
 .ci-guide-prose p {
   color: var(--muted);
   font-size: 0.88rem;
@@ -177,211 +679,69 @@
 .ci-guide-link {
   color: var(--accent);
   text-decoration: none;
-  transition: color 0.15s;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
 }
 
 .ci-guide-prose a:hover,
 .ci-guide-link:hover {
-  text-decoration: underline;
-}
-
-/* Code block */
-.ci-guide-code-block {
-  border-radius: 0.85rem;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--code-bg);
-  margin-bottom: 1.5rem;
-  position: relative;
-}
-
-.ci-guide-tab-bar {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  overflow-x: auto;
-}
-
-.ci-guide-tab {
-  padding: 0.55rem 1rem;
-  font-size: 0.75rem;
-  font-family: var(--mono);
-  font-weight: 500;
-  color: var(--soft);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  transition: color 0.15s, border-color 0.15s;
-  white-space: nowrap;
-}
-
-.ci-guide-tab.active {
-  color: var(--accent);
   border-bottom-color: var(--accent);
 }
 
-.ci-guide-tab:hover {
-  color: var(--text-secondary);
+/* ── Animations ───────────────────────────────── */
+
+@keyframes guideReveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Code panels — used by tabbed and static blocks */
-.ci-guide-panel,
-.ci-guide-code-panel {
-  padding: 1.2rem 1.4rem;
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  line-height: 1.9;
-  color: var(--muted);
-  overflow-x: auto;
-  white-space: pre;
+@keyframes sectionReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.ci-guide-code-label {
-  padding: 0.5rem 1rem;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--soft);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  letter-spacing: 0.03em;
-}
+/* ── Responsive ───────────────────────────────── */
 
-.ci-guide-code-body {
-  padding: 1.2rem 1.4rem;
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  line-height: 1.9;
-  color: var(--muted);
-  overflow-x: auto;
-  white-space: pre;
-}
+@media (max-width: 768px) {
+  .ci-guide-pipeline {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+  }
 
-/* Copy button */
-.ci-guide-copy-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.6rem;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.3rem 0.65rem;
-  border-radius: 0.4rem;
-  font-size: 0.7rem;
-  font-family: var(--mono);
-  font-weight: 500;
-  color: var(--accent);
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  cursor: pointer;
-  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
-}
+  .ci-guide-pipe-line {
+    display: none;
+  }
 
-.ci-guide-copy-btn:hover {
-  background: var(--accent-glow);
-  border-color: var(--accent);
-}
+  .ci-guide-pipe-sub {
+    display: none;
+  }
 
-.ci-guide-copy-btn.copied {
-  color: var(--green);
-  border-color: var(--green-border);
-}
+  .ci-guide-pipe-node {
+    padding: 0.4rem 0.7rem;
+  }
 
-/* Syntax highlighting */
-.ci-guide-syn-comment { color: var(--soft); }
-.ci-guide-syn-key     { color: var(--accent); }
-.ci-guide-syn-flag    { color: var(--amber); }
-.ci-guide-syn-arg     { color: var(--green); }
-.ci-guide-syn-str     { color: #f9a8d4; }
+  .ci-guide-nav {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
 
-/* Options grid */
-.ci-guide-options-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 0.85rem;
-  margin-top: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.ci-guide-option-card {
-  padding: 1.1rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--border-subtle);
-  background: var(--surface);
-}
-
-.ci-guide-option-name {
-  font-family: var(--mono);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--accent);
-  margin-bottom: 0.2rem;
-}
-
-.ci-guide-option-desc {
-  font-size: 0.78rem;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.ci-guide-option-desc code {
-  font-size: 0.75rem;
-  background: var(--accent-soft);
-  padding: 0.1rem 0.3rem;
-  border-radius: 0.2rem;
-  color: var(--accent);
-}
-
-.ci-guide-option-default {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--soft);
-  margin-top: 0.2rem;
-}
-
-.ci-guide-option-default code {
-  font-size: 0.7rem;
-  background: var(--accent-soft);
-  padding: 0.08rem 0.25rem;
-  border-radius: 0.2rem;
-  color: var(--accent);
-}
-
-/* Callout */
-.ci-guide-callout {
-  padding: 1rem 1.25rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--accent-border);
-  background: var(--accent-soft);
-  margin-bottom: 1.5rem;
-}
-
-.ci-guide-callout-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--accent);
-  margin-bottom: 0.3rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.ci-guide-callout p {
-  color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.65;
-  margin: 0;
-}
-
-.ci-guide-callout code {
-  font-size: 0.78rem;
-  background: var(--accent-soft);
-  padding: 0.1rem 0.3rem;
-  border-radius: 0.2rem;
-  color: var(--accent);
+  .ci-guide-nav-sep {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
@@ -389,8 +749,44 @@
     padding: 1.25rem 1rem 3rem;
   }
 
-  .ci-guide-options-grid {
-    grid-template-columns: 1fr;
+  .ci-guide-hero {
+    padding: 2rem 0 1.5rem;
+  }
+
+  /* Collapse timeline to inline markers */
+  .ci-guide-timeline {
+    padding-left: 0;
+  }
+
+  .ci-guide-timeline::before {
+    display: none;
+  }
+
+  .ci-guide-step-marker {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .ci-guide-step-marker span {
+    font-size: 0.62rem;
+  }
+
+  .ci-guide-section {
+    padding-bottom: 2.5rem;
+  }
+
+  /* Table scrolls horizontally */
+  .ci-guide-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ci-guide-table {
+    min-width: 520px;
   }
 
   .ci-guide-tab-bar {
@@ -400,5 +796,37 @@
   .ci-guide-tab {
     padding: 0.5rem 0.7rem;
     font-size: 0.7rem;
+  }
+
+  .ci-guide-terminal-title {
+    font-size: 0.65rem;
+  }
+}
+
+/* ── Reduce motion ────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .ci-guide-badge,
+  .ci-guide-hero h1,
+  .ci-guide-hero-sub,
+  .ci-guide-pipeline,
+  .ci-guide-nav,
+  .ci-guide-section {
+    animation: none !important;
+  }
+
+  .ci-guide-pipe-ring {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .ci-guide-pipe-pulse {
+    animation: none !important;
+    display: none;
+  }
+
+  .ci-guide-dot {
+    animation: none !important;
+    opacity: 1;
   }
 }
