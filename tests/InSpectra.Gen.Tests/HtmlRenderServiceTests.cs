@@ -13,7 +13,8 @@ public class HtmlRenderServiceTests
         LightTheme: true,
         UrlLoading: false,
         NugetBrowser: false,
-        PackageUpload: false);
+        PackageUpload: false,
+        ColorThemePicker: false);
 
     [Fact]
     public async Task File_render_writes_bundle_and_injects_inline_bootstrap()
