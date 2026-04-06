@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useDeferredValue } from "react";
+import { useEffect, useRef, useState, useDeferredValue, type MutableRefObject } from "react";
 
 function readBool(key: string, fallback: boolean): boolean {
   const v = localStorage.getItem(key);
@@ -19,10 +19,17 @@ export function useViewerInteraction() {
   const [searchTerm, setSearchTerm] = useState("");
   const deferredSearch = useDeferredValue(searchTerm);
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [composerOpen, setComposerOpen] = useState(() => {
-    return window.innerWidth <= 768 ? false : readBool("inspectra-composer-open", true);
-  });
   const [composerWidth, setComposerWidth] = useState(() => readNumber("inspectra-composer-width", 304));
+  const composerOpenedByUser = useRef(false);
+  const [composerOpen, setComposerOpen] = useState(() => {
+    if (window.innerWidth <= 768) return false;
+    const saved = readBool("inspectra-composer-open", true);
+    if (!saved) return false;
+    // If default-open would cause floating, start collapsed
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const sidebarW = 17 * rem;
+    return window.innerWidth - sidebarW - readNumber("inspectra-composer-width", 304) >= 490;
+  });
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileSidebarSearch, setMobileSidebarSearch] = useState(false);
 
@@ -45,6 +52,7 @@ export function useViewerInteraction() {
   function toggleComposer() {
     setComposerOpen((prev) => {
       const next = !prev;
+      composerOpenedByUser.current = next;
       localStorage.setItem("inspectra-composer-open", String(next));
       if (next) setMobileSidebarOpen(false);
       return next;
@@ -68,6 +76,7 @@ export function useViewerInteraction() {
     deferredSearch,
     paletteOpen,
     composerOpen,
+    composerOpenedByUser,
     composerWidth,
     mobileSidebarOpen,
     mobileSidebarSearch,

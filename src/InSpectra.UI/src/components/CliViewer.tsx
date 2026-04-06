@@ -45,6 +45,7 @@ export function CliViewer({
     deferredSearch,
     paletteOpen,
     composerOpen,
+    composerOpenedByUser,
     composerWidth,
     mobileSidebarOpen,
     mobileSidebarSearch,
@@ -84,7 +85,15 @@ export function CliViewer({
       }
       const rem = parseFloat(getComputedStyle(window.document.documentElement).fontSize);
       const sidebarWidth = 17 * rem;
-      setComposerFloating(grid!.offsetWidth - sidebarWidth - composerWidth < 490);
+      const wouldFloat = grid!.offsetWidth - sidebarWidth - composerWidth < 490;
+
+      if (wouldFloat && !composerOpenedByUser.current) {
+        // Auto-collapse when the default open state would cause floating
+        setComposerOpen(false);
+        setComposerFloating(false);
+      } else {
+        setComposerFloating(wouldFloat);
+      }
     }
 
     const ro = new ResizeObserver(update);
