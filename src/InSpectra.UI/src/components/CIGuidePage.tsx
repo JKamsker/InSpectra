@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Copy, Check, Info, AlertCircle } from "lucide-react";
 
 type UsageTab = "dotnet-tool" | "from-file" | "markdown" | "build-render" | "release-asset";
@@ -352,10 +352,13 @@ export function CIGuidePage({ section }: { section?: string }) {
   }, [section]);
 
   const sectionIds = ["usage", "inputs", "pages", "prerequisites"];
+  const scrollingRef = useRef(false);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const sectionObserver = new IntersectionObserver(
       (entries) => {
+        if (scrollingRef.current) return;
         for (const entry of entries) {
           if (entry.isIntersecting) {
             history.replaceState(null, "", `#/guide/${entry.target.id}`);
@@ -365,21 +368,42 @@ export function CIGuidePage({ section }: { section?: string }) {
       { rootMargin: "-20% 0px -60% 0px", threshold: 0 }
     );
 
+    const heroObserver = new IntersectionObserver(
+      (entries) => {
+        if (scrollingRef.current) return;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            history.replaceState(null, "", "#/guide");
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+
     for (const id of sectionIds) {
       const el = document.getElementById(id);
-      if (el) observer.observe(el);
+      if (el) sectionObserver.observe(el);
     }
 
-    return () => observer.disconnect();
+    const hero = document.querySelector(".ci-guide-hero");
+    if (hero) heroObserver.observe(hero);
+
+    return () => {
+      sectionObserver.disconnect();
+      heroObserver.disconnect();
+    };
   }, []);
 
   const scrollTo = useCallback((e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
+    scrollingRef.current = true;
+    clearTimeout(scrollTimerRef.current);
+    history.replaceState(null, "", `#/guide/${id}`);
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    history.replaceState(null, "", `#/guide/${id}`);
+    scrollTimerRef.current = setTimeout(() => { scrollingRef.current = false; }, 800);
   }, []);
 
   const usageTabs: { id: UsageTab; label: string }[] = [
