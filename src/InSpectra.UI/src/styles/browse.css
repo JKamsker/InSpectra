@@ -21,6 +21,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+  min-width: 0;
 }
 
 .browse-header-row .secondary-button {
@@ -382,6 +383,13 @@
   display: flex;
   align-items: center;
   gap: 0.85rem;
+  min-width: 0;
+}
+
+.browse-detail-title-row h1 {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .browse-package-icon-lg {
@@ -404,6 +412,9 @@
   border-radius: 0.25rem;
   background: var(--inline-code-bg);
   width: fit-content;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .browse-nuget-link {
