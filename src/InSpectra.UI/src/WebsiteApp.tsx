@@ -182,8 +182,6 @@ export function WebsiteApp() {
           error={error}
           loading={loadState.status === "loading"}
           onFilesSelected={handleFiles}
-          showUpload={featureFlags.packageUpload}
-          showNugetBrowser={featureFlags.nugetBrowser}
         />
       </>
     );

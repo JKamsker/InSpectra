@@ -9,8 +9,8 @@ export function ViewerDropzone({ onFilesSelected }: ViewerDropzoneProps) {
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
   const [hovering, setHovering] = useState(false);
-  const hideTimer = useRef<number>();
-  const unmountTimer = useRef<number>();
+  const hideTimer = useRef<number>(undefined);
+  const unmountTimer = useRef<number>(undefined);
 
   function show() {
     clearTimeout(hideTimer.current);

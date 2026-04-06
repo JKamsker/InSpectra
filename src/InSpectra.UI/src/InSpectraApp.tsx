@@ -40,8 +40,6 @@ export function InSpectraApp() {
         error={error}
         loading={false}
         onFilesSelected={handleFiles}
-        showUpload={featureFlags.packageUpload}
-        showNugetBrowser={featureFlags.nugetBrowser}
       />
     );
   }

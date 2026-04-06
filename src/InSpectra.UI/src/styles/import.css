@@ -1,4 +1,4 @@
-/* ── Import screen ──────────────────────────── */
+/* ── Shared layout (used by NugetBrowser, PackageDetail, StaticViewer error) */
 
 .import-screen {
   max-width: 54rem;
@@ -23,56 +23,6 @@
   font-family: var(--font);
 }
 
-.import-dropzone {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 1rem;
-  align-items: center;
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border: 1px dashed var(--border);
-  border-radius: 0.55rem;
-  background: var(--bg);
-  transition: border-color 0.2s var(--ease), transform 0.2s var(--ease);
-}
-
-.import-dropzone.dragging,
-.import-dropzone:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 0 16px var(--accent-glow);
-  border-style: solid;
-}
-
-.dropzone-icon {
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.5rem;
-  color: var(--accent);
-  background: var(--accent-glow);
-}
-
-.dropzone-icon svg {
-  width: 1.1rem;
-  height: 1.1rem;
-}
-
-.dropzone-copy {
-  display: grid;
-  gap: 0.15rem;
-}
-
-.dropzone-copy strong {
-  font-size: 0.85rem;
-}
-
-.dropzone-copy span {
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
 .inline-alert {
   margin-top: 0.75rem;
   padding: 0.65rem 0.85rem;
@@ -83,91 +33,92 @@
   font-size: 0.85rem;
 }
 
-.import-facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin-top: 1rem;
-  animation: ds-fade-up 0.55s var(--ease-out) 0.1s both;
-}
+/* ── Import page — full-page dropzone ───────── */
 
-.fact-card {
-  padding: 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  background: var(--surface);
-  transition: border-color 0.2s var(--ease), transform 0.15s var(--ease),
-    box-shadow 0.2s var(--ease);
-}
-
-.fact-card:hover {
-  border-color: var(--accent-border);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-
-.fact-icon {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.4rem;
-  color: var(--accent);
-  background: var(--accent-glow);
-  margin-bottom: 0.6rem;
-}
-
-.fact-icon svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.fact-card h2 {
-  font-size: 0.88rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-}
-
-.fact-card p {
-  font-size: 0.82rem;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-/* ── Browse CTA (import screen) ────────────── */
-
-.import-browse-cta {
+.import-page {
+  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.25rem;
-  margin-top: 1rem;
+  justify-content: center;
+  min-height: calc(100vh - 3.5rem);
+  padding: 2rem;
+  cursor: pointer;
   background:
-    radial-gradient(ellipse at 5% 50%, rgba(6, 182, 212, 0.06), transparent 60%),
-    var(--surface);
-  animation: ds-fade-up 0.55s var(--ease-out) 0.15s both;
+    radial-gradient(ellipse at 30% 20%, rgba(6, 182, 212, 0.05), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(6, 182, 212, 0.03), transparent 50%),
+    var(--bg);
+  transition: background 0.25s var(--ease);
+  outline: none;
 }
 
-.browse-cta-content {
+.import-page.dragging {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(6, 182, 212, 0.1), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(6, 182, 212, 0.06), transparent 50%),
+    var(--bg);
+}
+
+.import-page-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.85rem;
+  gap: 1.5rem;
+  padding: 3.5rem 5rem;
+  border: 2px dashed var(--accent-border);
+  border-radius: 1.25rem;
+  background: var(--surface);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.08),
+    0 0 48px var(--accent-glow);
+  max-width: 90vw;
+  text-align: center;
+  transition:
+    border-color 0.2s var(--ease),
+    border-style 0.2s var(--ease),
+    box-shadow 0.25s var(--ease),
+    transform 0.25s var(--ease);
+  animation: ds-fade-up 0.45s var(--ease-out) both;
 }
 
-.browse-cta-content h2 {
-  font-size: 0.88rem;
-  font-weight: 600;
-  margin-bottom: 0.15rem;
+.import-page.dragging .import-page-card {
+  border-color: var(--accent);
+  border-style: solid;
+  transform: translateY(-4px);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.14),
+    0 0 64px var(--accent-glow),
+    inset 0 0 32px var(--accent-glow);
 }
 
-.browse-cta-content p {
+.import-page.dragging .viewer-dropzone-icon {
+  transform: scale(1.1);
+}
+
+.import-page-error {
+  padding: 0.6rem 1rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--red-border);
+  background: var(--red-soft);
+  color: var(--red);
   font-size: 0.82rem;
-  color: var(--muted);
-  line-height: 1.5;
+  max-width: 28rem;
 }
 
-.browse-cta-btn {
-  flex-shrink: 0;
-  text-decoration: none;
+/* ── Mobile ────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .import-page {
+    padding: 1.25rem;
+  }
+
+  .import-page-card {
+    padding: 2.5rem 1.75rem;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .import-page-card {
+    padding: 2rem 1.25rem;
+  }
 }

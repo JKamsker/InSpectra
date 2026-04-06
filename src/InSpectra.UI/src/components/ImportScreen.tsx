@@ -1,16 +1,13 @@
-import { FileCode2, FileJson2, LoaderCircle, Package, Upload } from "lucide-react";
+import { FileCode2, FileJson2, LoaderCircle, Upload } from "lucide-react";
 import { useRef, useState } from "react";
-import { buildBrowseHash } from "../data/navigation";
 
 interface ImportScreenProps {
   error?: string | null;
   loading: boolean;
   onFilesSelected: (files: File[]) => void;
-  showUpload?: boolean;
-  showNugetBrowser?: boolean;
 }
 
-export function ImportScreen({ error, loading, onFilesSelected, showUpload = true, showNugetBrowser = true }: ImportScreenProps) {
+export function ImportScreen({ error, loading, onFilesSelected }: ImportScreenProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -19,126 +16,63 @@ export function ImportScreen({ error, loading, onFilesSelected, showUpload = tru
   }
 
   function handleFiles(fileList: FileList | null) {
-    if (!fileList) {
-      return;
-    }
-
-    onFilesSelected(Array.from(fileList));
+    if (fileList) onFilesSelected(Array.from(fileList));
   }
 
   return (
-    <main className="import-screen">
-      <section className="import-hero panel">
-        <span className="ds-badge"><span className="ds-badge-dot" />InSpectraUI</span>
-        <h1>Inspect a CLI snapshot without rebuilding the viewer.</h1>
-        <p className="lede">
-          Drop <code>opencli.json</code>, add <code>xmldoc.xml</code> if you have it, and explore the
-          command graph locally with relocatable static assets.
-        </p>
+    <main
+      className={`import-page${isDragging ? " dragging" : ""}`}
+      onDragEnter={(e) => { e.preventDefault(); setIsDragging(true); }}
+      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+      onDragLeave={(e) => { e.preventDefault(); if (e.currentTarget === e.target) setIsDragging(false); }}
+      onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFiles(e.dataTransfer.files); }}
+      onClick={openPicker}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPicker(); } }}
+      aria-label="Import OpenCLI snapshot"
+    >
+      <div className="import-page-card">
+        <div className="viewer-dropzone-icon">
+          {loading
+            ? <LoaderCircle className="spin" aria-hidden="true" />
+            : <Upload aria-hidden="true" />}
+        </div>
 
-        {showUpload && (
-          <div
-            className={`import-dropzone ${isDragging ? "dragging" : ""}`}
-            role="button"
-            tabIndex={0}
-            aria-label="Import OpenCLI snapshot"
-            onClick={openPicker}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                openPicker();
-              }
-            }}
-            onDragEnter={(event) => {
-              event.preventDefault();
-              setIsDragging(true);
-            }}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setIsDragging(true);
-            }}
-            onDragLeave={(event) => {
-              event.preventDefault();
-              if (event.currentTarget === event.target) {
-                setIsDragging(false);
-              }
-            }}
-            onDrop={(event) => {
-              event.preventDefault();
-              setIsDragging(false);
-              handleFiles(event.dataTransfer.files);
-            }}
-          >
-            <div className="dropzone-icon">
-              {loading ? <LoaderCircle className="spin" aria-hidden="true" /> : <Upload aria-hidden="true" />}
-            </div>
-            <div className="dropzone-copy">
-              <strong>{loading ? "Loading snapshot" : "Drop your files here"}</strong>
-              <span>
-                {loading
-                  ? "Parsing OpenCLI and applying XML enrichment."
-                  : "Choose one or two files: opencli.json and optional xmldoc.xml."}
-              </span>
-            </div>
-            <button type="button" className="secondary-button" disabled={loading}>
-              {loading ? "Working…" : "Pick files"}
-            </button>
-            <input
-              ref={inputRef}
-              aria-label="OpenCLI files"
-              className="visually-hidden"
-              type="file"
-              multiple
-              accept=".json,.xml"
-              onChange={(event) => {
-                handleFiles(event.target.files);
-                event.target.value = "";
-              }}
-            />
-          </div>
-        )}
+        <div className="viewer-dropzone-text">
+          <strong>{loading ? "Importing snapshot" : "Drop files or click to browse"}</strong>
+          <span>
+            {loading
+              ? "Parsing OpenCLI and applying XML enrichment."
+              : "Load an OpenCLI snapshot into the viewer"}
+          </span>
+        </div>
 
-        {error ? (
-          <p className="inline-alert" role="alert">
-            {error}
-          </p>
-        ) : null}
-      </section>
-
-      {showNugetBrowser && (
-        <section className="import-browse-cta panel">
-          <div className="browse-cta-content">
-            <div className="fact-icon">
-              <Package aria-hidden="true" />
-            </div>
-            <div>
-              <h2>Browse NuGet tools</h2>
-              <p>Explore indexed .NET CLI tool packages and inspect their command structure directly.</p>
-            </div>
-          </div>
-          <a href={buildBrowseHash()} className="secondary-button browse-cta-btn">
-            Open browser
-          </a>
-        </section>
-      )}
-
-      <section className="import-facts">
-        <article className="fact-card panel">
-          <div className="fact-icon">
+        <div className="viewer-dropzone-files">
+          <div className="viewer-dropzone-file-tag">
             <FileJson2 aria-hidden="true" />
+            <span>opencli.json</span>
           </div>
-          <h2>Canonical input</h2>
-          <p>OpenCLI JSON stays the source of truth. The viewer enriches in-browser instead of relying on a custom schema.</p>
-        </article>
-
-        <article className="fact-card panel">
-          <div className="fact-icon">
+          <span className="viewer-dropzone-plus">+</span>
+          <div className="viewer-dropzone-file-tag optional">
             <FileCode2 aria-hidden="true" />
+            <span>xmldoc.xml</span>
+            <em>optional</em>
           </div>
-          <h2>Optional XML</h2>
-          <p>XML descriptions only fill blank command, option, and argument descriptions. Existing JSON content wins.</p>
-        </article>
-      </section>
+        </div>
+
+        {error && <p className="import-page-error" role="alert">{error}</p>}
+      </div>
+
+      <input
+        ref={inputRef}
+        aria-label="OpenCLI files"
+        className="visually-hidden"
+        type="file"
+        multiple
+        accept=".json,.xml"
+        onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }}
+      />
     </main>
   );
 }
