@@ -66,6 +66,20 @@ inputs:
     description: 'Custom label shown in the viewer header (e.g. "v1.2.3")'
     required: false
 
+  single-file:
+    description: 'Emit a single self-contained HTML file (works from file://)'
+    required: false
+    default: 'false'
+
+  compression-level:
+    description: >
+      Compression level for HTML output.
+        0  - none (raw JSON, largest)
+        1  - compress embedded JSON
+        2  - self-extracting bundle (smallest, default)
+    required: false
+    default: '2'
+
   extra-args:
     description: 'Additional flags forwarded to the inspectra CLI'
     required: false
@@ -162,6 +176,8 @@ runs:
         XMLDOC_ARGS: ${{ inputs.xmldoc-args }}
         TIMEOUT: ${{ inputs.timeout }}
         LABEL: ${{ inputs.label }}
+        SINGLE_FILE: ${{ inputs.single-file }}
+        COMPRESSION_LEVEL: ${{ inputs.compression-level }}
         OUTPUT_DIR: ${{ inputs.output-dir }}
         EXTRA_ARGS: ${{ inputs.extra-args }}
       run: |
@@ -228,6 +244,14 @@ runs:
           args+=(--label "$LABEL")
         fi
 
+        # ── HTML-specific options ──
+        if [ "$subcmd" = "html" ]; then
+          if [ "$SINGLE_FILE" = "true" ]; then
+            args+=(--single-file)
+          fi
+          args+=(--compression-level "$COMPRESSION_LEVEL")
+        fi
+
         if [ -n "${EXTRA_ARGS:-}" ]; then
           # shellcheck disable=SC2206
           args+=($EXTRA_ARGS)
@@ -247,7 +271,6 @@ runs:
         case "$FORMAT" in
           html)
             test -f "$OUTPUT_DIR/index.html"
-            grep -q './assets/' "$OUTPUT_DIR/index.html"
             ;;
           markdown)
             test -d "$OUTPUT_DIR"

@@ -85,6 +85,16 @@ on:
         type: string
         description: 'Custom label shown in the viewer header (e.g. "v1.2.3")'
 
+      single-file:
+        type: string
+        default: 'false'
+        description: 'Emit a single self-contained HTML file'
+
+      compression-level:
+        type: string
+        default: '2'
+        description: 'Compression level (0=none, 1=compress JSON, 2=self-extracting)'
+
       extra-args:
         type: string
         description: 'Additional flags forwarded to the inspectra CLI'
@@ -143,6 +153,8 @@ jobs:
           opencli-json: ${{ inputs.opencli-json }}
           xmldoc: ${{ inputs.xmldoc }}
           output-dir: _inspectra-site
+          single-file: ${{ inputs.single-file }}
+          compression-level: ${{ inputs.compression-level }}
           extra-args: ${{ inputs.extra-args }}
           inspectra-version: ${{ inputs.inspectra-version }}
           dotnet-version: ${{ inputs.dotnet-version }}
