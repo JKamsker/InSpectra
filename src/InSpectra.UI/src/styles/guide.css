@@ -219,21 +219,17 @@
   font-family: var(--mono);
   font-size: 0.74rem;
   font-weight: 500;
-  color: var(--muted);
-  padding: 0.4rem 0.85rem;
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  transition: color 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
-  text-decoration: none;
-  cursor: pointer;
+  color: var(--accent);
+  padding: 0.4rem 0.2rem;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-border);
+  text-underline-offset: 3px;
+  transition: color 0.15s, text-decoration-color 0.15s;
 }
 
 .ci-guide-nav-link:hover {
-  color: var(--accent);
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  box-shadow: 0 1px 4px var(--accent-glow);
+  color: var(--accent-hover);
+  text-decoration-color: var(--accent);
 }
 
 .ci-guide-nav-sep {
