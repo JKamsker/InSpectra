@@ -22,7 +22,7 @@ interface PackageDetailProps {
 }
 
 export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: PackageDetailProps) {
-  const [loadingSpec, setLoadingSpec] = useState(false);
+  const [loadingVersion, setLoadingVersion] = useState<string | null>(null);
   const activeVersion = selectedVersion || pkg.latestVersion;
   const versionInfo = pkg.versions.find((v) => v.version === activeVersion) || pkg.versions[0];
   const iconUrl = summary?.packageIconUrl || DEFAULT_PACKAGE_ICON_URL;
@@ -38,7 +38,7 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
     const urls = resolvePackageUrls(pkg, resolvedVersion);
     const label = `${pkg.packageId} v${resolvedVersion}`;
     const command = pkg.versions.find((candidate) => candidate.version === resolvedVersion)?.command ?? versionInfo.command;
-    setLoadingSpec(true);
+    setLoadingVersion(resolvedVersion);
     onLoadPackage(urls.opencliUrl, urls.xmldocUrl, label, pkg.packageId, isLatest ? undefined : resolvedVersion, command);
   }
 
@@ -167,7 +167,7 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
                   <span className={`ver-node${isLatest ? " ver-node--latest" : ""}`} />
                   {!isLast && <span className="ver-rail-line" />}
                 </div>
-                <div className="ver-body">
+                <div className="ver-body" role="button" tabIndex={0} onClick={() => !loadingVersion && handleLoad(ver.version)} onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !loadingVersion) { e.preventDefault(); handleLoad(ver.version); } }}>
                   <div className="ver-content">
                     <div className="ver-meta">
                       <strong className="ver-number">v{ver.version}</strong>
@@ -189,10 +189,10 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
                   <button
                     type="button"
                     className="ver-inspect-btn"
-                    disabled={loadingSpec}
-                    onClick={() => handleLoad(ver.version)}
+                    disabled={!!loadingVersion}
+                    onClick={(e) => { e.stopPropagation(); handleLoad(ver.version); }}
                   >
-                    {loadingSpec ? (
+                    {loadingVersion === ver.version ? (
                       <><LoaderCircle className="spin" aria-hidden="true" size={13} /> Loading</>
                     ) : (
                       "Inspect"
