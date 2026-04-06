@@ -35,13 +35,13 @@
   width: 1.65rem;
   height: 1.65rem;
   border-radius: 0.4rem;
-  background: linear-gradient(135deg, #0891b2, #06b6d4);
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   color: #fff;
   font-family: var(--mono);
   font-weight: 700;
   font-size: 0.65rem;
   letter-spacing: -0.04em;
-  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 2px 8px var(--accent-glow);
 }
 
 .brand-info {

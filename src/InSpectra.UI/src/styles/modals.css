@@ -20,7 +20,7 @@
   padding: 2rem;
   background:
     radial-gradient(ellipse at 30% 20%, var(--accent-glow), transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(6, 182, 212, 0.03), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, var(--accent-glow), transparent 50%),
     var(--bg);
 }
 

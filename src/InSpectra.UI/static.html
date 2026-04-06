@@ -22,6 +22,8 @@
         var s = localStorage.getItem("inspectra-theme");
         if (s === "dark" || s === "light") document.documentElement.dataset.theme = s;
         else if (matchMedia("(prefers-color-scheme:dark)").matches) document.documentElement.dataset.theme = "dark";
+        var c = localStorage.getItem("inspectra-color-theme");
+        if (c) document.documentElement.dataset.colorTheme = c;
       })();
     </script>
     <script id="inspectra-bootstrap" type="application/json">__INSPECTRA_BOOTSTRAP__</script>

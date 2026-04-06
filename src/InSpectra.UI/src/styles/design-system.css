@@ -138,8 +138,8 @@
 .ds-hero-glow-bg {
   padding: 1.75rem;
   background:
-    radial-gradient(ellipse at 5% 15%, rgba(6, 182, 212, 0.06), transparent 45%),
-    radial-gradient(ellipse at 95% 85%, rgba(6, 182, 212, 0.03), transparent 45%),
+    radial-gradient(ellipse at 5% 15%, var(--accent-glow), transparent 45%),
+    radial-gradient(ellipse at 95% 85%, var(--accent-glow), transparent 45%),
     var(--surface);
   overflow: hidden;
 }
@@ -204,8 +204,8 @@
 .ds-hero-panel {
   padding: 1.75rem;
   background:
-    radial-gradient(ellipse at 5% 15%, rgba(6, 182, 212, 0.06), transparent 45%),
-    radial-gradient(ellipse at 95% 85%, rgba(6, 182, 212, 0.03), transparent 45%),
+    radial-gradient(ellipse at 5% 15%, var(--accent-glow), transparent 45%),
+    radial-gradient(ellipse at 95% 85%, var(--accent-glow), transparent 45%),
     var(--surface);
   animation: ds-fade-up 0.55s var(--ease-out) both;
 }

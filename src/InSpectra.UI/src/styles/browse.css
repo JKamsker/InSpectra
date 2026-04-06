@@ -358,8 +358,8 @@
 
 .browse-badge-latest {
   color: var(--accent);
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-border);
 }
 
 /* Browse package detail */
