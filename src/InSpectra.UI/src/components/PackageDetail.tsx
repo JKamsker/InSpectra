@@ -146,42 +146,62 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
         </div>
       </section>
 
-      <section className="browse-versions panel section-card">
+      <section className="ver-timeline-section panel section-card">
         <div className="section-heading">
           <Package aria-hidden="true" />
-          <h2>Versions</h2>
+          <h2>Version history</h2>
         </div>
 
-        <div className="browse-version-list">
-          {pkg.versions.map((ver) => (
-            <div key={ver.version} className={`browse-version-row ${ver.version === activeVersion ? "active" : ""}`}>
-              <div className="browse-version-info">
-                <strong>v{ver.version}</strong>
-                {ver.version === pkg.latestVersion && (
-                  <span className="browse-badge browse-badge-latest">Latest</span>
-                )}
-                <StatusBadge status={ver.status} />
-                {ver.paths.opencliSource && (
-                  <span className="browse-badge browse-badge-synth">Synthesized</span>
-                )}
-              </div>
-              <div className="browse-version-dates">
-                <span>Published {formatDate(ver.publishedAt)}</span>
-              </div>
-              <button
-                type="button"
-                className="secondary-button"
-                disabled={loadingSpec}
-                onClick={() => handleLoad(ver.version)}
+        <div className="ver-timeline">
+          {pkg.versions.map((ver, index) => {
+            const isLatest = ver.version === pkg.latestVersion;
+            const isActive = ver.version === activeVersion;
+            const isLast = index === pkg.versions.length - 1;
+            return (
+              <div
+                key={ver.version}
+                className={`ver-row${isActive ? " ver-row--active" : ""}`}
+                style={{ animationDelay: `${0.08 * index}s` }}
               >
-                {loadingSpec ? (
-                  <><LoaderCircle className="spin" aria-hidden="true" size={14} /> Loading...</>
-                ) : (
-                  "Inspect"
-                )}
-              </button>
-            </div>
-          ))}
+                <div className="ver-rail">
+                  <span className={`ver-node${isLatest ? " ver-node--latest" : ""}`} />
+                  {!isLast && <span className="ver-rail-line" />}
+                </div>
+                <div className="ver-body">
+                  <div className="ver-content">
+                    <div className="ver-meta">
+                      <strong className="ver-number">v{ver.version}</strong>
+                      <div className="ver-badges">
+                        {isLatest && (
+                          <span className="browse-badge browse-badge-latest">Latest</span>
+                        )}
+                        <StatusBadge status={ver.status} />
+                        {ver.paths.opencliSource && (
+                          <span className="browse-badge browse-badge-synth">Synthesized</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="ver-details">
+                      <span className="ver-date">Published {formatDate(ver.publishedAt)}</span>
+                      {ver.command && <code className="ver-command">{ver.command}</code>}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="ver-inspect-btn"
+                    disabled={loadingSpec}
+                    onClick={() => handleLoad(ver.version)}
+                  >
+                    {loadingSpec ? (
+                      <><LoaderCircle className="spin" aria-hidden="true" size={13} /> Loading</>
+                    ) : (
+                      "Inspect"
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
     </main>
