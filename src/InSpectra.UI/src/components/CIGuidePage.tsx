@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Copy, Check, Info, AlertCircle } from "lucide-react";
 
 type UsageTab = "dotnet-tool" | "from-file" | "markdown" | "build-render" | "release-asset";
@@ -340,8 +340,16 @@ const pipelineSteps = [
 
 /* ── Main component ── */
 
-export function CIGuidePage() {
+export function CIGuidePage({ section }: { section?: string }) {
   const [activeUsageTab, setActiveUsageTab] = useState<UsageTab>("dotnet-tool");
+
+  useEffect(() => {
+    if (!section) return;
+    const el = document.getElementById(section);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [section]);
 
   const usageTabs: { id: UsageTab; label: string }[] = [
     { id: "dotnet-tool", label: ".NET Tool" },
@@ -391,13 +399,13 @@ export function CIGuidePage() {
 
       {/* ── Quick nav ── */}
       <nav className="ci-guide-nav" aria-label="Page sections">
-        <a href="#usage" className="ci-guide-nav-link">Usage</a>
+        <a href="#/guide/usage" className="ci-guide-nav-link">Usage</a>
         <span className="ci-guide-nav-sep" aria-hidden="true" />
-        <a href="#inputs" className="ci-guide-nav-link">Input Reference</a>
+        <a href="#/guide/inputs" className="ci-guide-nav-link">Input Reference</a>
         <span className="ci-guide-nav-sep" aria-hidden="true" />
-        <a href="#pages" className="ci-guide-nav-link">GitHub Pages</a>
+        <a href="#/guide/pages" className="ci-guide-nav-link">GitHub Pages</a>
         <span className="ci-guide-nav-sep" aria-hidden="true" />
-        <a href="#prerequisites" className="ci-guide-nav-link">Prerequisites</a>
+        <a href="#/guide/prerequisites" className="ci-guide-nav-link">Prerequisites</a>
       </nav>
 
       {/* ── Timeline content ── */}

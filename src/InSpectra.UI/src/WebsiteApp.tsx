@@ -161,7 +161,7 @@ export function WebsiteApp() {
     return (
       <>
         <SiteHeader route={route} onFilesSelected={handleFiles} />
-        <CIGuidePage />
+        <CIGuidePage section={route.section} />
       </>
     );
   }

@@ -1,7 +1,7 @@
 export type HashRoute =
   | { kind: "overview" }
   | { kind: "about" }
-  | { kind: "guide" }
+  | { kind: "guide"; section?: string }
   | { kind: "command"; commandPath: string }
   | { kind: "browse"; packageId?: string; version?: string }
   | { kind: "package"; packageId: string; version?: string; commandPath?: string };
@@ -45,8 +45,9 @@ export function parseHashRoute(hash: string): HashRoute {
     return { kind: "about" };
   }
 
-  if (normalized === "/guide") {
-    return { kind: "guide" };
+  if (normalized === "/guide" || normalized.startsWith("/guide/")) {
+    const section = normalized.slice("/guide".length).replace(/^\//, "") || undefined;
+    return { kind: "guide", section };
   }
 
   if (normalized === "/browse" || normalized.startsWith("/browse/")) {
