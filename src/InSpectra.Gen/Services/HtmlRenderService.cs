@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using InSpectra.Gen.Models;
 using InSpectra.Gen.Runtime;
 
@@ -52,9 +53,13 @@ public sealed class HtmlRenderService(
             .OrderBy(file => file.RelativePath, StringComparer.Ordinal)
             .ToList();
 
+        // Only ship assets that static.html actually references — skip website-only files
+        var referencedAssets = CollectReferencedAssets(bundleRoot);
+
         if (options.DryRun)
         {
             var plannedFiles = bundleFiles
+                .Where(file => referencedAssets.Contains(file.RelativePath))
                 .Select(file => new RenderedFile(file.RelativePath, Path.Combine(outputDirectory, file.RelativePath), null))
                 .ToList();
 
@@ -72,11 +77,10 @@ public sealed class HtmlRenderService(
         var writtenFiles = new List<RenderedFile>();
         foreach (var file in bundleFiles)
         {
-            var destinationPath = Path.Combine(outputDirectory, file.RelativePath);
-            var destinationDirectory = Path.GetDirectoryName(destinationPath);
-            if (!string.IsNullOrWhiteSpace(destinationDirectory))
+            // Skip assets not referenced by the static bundle template
+            if (!referencedAssets.Contains(file.RelativePath))
             {
-                Directory.CreateDirectory(destinationDirectory);
+                continue;
             }
 
             // static.html is the static bundle template — inject bootstrap and write as index.html
@@ -90,10 +94,11 @@ public sealed class HtmlRenderService(
                 continue;
             }
 
-            // Skip the website index.html — static bundles don't need it
-            if (string.Equals(file.RelativePath, "index.html", StringComparison.OrdinalIgnoreCase))
+            var destinationPath = Path.Combine(outputDirectory, file.RelativePath);
+            var destinationDirectory = Path.GetDirectoryName(destinationPath);
+            if (!string.IsNullOrWhiteSpace(destinationDirectory))
             {
-                continue;
+                Directory.CreateDirectory(destinationDirectory);
             }
 
             File.Copy(file.SourcePath, destinationPath, overwrite: true);
@@ -125,6 +130,25 @@ public sealed class HtmlRenderService(
             Summary = summary,
             Stats = statsFactory.Create(normalized, files.Count),
         };
+    }
+
+    private static HashSet<string> CollectReferencedAssets(string bundleRoot)
+    {
+        var referenced = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "static.html" };
+        var staticHtmlPath = Path.Combine(bundleRoot, "static.html");
+
+        if (!File.Exists(staticHtmlPath))
+        {
+            return referenced;
+        }
+
+        var html = File.ReadAllText(staticHtmlPath);
+        foreach (Match match in Regex.Matches(html, @"(?:src|href)=""\./([^""]+)"""))
+        {
+            referenced.Add(match.Groups[1].Value);
+        }
+
+        return referenced;
     }
 
     private static string BuildInlineBootstrap(
