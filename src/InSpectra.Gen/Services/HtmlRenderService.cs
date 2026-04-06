@@ -109,30 +109,26 @@ public sealed class HtmlRenderService(
 
         if (options.SingleFile)
         {
-            var indexFile = writtenFiles.FirstOrDefault(f => f.RelativePath == "index.html");
-            if (indexFile?.Content is not null)
+            var selfExtractingHtml = BuildSelfExtractingHtml(prepared, options, features, label, outputDirectory);
+
+            // Remove all written files — we're replacing with a single self-extracting HTML
+            foreach (var file in writtenFiles)
             {
-                var inlinedHtml = InlineAssets(indexFile.Content, outputDirectory);
-                await File.WriteAllTextAsync(indexFile.FullPath, inlinedHtml, cancellationToken);
-
-                // Remove the separate asset files — everything is in index.html now
-                foreach (var file in writtenFiles.Where(f => f.RelativePath != "index.html"))
+                if (File.Exists(file.FullPath))
                 {
-                    if (File.Exists(file.FullPath))
-                    {
-                        File.Delete(file.FullPath);
-                    }
+                    File.Delete(file.FullPath);
                 }
-
-                // Clean up empty assets directory
-                var assetsDir = Path.Combine(outputDirectory, "assets");
-                if (Directory.Exists(assetsDir) && !Directory.EnumerateFileSystemEntries(assetsDir).Any())
-                {
-                    Directory.Delete(assetsDir);
-                }
-
-                writtenFiles = [new RenderedFile("index.html", indexFile.FullPath, inlinedHtml)];
             }
+
+            var assetsDir = Path.Combine(outputDirectory, "assets");
+            if (Directory.Exists(assetsDir) && !Directory.EnumerateFileSystemEntries(assetsDir).Any())
+            {
+                Directory.Delete(assetsDir);
+            }
+
+            var indexDestination = Path.Combine(outputDirectory, "index.html");
+            await File.WriteAllTextAsync(indexDestination, selfExtractingHtml, cancellationToken);
+            writtenFiles = [new RenderedFile("index.html", indexDestination, selfExtractingHtml)];
         }
 
         var summary = options.Quiet
@@ -160,6 +156,92 @@ public sealed class HtmlRenderService(
             Summary = summary,
             Stats = statsFactory.Create(normalized, files.Count),
         };
+    }
+
+    /// <summary>
+    /// Builds a self-extracting HTML file that packs CSS, JS, and bootstrap data into a
+    /// single gzip+base64 blob. A tiny inline decompressor unpacks everything at load time.
+    /// </summary>
+    private string BuildSelfExtractingHtml(
+        AcquiredRenderDocument prepared,
+        RenderExecutionOptions options,
+        HtmlFeatureFlags features,
+        string? label,
+        string outputDirectory)
+    {
+        // Collect assets
+        var referencedAssets = CollectReferencedAssets(
+            bundleLocator.ResolveAsync(CancellationToken.None).GetAwaiter().GetResult());
+
+        var assetsDir = Path.Combine(outputDirectory, "assets");
+        var cssFiles = Directory.GetFiles(assetsDir, "*.css")
+            .Where(f => referencedAssets.Contains("assets/" + Path.GetFileName(f)))
+            .ToList();
+        var jsEntryFiles = Directory.GetFiles(assetsDir, "*.js")
+            .Where(f => referencedAssets.Contains("assets/" + Path.GetFileName(f)))
+            .ToList();
+
+        var css = string.Join("\n", cssFiles.Select(File.ReadAllText));
+
+        // Build the IIFE JS bundle from entry + chunks
+        var entryFile = jsEntryFiles.FirstOrDefault(f => !Path.GetFileName(f).StartsWith("loadSource", StringComparison.Ordinal));
+        var js = entryFile is not null
+            ? BundleModulesAsIife(File.ReadAllText(entryFile), assetsDir)
+            : string.Join("\n", jsEntryFiles.Select(File.ReadAllText));
+
+        // Build raw bootstrap JSON (not pre-compressed — we'll compress everything together)
+        var bootstrapPayload = BuildRawBootstrapJson(prepared, options.IncludeHidden, options.IncludeMetadata, features, label);
+
+        // Pack all payloads into one JSON object and gzip+base64 the whole thing
+        var pack = JsonSerializer.Serialize(new { c = css, j = js, b = bootstrapPayload }, JsonOutput.CompactSerializerOptions);
+        var compressedBlob = GzipBase64(pack);
+
+        // Build the minimal self-extracting HTML
+        const string head =
+            """<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>InSpectraUI</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></head><body><div id="root"></div>""";
+
+        const string themeScript =
+            """<script>(function(){var s=localStorage.getItem("inspectra-theme");if(s==="dark"||s==="light")document.documentElement.dataset.theme=s;else if(matchMedia("(prefers-color-scheme:dark)").matches)document.documentElement.dataset.theme="dark"})()</script>""";
+
+        const string decompressor =
+            """<script>var _u=Uint8Array.from(atob(document.getElementById("_z").textContent),function(c){return c.charCodeAt(0)});new Response(new Blob([_u]).stream().pipeThrough(new DecompressionStream("gzip"))).text().then(function(t){var p=JSON.parse(t);var d=document;var s=d.createElement("style");s.textContent=p.c;d.head.appendChild(s);var b=d.createElement("script");b.id="inspectra-bootstrap";b.type="application/json";b.textContent=p.b;d.body.appendChild(b);var j=d.createElement("script");j.textContent=p.j;d.body.appendChild(j)})</script>""";
+
+        return head + themeScript +
+               """<script id="_z" type="text/plain">""" + compressedBlob + "</script>" +
+               decompressor + "</body></html>";
+    }
+
+    private static string BuildRawBootstrapJson(
+        AcquiredRenderDocument prepared,
+        bool includeHidden,
+        bool includeMetadata,
+        HtmlFeatureFlags features,
+        string? label)
+    {
+        var payload = new InlineBootstrap
+        {
+            Mode = "inline",
+            OpenCli = prepared.RawDocument,
+            XmlDoc = prepared.XmlDocument,
+            Options = new ViewerOptionsPayload
+            {
+                IncludeHidden = includeHidden,
+                IncludeMetadata = includeMetadata,
+                Label = label,
+            },
+            Features = new FeatureFlagsPayload
+            {
+                ShowHome = features.ShowHome,
+                Composer = features.Composer,
+                DarkTheme = features.DarkTheme,
+                LightTheme = features.LightTheme,
+                UrlLoading = features.UrlLoading,
+                NugetBrowser = features.NugetBrowser,
+                PackageUpload = features.PackageUpload,
+            },
+        };
+
+        return JsonSerializer.Serialize(payload, JsonOutput.CompactSerializerOptions);
     }
 
     private static string InlineAssets(string html, string outputDirectory)
