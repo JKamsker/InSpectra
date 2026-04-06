@@ -59,7 +59,7 @@
 /* ── Gradient accent text ────────────────────── */
 
 .ds-accent-gradient {
-  background: linear-gradient(135deg, var(--accent), var(--green));
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
