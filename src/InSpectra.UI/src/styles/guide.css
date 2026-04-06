@@ -177,7 +177,6 @@
   height: 1px;
   background: var(--border);
   align-self: center;
-  margin-top: -0.55rem;
   position: relative;
   overflow: hidden;
 }
