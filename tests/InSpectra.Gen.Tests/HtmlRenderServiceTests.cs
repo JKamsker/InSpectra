@@ -39,6 +39,8 @@ public class HtmlRenderServiceTests
                 IncludeHidden: false,
                 IncludeMetadata: true,
                 Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 0,
                 OutputFile: null,
                 OutputDirectory: outputDirectory));
 
@@ -51,9 +53,9 @@ public class HtmlRenderServiceTests
         Assert.Equal(RenderLayout.App, result.Layout);
         Assert.Contains(result.Files, file => file.RelativePath == "index.html");
         Assert.Contains(result.Files, file => file.RelativePath == "assets/app.js");
-        Assert.Contains("\"mode\": \"inline\"", index);
+        Assert.Contains("\"mode\":\"inline\"", index);
         Assert.Contains("\"xmlDoc\":", index);
-        Assert.Contains("\"includeMetadata\": true", index);
+        Assert.Contains("\"includeMetadata\":true", index);
         Assert.Contains("jdr", index);
     }
 
@@ -87,6 +89,8 @@ public class HtmlRenderServiceTests
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 0,
                 OutputFile: null,
                 OutputDirectory: outputDirectory));
 
@@ -94,7 +98,7 @@ public class HtmlRenderServiceTests
         var index = await File.ReadAllTextAsync(Path.Combine(outputDirectory, "index.html"));
 
         Assert.Equal("exec", result.Source.Kind);
-        Assert.Contains("\"includeHidden\": false", index);
+        Assert.Contains("\"includeHidden\":false", index);
         Assert.Contains("\"xmlDoc\":", index);
         Assert.Contains("auth", index);
     }
@@ -123,16 +127,18 @@ public class HtmlRenderServiceTests
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 0,
                 OutputFile: null,
                 OutputDirectory: outputDirectory));
 
         var result = await service.RenderFromFileAsync(request, DefaultFeatures, CancellationToken.None);
 
         Assert.True(result.IsDryRun);
-        Assert.Equal(4, result.Files.Count);
+        Assert.Equal(3, result.Files.Count);
         Assert.DoesNotContain(result.Files, file => file.Content is not null);
         Assert.False(Directory.Exists(outputDirectory));
-        Assert.Contains("4 files planned", result.Summary);
+        Assert.Contains("3 files planned", result.Summary);
     }
 
     private static HtmlRenderService CreateHtmlRenderService(ViewerBundleLocatorOptions options)
@@ -148,7 +154,8 @@ public class HtmlRenderServiceTests
     {
         var bundleRoot = Path.Combine(rootPath, folderName);
         Directory.CreateDirectory(Path.Combine(bundleRoot, "assets"));
-        File.WriteAllText(Path.Combine(bundleRoot, "static.html"), "<!doctype html><script id=\"inspectra-bootstrap\" type=\"application/json\">__INSPECTRA_BOOTSTRAP__</script>");
+        File.WriteAllText(Path.Combine(bundleRoot, "static.html"),
+            """<!doctype html><head><script type="module" src="./assets/app.js"></script><link rel="stylesheet" href="./assets/app.css"></head><body><div id="root"></div><script id="inspectra-bootstrap" type="application/json">__INSPECTRA_BOOTSTRAP__</script></body></html>""");
         File.WriteAllText(Path.Combine(bundleRoot, "index.html"), "<!doctype html><div id=\"root\"></div>");
         File.WriteAllText(Path.Combine(bundleRoot, "assets", "app.js"), "console.log('bundle');");
         File.WriteAllText(Path.Combine(bundleRoot, "assets", "app.css"), "body { color: black; }");

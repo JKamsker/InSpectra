@@ -30,6 +30,8 @@ public class MarkdownRenderServiceTests
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 0,
                 OutputFile: outputFile,
                 OutputDirectory: null));
 
@@ -61,6 +63,8 @@ public class MarkdownRenderServiceTests
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 0,
                 OutputFile: null,
                 OutputDirectory: temp.Path));
 
