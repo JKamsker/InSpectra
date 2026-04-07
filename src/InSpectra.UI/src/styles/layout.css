@@ -128,34 +128,54 @@
 
 /* ── Composer hint animation ───────────────── */
 
+@property --composer-hint-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
 .toolbar-button.composer-hint {
+  position: relative;
   color: var(--accent);
   border-color: var(--accent-border);
-  animation: composer-hint-pulse 2.4s var(--ease) infinite;
+  isolation: isolate;
 }
 
-.toolbar-button.composer-hint:hover {
+.toolbar-button.composer-hint::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 0.45rem;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--composer-hint-angle),
+    transparent 0deg,
+    var(--accent) 45deg,
+    transparent 90deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: composer-hint-spin 2.4s linear infinite;
+  pointer-events: none;
+}
+
+.toolbar-button.composer-hint:hover::before {
   animation: none;
-  box-shadow: none;
+  opacity: 0;
 }
 
-@keyframes composer-hint-pulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--accent-glow);
-    border-color: var(--accent-border);
-  }
-  50% {
-    box-shadow: 0 0 0 6px transparent;
-    border-color: var(--accent);
-  }
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-    border-color: var(--accent-border);
+@keyframes composer-hint-spin {
+  to {
+    --composer-hint-angle: 360deg;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toolbar-button.composer-hint {
+  .toolbar-button.composer-hint::before {
     animation: none;
   }
 }
