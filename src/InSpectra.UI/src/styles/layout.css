@@ -156,7 +156,6 @@
   pointer-events: none;
 }
 
-/* Slower chaser — the trailing point */
 .toolbar-button.composer-hint::before {
   background: conic-gradient(
     from var(--composer-hint-angle),
@@ -168,7 +167,7 @@
   animation: composer-hint-spin 2.4s linear infinite;
 }
 
-/* Faster chaser — 1.5x the speed of ::before (2.4s / 1.5 = 1.6s) */
+/* Second chaser — same speed, offset start so it trails behind */
 .toolbar-button.composer-hint::after {
   background: conic-gradient(
     from var(--composer-hint-angle),
@@ -177,7 +176,8 @@
     transparent 60deg,
     transparent 360deg
   );
-  animation: composer-hint-spin 1.6s linear infinite;
+  animation: composer-hint-spin 2.4s linear infinite;
+  animation-delay: -1.2s;
 }
 
 .toolbar-button.composer-hint:hover::before,
