@@ -141,29 +141,47 @@
   isolation: isolate;
 }
 
-.toolbar-button.composer-hint::before {
+.toolbar-button.composer-hint::before,
+.toolbar-button.composer-hint::after {
   content: "";
   position: absolute;
   inset: -2px;
   border-radius: 0.45rem;
   padding: 2px;
-  background: conic-gradient(
-    from var(--composer-hint-angle),
-    transparent 0deg,
-    var(--accent) 45deg,
-    transparent 90deg,
-    transparent 360deg
-  );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
-  animation: composer-hint-spin 2.4s linear infinite;
   pointer-events: none;
 }
 
-.toolbar-button.composer-hint:hover::before {
+/* Slower chaser — the trailing point */
+.toolbar-button.composer-hint::before {
+  background: conic-gradient(
+    from var(--composer-hint-angle),
+    transparent 0deg,
+    var(--accent) 30deg,
+    transparent 60deg,
+    transparent 360deg
+  );
+  animation: composer-hint-spin 2.4s linear infinite;
+}
+
+/* Faster chaser — 1.5x the speed of ::before (2.4s / 1.5 = 1.6s) */
+.toolbar-button.composer-hint::after {
+  background: conic-gradient(
+    from var(--composer-hint-angle),
+    transparent 0deg,
+    var(--accent-hover) 30deg,
+    transparent 60deg,
+    transparent 360deg
+  );
+  animation: composer-hint-spin 1.6s linear infinite;
+}
+
+.toolbar-button.composer-hint:hover::before,
+.toolbar-button.composer-hint:hover::after {
   animation: none;
   opacity: 0;
 }
@@ -175,7 +193,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toolbar-button.composer-hint::before {
+  .toolbar-button.composer-hint::before,
+  .toolbar-button.composer-hint::after {
     animation: none;
   }
 }
