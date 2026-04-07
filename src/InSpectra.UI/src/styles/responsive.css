@@ -45,6 +45,11 @@
     gap: 0.4rem;
   }
 
+  .brand-block {
+    margin-right: auto;
+    min-width: 0;
+  }
+
   .brand-info {
     min-width: 0;
   }
