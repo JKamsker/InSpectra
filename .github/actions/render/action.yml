@@ -137,8 +137,24 @@ inputs:
     description: 'InSpectra.Gen NuGet tool version (empty = latest)'
     required: false
 
+  inspectra-cli-package:
+    description: 'NuGet package id auto-added to the target project in dotnet mode (provides cli opencli / cli xmldoc).'
+    required: false
+    default: 'InSpectra.Cli'
+
+  inspectra-cli-version:
+    description: 'Version constraint for the auto-added InSpectra.Cli package (empty = latest).'
+    required: false
+
+  skip-inspectra-cli:
+    description: 'Set to "true" to skip the automatic InSpectra.Cli PackageReference in dotnet mode (e.g. when the project already manages it).'
+    required: false
+    default: 'false'
+
   dotnet-version:
-    description: '.NET SDK version to install'
+    description: >
+      .NET SDK version(s) required by InSpectra (default 10.0.x). In dotnet mode the action also
+      auto-adds the version derived from the project's TargetFramework.
     required: false
     default: '10.0.x'
 
@@ -189,10 +205,74 @@ runs:
           exit 1
         fi
 
+    - name: Resolve required .NET SDKs
+      id: dotnet-needs
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        PROJECT: ${{ inputs.project }}
+        INPUT_VERSION: ${{ inputs.dotnet-version }}
+      run: |
+        set -euo pipefail
+
+        # 1. Versions InSpectra itself needs (defaults to 10.0.x).
+        declare -A want
+        for v in ${INPUT_VERSION:-10.0.x}; do
+          want["$v"]=1
+        done
+
+        # 2. In dotnet mode, also include SDKs derived from the project's TargetFramework(s).
+        if [ "$MODE" = "dotnet" ] && [ -n "$PROJECT" ]; then
+          csproj="$PROJECT"
+          if [ -d "$csproj" ]; then
+            csproj=$(find "$PROJECT" -maxdepth 1 \( -name '*.csproj' -o -name '*.fsproj' -o -name '*.vbproj' \) -print -quit || true)
+          fi
+          if [ -n "$csproj" ] && [ -f "$csproj" ]; then
+            tfms=$(sed -nE 's|.*<TargetFrameworks?>([^<]+)</TargetFrameworks?>.*|\1|p' "$csproj" | tr ';' ' ')
+            for tfm in $tfms; do
+              if [[ "$tfm" =~ ^net([0-9]+\.[0-9]+)$ ]]; then
+                want["${BASH_REMATCH[1]}.x"]=1
+              fi
+            done
+          fi
+        fi
+
+        # 3. Subtract versions that are already installed.
+        installed=""
+        if command -v dotnet >/dev/null 2>&1; then
+          installed=$(dotnet --list-sdks 2>/dev/null | awk '{print $1}' || true)
+        fi
+
+        needed=()
+        for v in "${!want[@]}"; do
+          mm="${v%.x}"
+          esc="${mm//./\\.}"
+          if printf '%s\n' "$installed" | grep -qE "^${esc}\."; then
+            echo "Already installed: $mm"
+          else
+            needed+=("$v")
+          fi
+        done
+
+        if [ "${#needed[@]}" -eq 0 ]; then
+          echo "All required .NET SDKs already installed."
+          echo "install=false" >> "$GITHUB_OUTPUT"
+          echo "versions=" >> "$GITHUB_OUTPUT"
+        else
+          echo "Will install: ${needed[*]}"
+          echo "install=true" >> "$GITHUB_OUTPUT"
+          {
+            echo 'versions<<EOF'
+            printf '%s\n' "${needed[@]}"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Setup .NET
+      if: steps.dotnet-needs.outputs.install == 'true'
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ inputs.dotnet-version }}
+        dotnet-version: ${{ steps.dotnet-needs.outputs.versions }}
         dotnet-quality: ${{ inputs.dotnet-quality }}
 
     - name: Install InSpectra
@@ -201,12 +281,52 @@ runs:
         INSPECTRA_VERSION: ${{ inputs.inspectra-version }}
       run: |
         set -euo pipefail
+        if command -v inspectra >/dev/null 2>&1; then
+          echo "inspectra already on PATH: $(inspectra --version)"
+          exit 0
+        fi
         if [ -n "$INSPECTRA_VERSION" ]; then
           dotnet tool install -g InSpectra.Gen --version "$INSPECTRA_VERSION"
         else
           dotnet tool install -g InSpectra.Gen
         fi
         inspectra --version
+
+    - name: Auto-add InSpectra.Cli to target project
+      if: inputs.mode == 'dotnet' && inputs.skip-inspectra-cli != 'true'
+      shell: bash
+      env:
+        PROJECT: ${{ inputs.project }}
+        PACKAGE: ${{ inputs.inspectra-cli-package }}
+        PACKAGE_VERSION: ${{ inputs.inspectra-cli-version }}
+      run: |
+        set -euo pipefail
+
+        pkg="${PACKAGE:-InSpectra.Cli}"
+
+        # `dotnet add package` needs a project file, not a directory — resolve if needed.
+        csproj="$PROJECT"
+        if [ -d "$csproj" ]; then
+          csproj=$(find "$PROJECT" -maxdepth 1 \( -name '*.csproj' -o -name '*.fsproj' -o -name '*.vbproj' \) -print -quit || true)
+        fi
+        if [ -z "$csproj" ] || [ ! -f "$csproj" ]; then
+          echo "::error::Could not resolve a .NET project at '$PROJECT' for InSpectra.Cli auto-install"
+          exit 1
+        fi
+
+        # Skip if already referenced (keeps the user's pinned version intact).
+        if grep -qE "<PackageReference[^>]*Include=\"${pkg}\"" "$csproj"; then
+          echo "$pkg is already referenced by $csproj — skipping auto-install."
+          exit 0
+        fi
+
+        args=(dotnet add "$csproj" package "$pkg")
+        if [ -n "$PACKAGE_VERSION" ]; then
+          args+=(--version "$PACKAGE_VERSION")
+        fi
+        echo "::group::${args[*]}"
+        "${args[@]}"
+        echo "::endgroup::"
 
     - name: Install target CLI
       if: inputs.dotnet-tool != ''

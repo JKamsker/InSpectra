@@ -99,10 +99,24 @@ on:
         type: string
         description: 'InSpectra.Gen NuGet tool version (empty = latest)'
 
+      inspectra-cli-package:
+        type: string
+        default: 'InSpectra.Cli'
+        description: 'NuGet package id auto-added to the target project in dotnet mode (provides cli opencli / cli xmldoc).'
+
+      inspectra-cli-version:
+        type: string
+        description: 'Version constraint for the auto-added InSpectra.Cli package (empty = latest).'
+
+      skip-inspectra-cli:
+        type: string
+        default: 'false'
+        description: 'Set to "true" to skip the automatic InSpectra.Cli PackageReference in dotnet mode.'
+
       dotnet-version:
         type: string
         default: '10.0.x'
-        description: '.NET SDK version'
+        description: '.NET SDK version (the action also auto-detects the project TargetFramework in dotnet mode)'
 
       dotnet-quality:
         type: string
@@ -216,6 +230,9 @@ jobs:
           no-theme-picker: ${{ inputs.no-theme-picker }}
           extra-args: ${{ inputs.extra-args }}
           inspectra-version: ${{ inputs.inspectra-version }}
+          inspectra-cli-package: ${{ inputs.inspectra-cli-package }}
+          inspectra-cli-version: ${{ inputs.inspectra-cli-version }}
+          skip-inspectra-cli: ${{ inputs.skip-inspectra-cli }}
           dotnet-version: ${{ inputs.dotnet-version }}
           dotnet-quality: ${{ inputs.dotnet-quality }}
 

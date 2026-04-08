@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Copy, Check, Info, AlertCircle } from "lucide-react";
 
-type UsageTab = "dotnet-tool" | "from-file" | "markdown" | "build-render" | "release-asset";
+type UsageTab = "from-source" | "dotnet-tool" | "from-file" | "markdown" | "build-render" | "release-asset";
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -29,6 +29,23 @@ function CopyButton({ text }: { text: string }) {
 /* ── Plain-text versions for copying ── */
 
 const usageSnippets: Record<UsageTab, string> = {
+  "from-source": `# .github/workflows/docs.yml — render straight from a .csproj
+steps:
+  - uses: actions/checkout@v6
+
+  - uses: JKamsker/InSpectra@v1
+    with:
+      mode: dotnet
+      project: src/MyCli              # .csproj path or directory
+      configuration: Release
+      format: html                    # html / markdown / markdown-monolith
+      output-dir: docs/cli
+
+  - uses: actions/upload-artifact@v4
+    with:
+      name: cli-docs
+      path: docs/cli`,
+
   "dotnet-tool": `# .github/workflows/docs.yml
 steps:
   - uses: actions/checkout@v6
@@ -150,6 +167,27 @@ function YamlComment({ children }: { children: string }) {
 
 function UsagePanel({ tab }: { tab: UsageTab }) {
   switch (tab) {
+    case "from-source":
+      return (
+        <div className="ci-guide-panel active">
+          <YamlComment># .github/workflows/docs.yml — render straight from a .csproj</YamlComment>{"\n"}
+          <span className="ci-guide-syn-key">steps</span>:{"\n"}
+          {"  "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/checkout@v6</span>{"\n"}
+          {"\n"}
+          {"  "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">JKamsker/InSpectra@v1</span>{"\n"}
+          {"    "}<span className="ci-guide-syn-flag">with</span>:{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">mode</span>: dotnet{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">project</span>: src/MyCli{"              "}<YamlComment># .csproj path or directory</YamlComment>{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">configuration</span>: Release{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">format</span>: html{"                    "}<YamlComment># html / markdown / markdown-monolith</YamlComment>{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">output-dir</span>: docs/cli{"\n"}
+          {"\n"}
+          {"  "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/upload-artifact@v4</span>{"\n"}
+          {"    "}<span className="ci-guide-syn-flag">with</span>:{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">name</span>: cli-docs{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">path</span>: docs/cli
+        </div>
+      );
     case "dotnet-tool":
       return (
         <div className="ci-guide-panel active">
@@ -254,7 +292,7 @@ interface InputDef {
 const inputs: InputDef[] = [
   {
     name: "mode",
-    desc: <>Render mode: <code>exec</code> invokes a live CLI, <code>file</code> reads from saved JSON.</>,
+    desc: <>Render mode: <code>exec</code> invokes a live CLI, <code>file</code> reads from saved JSON, <code>dotnet</code> runs a .NET project from source.</>,
     defaultVal: <><code>exec</code></>,
   },
   {
@@ -265,7 +303,7 @@ const inputs: InputDef[] = [
   {
     name: "cli-name",
     desc: <>CLI executable name or path. Required for exec mode.</>,
-    defaultVal: <>Required</>,
+    defaultVal: <>Required (exec)</>,
   },
   {
     name: "dotnet-tool",
@@ -280,12 +318,42 @@ const inputs: InputDef[] = [
   {
     name: "opencli-json",
     desc: <>Path to your <code>opencli.json</code> file. Required for file mode.</>,
-    defaultVal: <>Required</>,
+    defaultVal: <>Required (file)</>,
   },
   {
     name: "xmldoc",
     desc: <>Path to <code>xmldoc.xml</code> for enrichment. File mode only.</>,
     defaultVal: <>Optional</>,
+  },
+  {
+    name: "project",
+    desc: <>Path to a <code>.csproj</code> / <code>.fsproj</code> / <code>.vbproj</code> (or directory containing one). Required for dotnet mode.</>,
+    defaultVal: <>Required (dotnet)</>,
+  },
+  {
+    name: "configuration",
+    desc: <>Build configuration for <code>dotnet run</code> (e.g. <code>Release</code>).</>,
+    defaultVal: <>Optional (dotnet)</>,
+  },
+  {
+    name: "framework",
+    desc: <>Target framework for <code>dotnet run</code> (e.g. <code>net10.0</code>).</>,
+    defaultVal: <>Optional (dotnet)</>,
+  },
+  {
+    name: "launch-profile",
+    desc: <>Launch profile for <code>dotnet run</code>.</>,
+    defaultVal: <>Optional (dotnet)</>,
+  },
+  {
+    name: "no-build",
+    desc: <>Pass <code>--no-build</code> to <code>dotnet run</code>. Use after a separate build step.</>,
+    defaultVal: <><code>false</code></>,
+  },
+  {
+    name: "no-restore",
+    desc: <>Pass <code>--no-restore</code> to <code>dotnet run</code>.</>,
+    defaultVal: <><code>false</code></>,
   },
   {
     name: "output-dir",
@@ -294,17 +362,17 @@ const inputs: InputDef[] = [
   },
   {
     name: "opencli-args",
-    desc: <>Override the OpenCLI export arguments (exec mode).</>,
+    desc: <>Override the OpenCLI export arguments (exec / dotnet mode).</>,
     defaultVal: <><code>cli opencli</code></>,
   },
   {
     name: "xmldoc-args",
-    desc: <>Override the xmldoc export arguments (exec mode).</>,
+    desc: <>Override the xmldoc export arguments (exec / dotnet mode).</>,
     defaultVal: <><code>cli xmldoc</code></>,
   },
   {
     name: "timeout",
-    desc: <>Timeout in seconds for each CLI export command (exec mode).</>,
+    desc: <>Timeout in seconds for each CLI export command (exec / dotnet mode).</>,
     defaultVal: <>Optional</>,
   },
   {
@@ -318,8 +386,23 @@ const inputs: InputDef[] = [
     defaultVal: <>Latest</>,
   },
   {
+    name: "inspectra-cli-package",
+    desc: <>NuGet package id auto-added to the target project in dotnet mode (provides <code>cli opencli</code> / <code>cli xmldoc</code>).</>,
+    defaultVal: <><code>InSpectra.Cli</code></>,
+  },
+  {
+    name: "inspectra-cli-version",
+    desc: <>Version constraint for the auto-added <code>InSpectra.Cli</code> package.</>,
+    defaultVal: <>Latest</>,
+  },
+  {
+    name: "skip-inspectra-cli",
+    desc: <>Skip the automatic <code>InSpectra.Cli</code> <code>PackageReference</code> when the project already manages it.</>,
+    defaultVal: <><code>false</code></>,
+  },
+  {
     name: "dotnet-version",
-    desc: <>.NET SDK version to install.</>,
+    desc: <>.NET SDK version(s) for InSpectra. In dotnet mode the action also auto-detects the project's <code>TargetFramework</code>; already-installed versions are skipped.</>,
     defaultVal: <><code>10.0.x</code></>,
   },
   {
@@ -341,7 +424,7 @@ const pipelineSteps = [
 /* ── Main component ── */
 
 export function CIGuidePage({ section }: { section?: string }) {
-  const [activeUsageTab, setActiveUsageTab] = useState<UsageTab>("dotnet-tool");
+  const [activeUsageTab, setActiveUsageTab] = useState<UsageTab>("from-source");
 
   useEffect(() => {
     if (!section) return;
@@ -407,6 +490,7 @@ export function CIGuidePage({ section }: { section?: string }) {
   }, []);
 
   const usageTabs: { id: UsageTab; label: string }[] = [
+    { id: "from-source", label: "From Source" },
     { id: "dotnet-tool", label: ".NET Tool" },
     { id: "from-file", label: "From File" },
     { id: "markdown", label: "Markdown" },
@@ -507,7 +591,13 @@ export function CIGuidePage({ section }: { section?: string }) {
             <div className="ci-guide-prose">
               <p>
                 The action installs <strong>.NET</strong> and <strong>InSpectra.Gen</strong> automatically.
-                It does <em>not</em> install your CLI &mdash; add that step before the action.
+                In <code>dotnet</code> mode it also reads your project's{" "}
+                <code>TargetFramework</code> and installs the matching SDK
+                (skipping versions already on the runner), and adds the{" "}
+                <code>InSpectra.Cli</code> <code>PackageReference</code> for you so{" "}
+                <code>cli opencli</code> / <code>cli xmldoc</code> work without touching your{" "}
+                <code>.csproj</code>. In <code>exec</code> mode you still install your CLI
+                yourself (or use <code>dotnet-tool</code>).
               </p>
             </div>
           </div>
@@ -530,8 +620,9 @@ export function CIGuidePage({ section }: { section?: string }) {
               <div className="ci-guide-callout-body">
                 <div className="ci-guide-callout-title">Automatic XML enrichment</div>
                 <p>
-                  In exec mode, the action automatically probes for <code>cli xmldoc</code> support and uses it
-                  when available. No flag needed &mdash; richer descriptions are included transparently.
+                  In <code>exec</code> and <code>dotnet</code> modes, the action automatically probes for{" "}
+                  <code>cli xmldoc</code> support and uses it when available. No flag needed &mdash;
+                  richer descriptions are included transparently.
                 </p>
               </div>
             </div>
@@ -655,9 +746,10 @@ export function CIGuidePage({ section }: { section?: string }) {
 
             <div className="ci-guide-prose">
               <p>
-                <strong>For exec mode</strong>, your CLI needs to implement the <code>cli opencli</code> command
-                which outputs the OpenCLI JSON spec to stdout. Optionally implement <code>cli xmldoc</code>{" "}
-                for richer descriptions. CLIs built with{" "}
+                <strong>For dotnet mode</strong> (recommended when the CLI source lives in the
+                same repo), the action checks out your project, auto-adds the{" "}
+                <code>InSpectra.Cli</code> <code>PackageReference</code> if it isn't already there,
+                and runs <code>dotnet run --project &lt;PROJECT&gt; -- cli opencli</code>. CLIs built with{" "}
                 <a
                   href="https://github.com/spectreconsole/spectre.console"
                   target="_blank"
@@ -666,7 +758,13 @@ export function CIGuidePage({ section }: { section?: string }) {
                 >
                   Spectre.Console.Cli
                 </a>{" "}
-                get this for free.
+                work out of the box because <code>InSpectra.Cli</code> wires up the export commands for you.
+              </p>
+              <p>
+                <strong>For exec mode</strong>, your CLI needs to implement the <code>cli opencli</code> command
+                which outputs the OpenCLI JSON spec to stdout. Optionally implement <code>cli xmldoc</code>{" "}
+                for richer descriptions. Adding the <code>InSpectra.Cli</code> NuGet package to your project
+                provides both commands.
               </p>
               <p>
                 <strong>For file mode</strong>, export your <code>opencli.json</code> once and check it into your

@@ -11,6 +11,7 @@ const snippets = {
   fileMd: `inspectra render file markdown ${lc}\n  mycli.json --out docs.md`,
   execHtml: `inspectra render exec html ${lc}\n  jf --with-xmldoc ${lc}\n  --out-dir ./jellyfin-docs`,
   execMd: `inspectra render exec markdown ${lc}\n  mytool --opencli-arg "cli opencli" ${lc}\n  --out docs.md`,
+  dotnetHtml: `inspectra render dotnet html ${lc}\n  src/MyCli --configuration Release ${lc}\n  --no-build --with-xmldoc --out-dir ./docs`,
 };
 
 export function AboutPage() {
@@ -124,10 +125,11 @@ export function AboutPage() {
               <div className="qs-step-line" />
             </div>
             <div className="qs-step-body">
-              <h3>Or render from a live CLI</h3>
+              <h3>Or render from a live CLI &mdash; or from a .NET project on disk</h3>
               <p>
-                Use <code>exec</code> mode to invoke a CLI directly and capture
-                its OpenCLI output.
+                Use <code>exec</code> mode to invoke a pre-built CLI directly, or{" "}
+                <code>dotnet</code> mode to point at a <code>.csproj</code> and let
+                InSpectra run <code>dotnet run -- cli opencli</code> for you.
               </p>
 
               <div className="qs-cmd">
@@ -137,6 +139,15 @@ export function AboutPage() {
 <span className="c">inspectra</span> <span className="a">render exec html</span> <span className="lc">{lc}</span>{"\n"}
 {"  "}jf <span className="f">--with-xmldoc</span> <span className="lc">{lc}</span>{"\n"}
 {"  "}<span className="f">--out-dir</span> ./jellyfin-docs</pre>
+              </div>
+
+              <div className="qs-cmd">
+                <CmdCopy id="dotnetHtml" text={snippets.dotnetHtml} />
+                <pre className="qs-code">
+<span className="comment"># Render from a .NET project source</span>{"\n"}
+<span className="c">inspectra</span> <span className="a">render dotnet html</span> <span className="lc">{lc}</span>{"\n"}
+{"  "}src/MyCli <span className="f">--configuration</span> Release <span className="lc">{lc}</span>{"\n"}
+{"  "}<span className="f">--no-build</span> <span className="f">--with-xmldoc</span> <span className="f">--out-dir</span> ./docs</pre>
               </div>
 
               <div className="qs-cmd">

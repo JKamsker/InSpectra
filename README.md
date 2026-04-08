@@ -54,10 +54,13 @@ This installs the `inspectra` command globally.
 ```yaml
 - uses: JKamsker/InSpectra@v1
   with:
-    cli-name: mycli
+    mode: dotnet
+    project: src/MyCli       # path to your .csproj
+    format: markdown         # or html
 ```
 
-See [GitHub Action](#github-action) for full documentation.
+See [GitHub Action](#github-action) for full documentation, including the
+auto-installed `InSpectra.Cli` package and SDK detection.
 
 ## Quick Start
 
@@ -88,6 +91,27 @@ inspectra render file markdown opencli.json \
   --out docs.md
 ```
 
+### Render from a .NET project on disk (dotnet mode)
+
+```bash
+# Point at a .csproj or directory containing one — InSpectra runs
+# `dotnet run --project <PROJECT> -- cli opencli` for you.
+inspectra render dotnet markdown src/MyCli \
+  --configuration Release \
+  --no-build \
+  --layout tree \
+  --out-dir ./docs
+
+inspectra render dotnet html src/MyCli \
+  --configuration Release \
+  --no-build \
+  --with-xmldoc \
+  --out-dir ./docs
+```
+
+This is the most convenient option when you're iterating on the CLI source —
+no manual export, no published tool, no pre-built binary.
+
 ### Render from a .NET tool
 
 ```bash
@@ -101,6 +125,11 @@ Open `./jellyfin-docs/index.html` in a browser. The bundle is relocatable becaus
 ## GitHub Action
 
 The `JKamsker/InSpectra@v1` action generates interactive CLI documentation in your CI pipeline.
+
+> Looking for a deeper guide? See **[`docs/CI/`](docs/CI/README.md)** for the
+> full integration manual: [usage patterns](docs/CI/usage.md),
+> [inputs reference](docs/CI/inputs.md), and end-to-end
+> [recipes](docs/CI/recipes.md) (Pages, docs PR, drift check, release asset).
 
 ### Basic usage (exec mode)
 
@@ -124,6 +153,35 @@ steps:
       cli-name: mycli
       dotnet-tool: MyCompany.MyCli    # installs via dotnet tool install -g
 ```
+
+### Generating docs from a .NET project on disk (dotnet mode)
+
+When you want docs generated from the **current source** (no published NuGet
+tool, no pre-built binary), point the action at a `.csproj`. The action then:
+
+1. Detects the project's `<TargetFramework>` and installs the matching .NET SDK
+   (skipping versions already on the runner).
+2. Adds a `<PackageReference Include="InSpectra.Cli" />` for you so you don't
+   have to maintain the dependency by hand. Skipped if already referenced.
+3. Runs `dotnet run --project <csproj> -- cli opencli` to extract the spec
+   and renders it.
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+
+  - uses: JKamsker/InSpectra@v1
+    with:
+      mode: dotnet
+      project: src/MyCli              # path to .csproj or directory
+      configuration: Release
+      no-build: 'false'               # set true if you build in a previous step
+      format: markdown                # html / markdown / markdown-monolith
+      output-dir: docs/cli
+```
+
+`actions/setup-dotnet` and `dotnet tool install` are no longer needed in the
+caller workflow — the action handles both.
 
 ### File mode (from saved spec)
 
@@ -157,22 +215,31 @@ steps:
 
 | Input | Default | Description |
 | --- | --- | --- |
-| `mode` | `exec` | `exec` (invoke a live CLI) or `file` (from saved opencli.json) |
+| `mode` | `exec` | `exec` (invoke a live CLI), `file` (from saved opencli.json), or `dotnet` (run a .NET project from source) |
 | `format` | `html` | `html`, `markdown` (tree), or `markdown-monolith` (single file) |
 | `cli-name` | | CLI executable name or path (exec mode) |
 | `dotnet-tool` | | NuGet package to `dotnet tool install -g` (exec mode) |
 | `dotnet-tool-version` | | Version constraint for the dotnet tool |
 | `opencli-json` | | Path to opencli.json (file mode) |
 | `xmldoc` | | Path to xmldoc.xml (file mode) |
+| `project` | | Path to a `.csproj` / `.fsproj` / `.vbproj` (or directory containing one) for dotnet mode |
+| `configuration` | | Build configuration for `dotnet run` (e.g. `Release`) |
+| `framework` | | Target framework for `dotnet run` (e.g. `net10.0`) |
+| `launch-profile` | | Launch profile for `dotnet run` |
+| `no-build` | `false` | Pass `--no-build` to `dotnet run` (use after a separate build step) |
+| `no-restore` | `false` | Pass `--no-restore` to `dotnet run` |
 | `output-dir` | `inspectra-output` | Directory where rendered output is written |
 | `label` | | Custom label shown in the viewer header (e.g. `v1.2.3`) |
 | `extra-args` | | Additional flags forwarded to the `inspectra` CLI |
 | `inspectra-version` | latest | InSpectra.Gen NuGet tool version |
-| `dotnet-version` | `10.0.x` | .NET SDK version to install |
+| `inspectra-cli-package` | `InSpectra.Cli` | NuGet package id auto-added to the target project in dotnet mode |
+| `inspectra-cli-version` | latest | Version pin for the auto-added InSpectra.Cli package |
+| `skip-inspectra-cli` | `false` | Skip the automatic InSpectra.Cli PackageReference (e.g. when the project already manages it) |
+| `dotnet-version` | `10.0.x` | .NET SDK version(s) for InSpectra. In dotnet mode the action also auto-detects the project's `TargetFramework` and installs that SDK; already-installed versions are skipped |
 | `dotnet-quality` | stable | .NET SDK quality channel (`preview` for pre-release) |
 | `opencli-args` | | Override the OpenCLI export arguments |
 | `xmldoc-args` | | Override the xmldoc export arguments |
-| `timeout` | | Timeout in seconds for each export command (exec mode) |
+| `timeout` | | Timeout in seconds for each export command (exec / dotnet mode) |
 
 ### Action output
 
@@ -200,8 +267,9 @@ jobs:
 
       - uses: JKamsker/InSpectra@v1
         with:
-          cli-name: mycli
-          dotnet-tool: MyCompany.MyCli
+          mode: dotnet
+          project: src/MyCli
+          configuration: Release
           output-dir: _site
 
       - uses: peaceiris/actions-gh-pages@v4
@@ -209,6 +277,46 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
 ```
+
+### End-to-end example: open a PR with regenerated Markdown
+
+The pattern for "always-fresh CLI reference checked into the repo" is the
+combination of `mode: dotnet` and [`peter-evans/create-pull-request`]:
+
+```yaml
+name: Update CLI Docs
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/MyCli/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: JKamsker/InSpectra@v1
+        with:
+          mode: dotnet
+          project: src/MyCli
+          format: markdown
+          output-dir: docs/cli
+
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/update-cli-docs
+          title: 'docs: regenerate CLI reference'
+          add-paths: docs/cli
+```
+
+[`peter-evans/create-pull-request`]: https://github.com/peter-evans/create-pull-request
 
 ## Reusable Workflow
 
@@ -233,7 +341,7 @@ The workflow accepts the same inputs as the action, plus:
 ## CLI Reference
 
 ```text
-inspectra render [file|exec] [markdown|html] [OPTIONS]
+inspectra render [file|exec|dotnet] [markdown|html] [OPTIONS]
 ```
 
 ### Markdown
@@ -241,6 +349,7 @@ inspectra render [file|exec] [markdown|html] [OPTIONS]
 ```bash
 render file markdown <OPENCLI_JSON> [OPTIONS]
 render exec markdown <SOURCE> [OPTIONS]
+render dotnet markdown <PROJECT> [OPTIONS]
 ```
 
 Markdown supports:
@@ -254,7 +363,30 @@ Markdown supports:
 ```bash
 render file html <OPENCLI_JSON> --out-dir <DIR> [OPTIONS]
 render exec html <SOURCE> --out-dir <DIR> [OPTIONS]
+render dotnet html <PROJECT> --out-dir <DIR> [OPTIONS]
 ```
+
+### Dotnet mode
+
+```bash
+render dotnet markdown <PROJECT> [OPTIONS]
+render dotnet html <PROJECT> --out-dir <DIR> [OPTIONS]
+```
+
+Resolves `<PROJECT>` to a `.csproj` / `.fsproj` / `.vbproj` (a directory with
+exactly one is also accepted) and runs `dotnet run --project <PROJECT> [build flags] -- cli opencli`
+under the hood. Reuses every option from `render exec` plus the dotnet-specific
+build flags:
+
+| Option | Description |
+| --- | --- |
+| `-c`, `--configuration <CONFIG>` | Build configuration (e.g. `Release`) |
+| `-f`, `--framework <TFM>` | Target framework moniker (e.g. `net10.0`) |
+| `--launch-profile <NAME>` | Launch profile to use |
+| `--no-build` | Pass `--no-build` to `dotnet run` (after a separate `dotnet build`) |
+| `--no-restore` | Pass `--no-restore` to `dotnet run` |
+| `--with-xmldoc` | Also invoke `cli xmldoc` for XML enrichment |
+| `--timeout <SECONDS>` | Per-invocation timeout (default `120`) |
 
 HTML uses bundle-directory output only:
 

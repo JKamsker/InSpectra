@@ -159,12 +159,13 @@ jobs:
           site="_site"
           mkdir -p "$site"
 
-          # Website: React app IS the landing page
+          # Website: React app IS the landing page (CIGuidePage replaces the
+          # old hand-written docs/integrate.html, the docs/CI/ markdown set
+          # is the offline-friendly equivalent).
           cp -r src/InSpectra.UI/dist/* "$site/"
           # Remove static bundle template (only used by .NET renderer)
           rm -f "$site/static.html"
 
-          cp docs/integrate.html "$site/integrate.html"
           echo "inspectra.kamsker.at" > "$site/CNAME"
           touch "$site/.nojekyll"
 
@@ -225,12 +226,13 @@ jobs:
           site="_site"
           mkdir -p "$site"
 
-          # Website: React app IS the landing page
+          # Website: React app IS the landing page (CIGuidePage replaces the
+          # old hand-written docs/integrate.html, the docs/CI/ markdown set
+          # is the offline-friendly equivalent).
           cp -r src/InSpectra.UI/dist/* "$site/"
           # Remove static bundle template (only used by .NET renderer)
           rm -f "$site/static.html"
 
-          cp docs/integrate.html "$site/integrate.html"
           echo "inspectra.kamsker.at" > "$site/CNAME"
           touch "$site/.nojekyll"
 
