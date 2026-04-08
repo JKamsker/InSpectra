@@ -64,9 +64,19 @@ export function useViewerInteraction() {
     localStorage.setItem("inspectra-composer-width", String(width));
   }
 
-  function handleMobileCommandSelect(path: string, onNavigate: (path: string) => void) {
+  function handleMobileCommandSelect(
+    path: string,
+    onNavigate: (path: string) => void,
+    hasChildren: boolean,
+  ) {
     onNavigate(path);
-    setMobileSidebarOpen(false);
+    // Keep the mobile sidebar open when navigating to a command group so the
+    // user can keep drilling down. Only collapse it when a leaf command is
+    // chosen — other dismissals (close button, overlay tap, swipe) handle the
+    // remaining cases.
+    if (!hasChildren) {
+      setMobileSidebarOpen(false);
+    }
   }
 
   return {

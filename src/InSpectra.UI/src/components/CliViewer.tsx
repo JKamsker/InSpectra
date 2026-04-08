@@ -294,7 +294,7 @@ export function CliViewer({
               commands={document.commands}
               searchTerm={deferredSearch}
               selectedPath={activeCommand?.path}
-              onSelect={(path) => handleMobileCommandSelect(path, onNavigate)}
+              onSelect={(path, hasChildren) => handleMobileCommandSelect(path, onNavigate, hasChildren)}
             />
           </nav>
         </aside>

@@ -6,7 +6,7 @@ interface CommandTreeProps {
   commands: NormalizedCommand[];
   searchTerm: string;
   selectedPath?: string;
-  onSelect: (path: string) => void;
+  onSelect: (path: string, hasChildren: boolean) => void;
 }
 
 const ExpansionContext = createContext<{
@@ -122,7 +122,7 @@ function TreeNode({
   command: NormalizedCommand;
   searchTerm: string;
   selectedPath?: string;
-  onSelect: (path: string) => void;
+  onSelect: (path: string, hasChildren: boolean) => void;
 }) {
   const { manualExpanded, autoExpanded, toggleManual, toggleAuto } = useContext(ExpansionContext);
   const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -147,7 +147,7 @@ function TreeNode({
           if (isSelected && hasChildren) {
             toggleAuto(command.path);
           } else {
-            onSelect(command.path);
+            onSelect(command.path, hasChildren);
           }
         }}
       >
