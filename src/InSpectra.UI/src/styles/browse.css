@@ -697,3 +697,14 @@
     min-width: 0;
   }
 }
+
+/* Tooltips are hover-only (useless on touch) and their absolute-positioned
+   pseudo-elements contribute to scrollWidth, causing horizontal page overflow
+   on narrow viewports. Drop them on mobile — the title attribute still gives
+   native long-press tooltips. */
+@media (hover: none), (max-width: 768px) {
+  .browse-card-stat[data-tooltip]::before,
+  .browse-card-stat[data-tooltip]::after {
+    content: none;
+  }
+}
