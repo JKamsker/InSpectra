@@ -154,19 +154,50 @@ public class MarkdownRenderServiceTests
     }
 
     [Fact]
-    public async Task Hybrid_depth_two_top_level_group_uses_stub_for_file_child()
+    public async Task Hybrid_depth_two_top_level_group_references_file_children_without_stubs()
     {
         using var temp = new TempDirectory();
 
         var result = await RenderHybridAsync(temp.Path, splitDepth: 2);
 
         var group = ReadFile(result, "accounts/index.md");
-        // `accounts basic-auth` is a group at depth 2 → has its own file.
+        // `accounts basic-auth` is a group at depth 2 → has its own file; reference lives only in
+        // the Subcommands list, no duplicate stub section or "See …" body.
         Assert.Contains("[basic-auth](basic-auth/index.md)", group);
-        // The body section for basic-auth should be a stub, not an inlined body.
-        Assert.Contains("See [`accounts basic-auth`](basic-auth/index.md)", group);
-        // Leaf `accounts add` still inlined with anchor.
+        Assert.DoesNotContain("See [`accounts basic-auth`](basic-auth/index.md)", group);
+        Assert.DoesNotContain("## `accounts basic-auth`", group);
+        // Leaf `accounts add` is still inlined with its anchor.
         Assert.Contains("<a id=\"command-accounts-add\"></a>", group);
+    }
+
+    [Fact]
+    public async Task Hybrid_readme_drops_commands_section_when_everything_is_split()
+    {
+        using var temp = new TempDirectory();
+
+        var result = await RenderHybridAsync(temp.Path, splitDepth: 2);
+
+        var readme = ReadFile(result, "README.md");
+        // At depth=2 every top-level command in the fixture is a split group (or an inlined leaf).
+        // With no top-level leaves to inline we want a clean README without a trailing `## Commands`.
+        // The jdr fixture has `doctor` (top-level leaf) which keeps `## Commands`, so this assertion
+        // guards the shape we care about: no per-group stub sections.
+        Assert.DoesNotContain("See [`accounts`](accounts/index.md)", readme);
+        Assert.DoesNotContain("### `accounts`", readme);
+    }
+
+    [Fact]
+    public async Task Hybrid_subcommand_list_is_nested_for_inlined_descendants()
+    {
+        using var temp = new TempDirectory();
+
+        var result = await RenderHybridAsync(temp.Path, splitDepth: 1);
+
+        var group = ReadFile(result, "accounts/index.md");
+        // `accounts basic-auth` has children; at depth=1 they're inlined, so the subcommand list
+        // should nest one level deeper with a two-space indent.
+        Assert.Contains("- [basic-auth](#command-accounts-basic-auth)", group);
+        Assert.Contains("  - [add](#command-accounts-basic-auth-add)", group);
     }
 
     [Fact]

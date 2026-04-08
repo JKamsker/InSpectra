@@ -46,6 +46,22 @@ public sealed class CommandPathResolver
         return Path.GetRelativePath(baseDirectory, targetPath).Replace('\\', '/');
     }
 
+    /// <summary>
+    /// Builds the relative group-file path for a prefix of <paramref name="pathSegments"/>, sanitizing
+    /// each segment the same way <see cref="GetCommandRelativePath"/> does for group commands. Used by
+    /// the hybrid renderer to compute breadcrumb links to ancestor group files.
+    /// </summary>
+    public string BuildGroupFilePath(string[] pathSegments, int segmentCount, string extension)
+    {
+        if (segmentCount <= 0 || segmentCount > pathSegments.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(segmentCount));
+        }
+
+        var sanitized = pathSegments.Take(segmentCount).Select(SanitizePathSegment).ToArray();
+        return Path.Combine(sanitized).Replace('\\', '/') + $"/index.{extension}";
+    }
+
     public string? GetParentRelativePath(NormalizedCommand command, string extension)
     {
         var parts = command.Path.Split(' ', StringSplitOptions.RemoveEmptyEntries);

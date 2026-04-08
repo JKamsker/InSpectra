@@ -158,26 +158,47 @@ public sealed class MarkdownSectionRenderer(
 
         builder.AppendLine($"{new string('#', headingLevel)} Subcommands");
         builder.AppendLine();
-        foreach (var child in command.Commands)
-        {
-            string line;
-            if (hybridContext is not null)
-            {
-                line = $"- [{child.Command.Name}]({hybridContext.ResolveTarget(child)}){formatter.FormatDescriptionSuffix(child.Command.Description)}";
-            }
-            else if (currentPagePath is null)
-            {
-                line = $"- `{child.Command.Name}`{formatter.FormatDescriptionSuffix(child.Command.Description)}";
-            }
-            else
-            {
-                line = $"- [{child.Command.Name}]({pathResolver.CreateRelativeLink(currentPagePath, pathResolver.GetCommandRelativePath(child, "md"))}){formatter.FormatDescriptionSuffix(child.Command.Description)}";
-            }
 
-            builder.AppendLine(line);
+        if (hybridContext is not null)
+        {
+            // In hybrid mode we render a nested outline so the Subcommands section doubles as a
+            // mini-TOC for every inlined descendant on this page. File-split descendants collapse
+            // into a single entry with the file link — their own page handles the deeper structure.
+            foreach (var child in command.Commands)
+            {
+                AppendHybridSubcommandTree(child, builder, indent: 0, hybridContext);
+            }
+        }
+        else
+        {
+            foreach (var child in command.Commands)
+            {
+                var line = currentPagePath is null
+                    ? $"- `{child.Command.Name}`{formatter.FormatDescriptionSuffix(child.Command.Description)}"
+                    : $"- [{child.Command.Name}]({pathResolver.CreateRelativeLink(currentPagePath, pathResolver.GetCommandRelativePath(child, "md"))}){formatter.FormatDescriptionSuffix(child.Command.Description)}";
+                builder.AppendLine(line);
+            }
         }
 
         builder.AppendLine();
+    }
+
+    private void AppendHybridSubcommandTree(NormalizedCommand command, StringBuilder builder, int indent, HybridLinkContext hybridContext)
+    {
+        var prefix = new string(' ', indent * 2);
+        var target = hybridContext.ResolveTarget(command);
+        builder.AppendLine($"{prefix}- [{command.Command.Name}]({target}){formatter.FormatDescriptionSuffix(command.Command.Description)}");
+
+        // Stop recursing at file-split children — their own page owns the deeper structure.
+        if (hybridContext.HasOwnFile(command))
+        {
+            return;
+        }
+
+        foreach (var child in command.Commands)
+        {
+            AppendHybridSubcommandTree(child, builder, indent + 1, hybridContext);
+        }
     }
 
     private void AppendArguments(NormalizedCommand command, StringBuilder builder, int headingLevel)

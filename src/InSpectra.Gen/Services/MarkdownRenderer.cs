@@ -173,14 +173,8 @@ public sealed class MarkdownRenderer(
         {
             if (hybridContext is not null && hybridContext.HasOwnFile(command))
             {
-                // Command lives in its own file — emit a stub reference instead of inlining the body.
-                var target = hybridContext.ResolveTarget(command);
-                builder.AppendLine($"{new string('#', headingLevel)} `{command.Path}`");
-                builder.AppendLine();
-                var suffix = formatter.FormatDescriptionSuffix(command.Command.Description);
-                var suffixText = string.IsNullOrEmpty(suffix) ? string.Empty : suffix;
-                builder.AppendLine($"See [`{command.Path}`]({target}){suffixText}");
-                builder.AppendLine();
+                // File-split children are reachable through the Subcommands list. Emitting a stub
+                // section here would duplicate that link with no extra information, so we skip it.
                 continue;
             }
 
@@ -329,12 +323,13 @@ public sealed class MarkdownRenderer(
             tableRenderer.AppendOptionTable(document.RootOptions.Select(option => new ResolvedOption { Option = option, IsInherited = false }), builder);
         }
 
-        if (document.Commands.Count > 0)
+        var inlinedTopLevel = document.Commands.Where(c => !context.HasOwnFile(c)).ToList();
+        if (inlinedTopLevel.Count > 0)
         {
             builder.AppendLine();
             builder.AppendLine("## Commands");
             builder.AppendLine();
-            AppendCommandSections(document.Commands, builder, includeMetadata, 3, context);
+            AppendCommandSections(inlinedTopLevel, builder, includeMetadata, 3, context);
         }
 
         if (includeMetadata)
@@ -374,17 +369,9 @@ public sealed class MarkdownRenderer(
         var builder = new StringBuilder();
         builder.AppendLine($"# `{command.Path}`");
         builder.AppendLine();
-
-        var rootLink = pathResolver.CreateRelativeLink(context.CurrentPagePath, "README.md");
-        builder.AppendLine($"- Root: [README]({rootLink})");
-
-        var parentPath = pathResolver.GetParentRelativePath(command, "md");
-        if (parentPath is not null && !string.Equals(parentPath, "index.md", StringComparison.Ordinal))
-        {
-            builder.AppendLine($"- Parent: [{pathResolver.GetParentDisplayName(command)}]({pathResolver.CreateRelativeLink(context.CurrentPagePath, parentPath)})");
-        }
-
+        builder.AppendLine(BuildHybridBreadcrumb(command, context));
         builder.AppendLine();
+
         sectionRenderer.AppendCommandBody(command, builder, includeMetadata, 2, currentPagePath: null, context);
 
         if (command.Commands.Count > 0)
@@ -393,5 +380,24 @@ public sealed class MarkdownRenderer(
         }
 
         return builder.ToString().TrimEnd() + Environment.NewLine;
+    }
+
+    private string BuildHybridBreadcrumb(NormalizedCommand command, HybridLinkContext context)
+    {
+        var parts = command.Path.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var segments = new List<string>
+        {
+            $"[README]({pathResolver.CreateRelativeLink(context.CurrentPagePath, "README.md")})",
+        };
+
+        for (var i = 1; i < parts.Length; i++)
+        {
+            var ancestorFile = pathResolver.BuildGroupFilePath(parts, i, "md");
+            var link = pathResolver.CreateRelativeLink(context.CurrentPagePath, ancestorFile);
+            segments.Add($"[{parts[i - 1]}]({link})");
+        }
+
+        segments.Add($"`{parts[^1]}`");
+        return string.Join(" › ", segments);
     }
 }
