@@ -197,9 +197,9 @@ public abstract class HtmlCommandSettingsBase : CommonCommandSettings
 public abstract class MarkdownCommandSettingsBase : CommonCommandSettings
 {
     /// <summary>
-    /// Markdown layout mode. Supported values are <c>single</c> and <c>tree</c>.
+    /// Markdown layout mode. Supported values are <c>single</c>, <c>tree</c>, and <c>hybrid</c>.
     /// </summary>
-    [Description("Markdown layout mode. Supported values are single and tree.")]
+    [Description("Markdown layout mode. Supported values are single, tree, and hybrid.")]
     [CommandOption("--layout <LAYOUT>")]
     public string? Layout { get; init; }
 
@@ -211,11 +211,19 @@ public abstract class MarkdownCommandSettingsBase : CommonCommandSettings
     public string? OutputFile { get; init; }
 
     /// <summary>
-    /// Output directory to write when using the <c>tree</c> layout.
+    /// Output directory to write when using the <c>tree</c> or <c>hybrid</c> layout.
     /// </summary>
-    [Description("Output directory to write when using the tree layout.")]
+    [Description("Output directory to write when using the tree or hybrid layout.")]
     [CommandOption("--out-dir <DIR>")]
     public string? OutputDirectory { get; init; }
+
+    /// <summary>
+    /// Depth at which the <c>hybrid</c> layout emits one Markdown file per command group.
+    /// Defaults to 1 (one file per top-level group).
+    /// </summary>
+    [Description("Depth at which hybrid layout emits one file per command group (defaults to 1).")]
+    [CommandOption("--split-depth <DEPTH>")]
+    public int? SplitDepth { get; init; }
 }
 
 /// <summary>

@@ -8,12 +8,13 @@ public static class RenderRequestFactory
         string? outputFile,
         string? outputDirectory,
         int? timeoutSeconds,
-        bool hasTimeoutSupport)
+        bool hasTimeoutSupport,
+        int? splitDepth = null)
     {
         var outputMode = ResolveOutputMode(settings);
         var layout = ResolveMarkdownLayout(layoutValue);
 
-        ValidateMarkdownLayoutOutputCombination(layout, outputMode, outputFile, outputDirectory);
+        ValidateMarkdownLayoutOutputCombination(layout, outputMode, outputFile, outputDirectory, splitDepth);
 
         if (hasTimeoutSupport && timeoutSeconds is <= 0)
         {
@@ -34,6 +35,16 @@ public static class RenderRequestFactory
             CompressLevel: 0,
             NormalizePath(outputFile),
             NormalizePath(outputDirectory));
+    }
+
+    public static MarkdownRenderOptions? CreateMarkdownRenderOptions(RenderLayout layout, int? splitDepth)
+    {
+        if (layout != RenderLayout.Hybrid)
+        {
+            return null;
+        }
+
+        return new MarkdownRenderOptions(splitDepth ?? 1);
     }
 
     public static RenderExecutionOptions CreateHtmlOptions(
@@ -254,7 +265,8 @@ public static class RenderRequestFactory
         {
             null or "" or "single" => RenderLayout.Single,
             "tree" => RenderLayout.Tree,
-            _ => throw new CliUsageException("`--layout` must be `single` or `tree`."),
+            "hybrid" => RenderLayout.Hybrid,
+            _ => throw new CliUsageException("`--layout` must be `single`, `tree`, or `hybrid`."),
         };
     }
 
@@ -262,7 +274,8 @@ public static class RenderRequestFactory
         RenderLayout layout,
         ResolvedOutputMode outputMode,
         string? outputFile,
-        string? outputDirectory)
+        string? outputDirectory,
+        int? splitDepth)
     {
         if (!string.IsNullOrWhiteSpace(outputFile) && !string.IsNullOrWhiteSpace(outputDirectory))
         {
@@ -271,7 +284,7 @@ public static class RenderRequestFactory
 
         if (layout == RenderLayout.Single && !string.IsNullOrWhiteSpace(outputDirectory))
         {
-            throw new CliUsageException("`--out-dir` is only valid with `--layout tree`.");
+            throw new CliUsageException("`--out-dir` is only valid with `--layout tree` or `--layout hybrid`.");
         }
 
         if (layout == RenderLayout.Tree && !string.IsNullOrWhiteSpace(outputFile))
@@ -279,9 +292,29 @@ public static class RenderRequestFactory
             throw new CliUsageException("`--out` is only valid with `--layout single`.");
         }
 
+        if (layout == RenderLayout.Hybrid && !string.IsNullOrWhiteSpace(outputFile))
+        {
+            throw new CliUsageException("`--out` is only valid with `--layout single`.");
+        }
+
         if (layout == RenderLayout.Tree && string.IsNullOrWhiteSpace(outputDirectory))
         {
             throw new CliUsageException("`--layout tree` requires `--out-dir`.");
+        }
+
+        if (layout == RenderLayout.Hybrid && string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            throw new CliUsageException("`--layout hybrid` requires `--out-dir`.");
+        }
+
+        if (splitDepth is not null && layout != RenderLayout.Hybrid)
+        {
+            throw new CliUsageException("`--split-depth` is only valid with `--layout hybrid`.");
+        }
+
+        if (splitDepth is <= 0)
+        {
+            throw new CliUsageException("`--split-depth` must be at least 1.");
         }
 
         if (outputMode == ResolvedOutputMode.Json && layout == RenderLayout.Single && string.IsNullOrWhiteSpace(outputFile))

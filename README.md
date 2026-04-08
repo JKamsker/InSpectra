@@ -28,7 +28,7 @@
 
 ## Features
 
-- **Markdown output** — GitHub-friendly single file or tree layout (one file per command)
+- **Markdown output** — GitHub-friendly single file, tree layout (one file per command), or hybrid layout (README + one file per command group)
 - **Interactive HTML viewer** — relocatable SPA bundle with sidebar navigation, search, dark/light theme, and deep-link hash routing
 - **Command composer** — interactively build CLI invocations from documented options and arguments
 - **Command palette** — fuzzy search across all commands (Ctrl+K)
@@ -355,8 +355,9 @@ render dotnet markdown <PROJECT> [OPTIONS]
 Markdown supports:
 
 - `--out <FILE>` for single-file output
-- `--out-dir <DIR>` with `--layout tree`
-- `--layout single|tree`
+- `--out-dir <DIR>` with `--layout tree` or `--layout hybrid`
+- `--layout single|tree|hybrid`
+- `--split-depth <N>` with `--layout hybrid` (defaults to `1`) — controls the depth at which per-group Markdown files are emitted. Depth `1` produces `README.md` plus one file per top-level group; depth `2` also emits a file per second-level group; and so on.
 
 ### HTML
 

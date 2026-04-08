@@ -14,7 +14,7 @@ public sealed class MarkdownRenderService(
         CancellationToken cancellationToken)
     {
         var prepared = await documentService.LoadFromFileAsync(request, cancellationToken);
-        return Render(prepared, request.Options);
+        return Render(prepared, request.Options, request.MarkdownOptions);
     }
 
     public async Task<RenderExecutionResult> RenderFromExecAsync(
@@ -22,10 +22,13 @@ public sealed class MarkdownRenderService(
         CancellationToken cancellationToken)
     {
         var prepared = await documentService.LoadFromExecAsync(request, cancellationToken);
-        return Render(prepared, request.Options);
+        return Render(prepared, request.Options, request.MarkdownOptions);
     }
 
-    private RenderExecutionResult Render(AcquiredRenderDocument prepared, RenderExecutionOptions options)
+    private RenderExecutionResult Render(
+        AcquiredRenderDocument prepared,
+        RenderExecutionOptions options,
+        MarkdownRenderOptions? markdownOptions)
     {
         var normalized = normalizer.Normalize(prepared.RenderDocument, options.IncludeHidden);
 
@@ -33,8 +36,54 @@ public sealed class MarkdownRenderService(
         {
             RenderLayout.Single => HandleSingleLayout(prepared, normalized, options),
             RenderLayout.Tree => HandleTreeLayout(prepared, normalized, options),
-            _ => throw new CliUsageException("Markdown rendering supports `single` and `tree` layouts only."),
+            RenderLayout.Hybrid => HandleHybridLayout(prepared, normalized, options, markdownOptions),
+            _ => throw new CliUsageException("Markdown rendering supports `single`, `tree`, and `hybrid` layouts only."),
         };
+    }
+
+    private RenderExecutionResult HandleHybridLayout(
+        AcquiredRenderDocument prepared,
+        NormalizedCliDocument document,
+        RenderExecutionOptions options,
+        MarkdownRenderOptions? markdownOptions)
+    {
+        var outputDirectory = options.OutputDirectory
+            ?? throw new CliUsageException("`--layout hybrid` requires `--out-dir`.");
+        var splitDepth = markdownOptions?.HybridSplitDepth ?? 1;
+        var files = renderer.RenderHybrid(document, options.IncludeMetadata, splitDepth);
+
+        if (options.DryRun)
+        {
+            var planned = files
+                .Select(file => new RenderedFile(file.RelativePath, Path.Combine(outputDirectory, file.RelativePath), null))
+                .ToList();
+
+            return CreateResult(
+                prepared,
+                document,
+                options,
+                planned,
+                $"Dry run: render `{prepared.Source.OpenCliOrigin}` as hybrid Markdown in `{outputDirectory}` ({planned.Count} files planned).");
+        }
+
+        OutputPathHelper.PrepareDirectory(outputDirectory, options.Overwrite);
+
+        var writtenFiles = new List<RenderedFile>();
+        foreach (var file in files)
+        {
+            var fullPath = Path.Combine(outputDirectory, file.RelativePath);
+            var directory = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllText(fullPath, file.Content);
+            writtenFiles.Add(new RenderedFile(file.RelativePath, fullPath, file.Content));
+        }
+
+        var summary = options.Quiet ? null : $"Wrote {writtenFiles.Count} hybrid Markdown files to `{outputDirectory}`.";
+        return CreateResult(prepared, document, options, writtenFiles, summary);
     }
 
     private RenderExecutionResult HandleSingleLayout(

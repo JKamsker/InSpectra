@@ -9,7 +9,8 @@ public sealed class ExecMarkdownCommand(MarkdownRenderService renderService) : A
 {
     public override Task<int> ExecuteAsync(CommandContext context, ExecRenderSettings settings, CancellationToken cancellationToken)
     {
-        var options = RenderRequestFactory.CreateMarkdownOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true);
+        var options = RenderRequestFactory.CreateMarkdownOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true, splitDepth: settings.SplitDepth);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, settings.SplitDepth);
         var workingDirectory = RenderRequestFactory.ResolveWorkingDirectory(settings.WorkingDirectory);
         var request = new ExecRenderRequest(
             settings.Source,
@@ -19,7 +20,8 @@ public sealed class ExecMarkdownCommand(MarkdownRenderService renderService) : A
             settings.XmlDocArguments.Length > 0 ? settings.XmlDocArguments : ["cli", "xmldoc"],
             workingDirectory,
             RenderRequestFactory.ResolveTimeoutSeconds(settings.TimeoutSeconds),
-            options);
+            options,
+            markdownOptions);
 
         return CommandOutputHandler.ExecuteAsync(
             options.OutputMode,

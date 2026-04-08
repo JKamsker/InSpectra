@@ -9,7 +9,8 @@ public sealed class DotnetMarkdownCommand(MarkdownRenderService renderService) :
 {
     public override Task<int> ExecuteAsync(CommandContext context, DotnetMarkdownSettings settings, CancellationToken cancellationToken)
     {
-        var options = RenderRequestFactory.CreateMarkdownOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true);
+        var options = RenderRequestFactory.CreateMarkdownOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true, splitDepth: settings.SplitDepth);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, settings.SplitDepth);
         var workingDirectory = RenderRequestFactory.ResolveWorkingDirectory(settings.WorkingDirectory);
         var resolvedProject = DotnetProjectResolver.Resolve(settings.Project, workingDirectory);
         var sourceArguments = DotnetProjectArgsBuilder.Build(
@@ -27,7 +28,8 @@ public sealed class DotnetMarkdownCommand(MarkdownRenderService renderService) :
             settings.XmlDocArguments.Length > 0 ? settings.XmlDocArguments : ["cli", "xmldoc"],
             workingDirectory,
             RenderRequestFactory.ResolveTimeoutSeconds(settings.TimeoutSeconds, defaultSeconds: 120),
-            options);
+            options,
+            markdownOptions);
 
         return CommandOutputHandler.ExecuteAsync(
             options.OutputMode,

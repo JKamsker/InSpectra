@@ -15,18 +15,15 @@ public enum DocumentFormat
     Html,
 }
 
-public enum MarkdownLayout
-{
-    Single,
-    Tree,
-}
-
 public enum RenderLayout
 {
     Single,
     Tree,
+    Hybrid,
     App,
 }
+
+public sealed record MarkdownRenderOptions(int HybridSplitDepth);
 
 public sealed record RenderExecutionOptions(
     RenderLayout Layout,
@@ -62,7 +59,8 @@ public sealed record HtmlThemeOptions(
 public sealed record FileRenderRequest(
     string OpenCliJsonPath,
     string? XmlDocPath,
-    RenderExecutionOptions Options);
+    RenderExecutionOptions Options,
+    MarkdownRenderOptions? MarkdownOptions = null);
 
 public sealed record ExecRenderRequest(
     string Source,
@@ -72,7 +70,8 @@ public sealed record ExecRenderRequest(
     IReadOnlyList<string> XmlDocArguments,
     string WorkingDirectory,
     int TimeoutSeconds,
-    RenderExecutionOptions Options);
+    RenderExecutionOptions Options,
+    MarkdownRenderOptions? MarkdownOptions = null);
 
 public sealed record RenderSourceInfo(
     string Kind,

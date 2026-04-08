@@ -21,6 +21,82 @@ public class RequestAndOutputContractTests
     }
 
     [Fact]
+    public void Hybrid_layout_requires_out_dir()
+    {
+        var settings = new TestMarkdownSettings();
+
+        var exception = Assert.Throws<CliUsageException>(() =>
+            RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, null, timeoutSeconds: null, hasTimeoutSupport: false));
+
+        Assert.Contains("`--layout hybrid` requires `--out-dir`", exception.Message);
+    }
+
+    [Fact]
+    public void Hybrid_layout_rejects_out_file()
+    {
+        var settings = new TestMarkdownSettings();
+
+        var exception = Assert.Throws<CliUsageException>(() =>
+            RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", "docs.md", null, timeoutSeconds: null, hasTimeoutSupport: false));
+
+        Assert.Contains("`--out` is only valid with `--layout single`", exception.Message);
+    }
+
+    [Fact]
+    public void Split_depth_requires_hybrid_layout()
+    {
+        var settings = new TestMarkdownSettings();
+
+        var exception = Assert.Throws<CliUsageException>(() =>
+            RenderRequestFactory.CreateMarkdownOptions(settings, "single", "docs.md", null, timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 2));
+
+        Assert.Contains("`--split-depth` is only valid with `--layout hybrid`", exception.Message);
+    }
+
+    [Fact]
+    public void Split_depth_must_be_positive()
+    {
+        var settings = new TestMarkdownSettings();
+
+        var exception = Assert.Throws<CliUsageException>(() =>
+            RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 0));
+
+        Assert.Contains("`--split-depth` must be at least 1", exception.Message);
+    }
+
+    [Fact]
+    public void Hybrid_layout_with_valid_split_depth_creates_markdown_render_options()
+    {
+        var settings = new TestMarkdownSettings();
+
+        var options = RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 2);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, 2);
+
+        Assert.Equal(RenderLayout.Hybrid, options.Layout);
+        Assert.NotNull(markdownOptions);
+        Assert.Equal(2, markdownOptions!.HybridSplitDepth);
+    }
+
+    [Fact]
+    public void Hybrid_layout_default_split_depth_is_one()
+    {
+        var settings = new TestMarkdownSettings();
+
+        var options = RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, splitDepth: null);
+
+        Assert.NotNull(markdownOptions);
+        Assert.Equal(1, markdownOptions!.HybridSplitDepth);
+    }
+
+    [Fact]
+    public void Non_hybrid_layout_produces_no_markdown_render_options()
+    {
+        Assert.Null(RenderRequestFactory.CreateMarkdownRenderOptions(RenderLayout.Single, splitDepth: null));
+        Assert.Null(RenderRequestFactory.CreateMarkdownRenderOptions(RenderLayout.Tree, splitDepth: null));
+    }
+
+    [Fact]
     public void Html_output_requires_out_dir()
     {
         var settings = new TestHtmlSettings();

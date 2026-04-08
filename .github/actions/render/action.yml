@@ -20,8 +20,15 @@ inputs:
         html               - interactive SPA bundle
         markdown            - tree layout (one file per command)
         markdown-monolith   - single Markdown file
+        markdown-hybrid     - README.md + one file per command group (see split-depth)
     required: false
     default: 'html'
+
+  split-depth:
+    description: >
+      Depth for markdown-hybrid output (default 1). Depth 1 emits one file per top-level group;
+      depth 2 also emits a file per second-level group; and so on. Ignored for other formats.
+    required: false
 
   # ── exec mode ──────────────────────────────────────────────────────
   cli-name:
@@ -347,6 +354,7 @@ runs:
       env:
         MODE: ${{ inputs.mode }}
         FORMAT: ${{ inputs.format }}
+        SPLIT_DEPTH: ${{ inputs.split-depth }}
         CLI_NAME: ${{ inputs.cli-name }}
         OPENCLI_JSON: ${{ inputs.opencli-json }}
         XMLDOC: ${{ inputs.xmldoc }}
@@ -387,11 +395,22 @@ runs:
             mkdir -p "$OUTPUT_DIR"
             format_args=(--layout single --out "$OUTPUT_DIR/README.md")
             ;;
+          markdown-hybrid)
+            subcmd="markdown"
+            format_args=(--layout hybrid --out-dir "$OUTPUT_DIR")
+            if [ -n "${SPLIT_DEPTH:-}" ]; then
+              format_args+=(--split-depth "$SPLIT_DEPTH")
+            fi
+            ;;
           *)
             echo "::error::Unknown format: $FORMAT"
             exit 1
             ;;
         esac
+
+        if [ -n "${SPLIT_DEPTH:-}" ] && [ "$FORMAT" != "markdown-hybrid" ]; then
+          echo "::warning::split-depth is ignored for format '$FORMAT'; it only applies to markdown-hybrid."
+        fi
 
         # ── build command based on mode ──
         if [ "$MODE" = "exec" ]; then
@@ -520,6 +539,15 @@ runs:
             ;;
           markdown-monolith)
             test -f "$OUTPUT_DIR/README.md"
+            ;;
+          markdown-hybrid)
+            test -f "$OUTPUT_DIR/README.md"
+            # Hybrid always emits the README plus at least one group file.
+            group_count=$(find "$OUTPUT_DIR" -mindepth 2 -name 'index.md' | wc -l)
+            if [ "$group_count" -eq 0 ]; then
+              echo "::error::markdown-hybrid output is missing per-group index.md files"
+              exit 1
+            fi
             ;;
         esac
         echo "InSpectra output verified ($FORMAT) at $OUTPUT_DIR"

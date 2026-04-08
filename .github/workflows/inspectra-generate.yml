@@ -27,7 +27,11 @@ on:
       format:
         type: string
         default: 'html'
-        description: 'html, markdown (tree), or markdown-monolith (single file)'
+        description: 'html, markdown (tree), markdown-monolith (single file), or markdown-hybrid (README + per-group files)'
+
+      split-depth:
+        type: string
+        description: 'Depth for markdown-hybrid output (default 1). Ignored for other formats.'
 
       # ── target CLI (exec mode) ──────────────────────────────────
       cli-name:
@@ -207,6 +211,7 @@ jobs:
         with:
           mode: ${{ inputs.mode }}
           format: ${{ inputs.format }}
+          split-depth: ${{ inputs.split-depth }}
           cli-name: ${{ inputs.cli-name }}
           label: ${{ inputs.label }}
           opencli-args: ${{ inputs.opencli-args }}

@@ -29,11 +29,12 @@ public sealed class MarkdownSectionRenderer(
         StringBuilder builder,
         bool includeMetadata,
         int headingLevel,
-        string? currentPagePath)
+        string? currentPagePath,
+        HybridLinkContext? hybridContext = null)
     {
         AppendDescription(command.Command.Description, builder);
         AppendAttributes(command.Command, builder);
-        AppendSubcommands(command, builder, headingLevel, currentPagePath);
+        AppendSubcommands(command, builder, headingLevel, currentPagePath, hybridContext);
         AppendArguments(command, builder, headingLevel);
         AppendOptions(command, builder, headingLevel);
         AppendExamples(command.Command.Examples, $"{new string('#', headingLevel)} Examples", builder);
@@ -148,7 +149,7 @@ public sealed class MarkdownSectionRenderer(
         builder.AppendLine();
     }
 
-    private void AppendSubcommands(NormalizedCommand command, StringBuilder builder, int headingLevel, string? currentPagePath)
+    private void AppendSubcommands(NormalizedCommand command, StringBuilder builder, int headingLevel, string? currentPagePath, HybridLinkContext? hybridContext)
     {
         if (command.Commands.Count == 0)
         {
@@ -159,9 +160,20 @@ public sealed class MarkdownSectionRenderer(
         builder.AppendLine();
         foreach (var child in command.Commands)
         {
-            var line = currentPagePath is null
-                ? $"- `{child.Command.Name}`{formatter.FormatDescriptionSuffix(child.Command.Description)}"
-                : $"- [{child.Command.Name}]({pathResolver.CreateRelativeLink(currentPagePath, pathResolver.GetCommandRelativePath(child, "md"))}){formatter.FormatDescriptionSuffix(child.Command.Description)}";
+            string line;
+            if (hybridContext is not null)
+            {
+                line = $"- [{child.Command.Name}]({hybridContext.ResolveTarget(child)}){formatter.FormatDescriptionSuffix(child.Command.Description)}";
+            }
+            else if (currentPagePath is null)
+            {
+                line = $"- `{child.Command.Name}`{formatter.FormatDescriptionSuffix(child.Command.Description)}";
+            }
+            else
+            {
+                line = $"- [{child.Command.Name}]({pathResolver.CreateRelativeLink(currentPagePath, pathResolver.GetCommandRelativePath(child, "md"))}){formatter.FormatDescriptionSuffix(child.Command.Description)}";
+            }
+
             builder.AppendLine(line);
         }
 
