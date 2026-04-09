@@ -10,7 +10,7 @@ public sealed class FileMarkdownCommand(MarkdownRenderService renderService) : A
     public override Task<int> ExecuteAsync(CommandContext context, FileRenderSettings settings, CancellationToken cancellationToken)
     {
         var options = RenderRequestFactory.CreateMarkdownOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: settings.SplitDepth);
-        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, settings.SplitDepth);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(settings, options.Layout, settings.SplitDepth);
         var request = new FileRenderRequest(
             settings.OpenCliJsonPath,
             settings.XmlDocPath,

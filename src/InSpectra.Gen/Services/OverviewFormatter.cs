@@ -44,7 +44,7 @@ public sealed class OverviewFormatter
         ["raw"] = 11,
     };
 
-    public string? BuildSummary(NormalizedCliDocument document)
+    public string? BuildSummary(NormalizedCliDocument document, string? titleOverride = null)
     {
         if (!string.IsNullOrWhiteSpace(document.Source.Info.Summary))
         {
@@ -65,9 +65,12 @@ public sealed class OverviewFormatter
                 BuildAreaSentence(areas, document.Commands.Count > areas.Length));
         }
 
-        var title = string.IsNullOrWhiteSpace(document.Source.Info.Title)
+        var displayTitle = string.IsNullOrWhiteSpace(titleOverride)
+            ? document.Source.Info.Title
+            : titleOverride;
+        var title = string.IsNullOrWhiteSpace(displayTitle)
             ? "Command-line reference."
-            : $"Command-line reference for `{document.Source.Info.Title}`.";
+            : $"Command-line reference for `{displayTitle}`.";
         return CombineSentences(title, BuildAreaSentence(areas, document.Commands.Count > areas.Length));
     }
 

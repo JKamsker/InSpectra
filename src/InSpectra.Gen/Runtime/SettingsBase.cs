@@ -238,6 +238,20 @@ public abstract class MarkdownCommandSettingsBase : CommonCommandSettings
     [Description("Depth at which hybrid layout emits one file per command group (defaults to 1).")]
     [CommandOption("--split-depth <DEPTH>")]
     public int? SplitDepth { get; init; }
+
+    /// <summary>
+    /// Override the CLI title shown in Markdown headings and overview text.
+    /// </summary>
+    [Description("Override the CLI title shown in Markdown headings and overview text.")]
+    [CommandOption("--title <TEXT>")]
+    public string? Title { get; init; }
+
+    /// <summary>
+    /// Override the CLI command prefix used in rendered Markdown examples.
+    /// </summary>
+    [Description("Override the CLI command prefix used in rendered Markdown examples.")]
+    [CommandOption("--command-prefix <TEXT>")]
+    public string? CommandPrefix { get; init; }
 }
 
 /// <summary>

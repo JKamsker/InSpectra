@@ -70,7 +70,7 @@ public class RequestAndOutputContractTests
         var settings = new TestMarkdownSettings();
 
         var options = RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 2);
-        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, 2);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(settings, options.Layout, 2);
 
         Assert.Equal(RenderLayout.Hybrid, options.Layout);
         Assert.NotNull(markdownOptions);
@@ -83,7 +83,7 @@ public class RequestAndOutputContractTests
         var settings = new TestMarkdownSettings();
 
         var options = RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false);
-        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, splitDepth: null);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(settings, options.Layout, splitDepth: null);
 
         Assert.NotNull(markdownOptions);
         Assert.Equal(1, markdownOptions!.HybridSplitDepth);
@@ -92,8 +92,10 @@ public class RequestAndOutputContractTests
     [Fact]
     public void Non_hybrid_layout_produces_no_markdown_render_options()
     {
-        Assert.Null(RenderRequestFactory.CreateMarkdownRenderOptions(RenderLayout.Single, splitDepth: null));
-        Assert.Null(RenderRequestFactory.CreateMarkdownRenderOptions(RenderLayout.Tree, splitDepth: null));
+        var settings = new TestMarkdownSettings();
+
+        Assert.Null(RenderRequestFactory.CreateMarkdownRenderOptions(settings, RenderLayout.Single, splitDepth: null));
+        Assert.Null(RenderRequestFactory.CreateMarkdownRenderOptions(settings, RenderLayout.Tree, splitDepth: null));
     }
 
     [Fact]

@@ -34,8 +34,8 @@ public sealed class MarkdownRenderService(
 
         return options.Layout switch
         {
-            RenderLayout.Single => HandleSingleLayout(prepared, normalized, options),
-            RenderLayout.Tree => HandleTreeLayout(prepared, normalized, options),
+            RenderLayout.Single => HandleSingleLayout(prepared, normalized, options, markdownOptions),
+            RenderLayout.Tree => HandleTreeLayout(prepared, normalized, options, markdownOptions),
             RenderLayout.Hybrid => HandleHybridLayout(prepared, normalized, options, markdownOptions),
             _ => throw new CliUsageException("Markdown rendering supports `single`, `tree`, and `hybrid` layouts only."),
         };
@@ -50,7 +50,7 @@ public sealed class MarkdownRenderService(
         var outputDirectory = options.OutputDirectory
             ?? throw new CliUsageException("`--layout hybrid` requires `--out-dir`.");
         var splitDepth = markdownOptions?.HybridSplitDepth ?? 1;
-        var files = renderer.RenderHybrid(document, options.IncludeMetadata, splitDepth);
+        var files = renderer.RenderHybrid(document, options.IncludeMetadata, splitDepth, markdownOptions);
 
         if (options.DryRun)
         {
@@ -89,9 +89,10 @@ public sealed class MarkdownRenderService(
     private RenderExecutionResult HandleSingleLayout(
         AcquiredRenderDocument prepared,
         NormalizedCliDocument document,
-        RenderExecutionOptions options)
+        RenderExecutionOptions options,
+        MarkdownRenderOptions? markdownOptions)
     {
-        var content = renderer.RenderSingle(document, options.IncludeMetadata);
+        var content = renderer.RenderSingle(document, options.IncludeMetadata, markdownOptions);
 
         if (options.DryRun)
         {
@@ -131,11 +132,12 @@ public sealed class MarkdownRenderService(
     private RenderExecutionResult HandleTreeLayout(
         AcquiredRenderDocument prepared,
         NormalizedCliDocument document,
-        RenderExecutionOptions options)
+        RenderExecutionOptions options,
+        MarkdownRenderOptions? markdownOptions)
     {
         var outputDirectory = options.OutputDirectory
             ?? throw new CliUsageException("`--layout tree` requires `--out-dir`.");
-        var files = renderer.RenderTree(document, options.IncludeMetadata);
+        var files = renderer.RenderTree(document, options.IncludeMetadata, markdownOptions);
 
         if (options.DryRun)
         {

@@ -9,12 +9,12 @@ public sealed class MarkdownSectionRenderer(
     RenderModelFormatter formatter,
     CommandPathResolver pathResolver)
 {
-    public void AppendInfoSection(OpenCliDocument document, StringBuilder builder)
+    public void AppendInfoSection(OpenCliDocument document, StringBuilder builder, string? commandPrefix = null)
     {
         AppendConventions(document, builder);
         AppendContact(document, builder);
         AppendLicense(document, builder);
-        AppendExamples(document.Examples, "### Examples", builder);
+        AppendExamples(document.Examples, "### Examples", builder, commandPrefix);
 
         if (document.ExitCodes.Count > 0)
         {
@@ -30,14 +30,15 @@ public sealed class MarkdownSectionRenderer(
         bool includeMetadata,
         int headingLevel,
         string? currentPagePath,
-        HybridLinkContext? hybridContext = null)
+        HybridLinkContext? hybridContext = null,
+        string? commandPrefix = null)
     {
         AppendDescription(command.Command.Description, builder);
         AppendAttributes(command.Command, builder);
         AppendSubcommands(command, builder, headingLevel, currentPagePath, hybridContext);
         AppendArguments(command, builder, headingLevel);
         AppendOptions(command, builder, headingLevel);
-        AppendExamples(command.Command.Examples, $"{new string('#', headingLevel)} Examples", builder);
+        AppendExamples(command.Command.Examples, $"{new string('#', headingLevel)} Examples", builder, commandPrefix);
 
         if (command.Command.ExitCodes.Count > 0)
         {
@@ -231,7 +232,7 @@ public sealed class MarkdownSectionRenderer(
             builder);
     }
 
-    private static void AppendExamples(IEnumerable<string> examples, string heading, StringBuilder builder)
+    private static void AppendExamples(IEnumerable<string> examples, string heading, StringBuilder builder, string? commandPrefix)
     {
         var exampleList = examples.ToList();
         if (exampleList.Count == 0)
@@ -243,7 +244,7 @@ public sealed class MarkdownSectionRenderer(
         builder.AppendLine();
         foreach (var example in exampleList)
         {
-            builder.AppendLine($"- `{example}`");
+            builder.AppendLine($"- `{FormatExample(example, commandPrefix)}`");
         }
 
         builder.AppendLine();
@@ -255,5 +256,23 @@ public sealed class MarkdownSectionRenderer(
             .Split(", ", StringSplitOptions.RemoveEmptyEntries)
             .Select(alias => $"`{alias}`");
         return $"Aliases: {string.Join(", ", aliases)}";
+    }
+
+    private static string FormatExample(string example, string? commandPrefix)
+    {
+        var trimmedExample = example.Trim();
+        if (string.IsNullOrWhiteSpace(trimmedExample) || string.IsNullOrWhiteSpace(commandPrefix))
+        {
+            return trimmedExample;
+        }
+
+        var trimmedPrefix = commandPrefix.Trim();
+        if (trimmedExample.Equals(trimmedPrefix, StringComparison.Ordinal) ||
+            trimmedExample.StartsWith($"{trimmedPrefix} ", StringComparison.Ordinal))
+        {
+            return trimmedExample;
+        }
+
+        return $"{trimmedPrefix} {trimmedExample}";
     }
 }

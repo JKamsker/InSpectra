@@ -1,5 +1,6 @@
 using System.Text;
 using InSpectra.Gen.Models;
+using InSpectra.Gen.Runtime;
 
 namespace InSpectra.Gen.Services;
 
@@ -11,15 +12,18 @@ public sealed class MarkdownRenderer(
     RenderModelFormatter formatter,
     OverviewFormatter overviewFormatter)
 {
-    public string RenderSingle(NormalizedCliDocument document, bool includeMetadata)
+    public string RenderSingle(
+        NormalizedCliDocument document,
+        bool includeMetadata,
+        MarkdownRenderOptions? markdownOptions = null)
     {
         var builder = new StringBuilder();
-        AppendHeader(document, builder);
+        AppendHeader(document, builder, markdownOptions);
         AppendTableOfContents(document, builder);
-        AppendOverview(document, builder, currentPagePath: null);
+        AppendOverview(document, builder, currentPagePath: null, markdownOptions: markdownOptions);
         AppendRootArguments(document, builder);
         AppendRootOptions(document, builder);
-        AppendCommandSections(document.Commands, builder, includeMetadata, 2);
+        AppendCommandSections(document.Commands, builder, includeMetadata, 2, markdownOptions: markdownOptions);
 
         if (includeMetadata)
         {
@@ -29,16 +33,19 @@ public sealed class MarkdownRenderer(
         return builder.ToString().TrimEnd() + Environment.NewLine;
     }
 
-    public IReadOnlyList<RelativeRenderedFile> RenderTree(NormalizedCliDocument document, bool includeMetadata)
+    public IReadOnlyList<RelativeRenderedFile> RenderTree(
+        NormalizedCliDocument document,
+        bool includeMetadata,
+        MarkdownRenderOptions? markdownOptions = null)
     {
         var files = new List<RelativeRenderedFile>
         {
-            new("index.md", RenderRootPage(document, includeMetadata)),
+            new("index.md", RenderRootPage(document, includeMetadata, markdownOptions)),
         };
 
         foreach (var command in document.Commands)
         {
-            AppendCommandPages(command, includeMetadata, files);
+            AppendCommandPages(command, includeMetadata, files, markdownOptions);
         }
 
         return files;
@@ -47,7 +54,8 @@ public sealed class MarkdownRenderer(
     public IReadOnlyList<RelativeRenderedFile> RenderHybrid(
         NormalizedCliDocument document,
         bool includeMetadata,
-        int splitDepth)
+        int splitDepth,
+        MarkdownRenderOptions? markdownOptions = null)
     {
         if (splitDepth < 1)
         {
@@ -59,25 +67,28 @@ public sealed class MarkdownRenderer(
 
         var files = new List<RelativeRenderedFile>
         {
-            new(readmePath, RenderHybridReadme(document, includeMetadata, rootContext)),
+            new(readmePath, RenderHybridReadme(document, includeMetadata, rootContext, markdownOptions)),
         };
 
         foreach (var command in document.Commands)
         {
-            AppendHybridGroupFiles(command, includeMetadata, rootContext, files);
+            AppendHybridGroupFiles(command, includeMetadata, rootContext, files, markdownOptions);
         }
 
         return files;
     }
 
-    private void AppendHeader(NormalizedCliDocument document, StringBuilder builder)
+    private void AppendHeader(
+        NormalizedCliDocument document,
+        StringBuilder builder,
+        MarkdownRenderOptions? markdownOptions)
     {
-        builder.AppendLine($"# {document.Source.Info.Title}");
+        builder.AppendLine($"# {ResolveTitle(document, markdownOptions)}");
         builder.AppendLine();
         builder.AppendLine($"- Version: `{document.Source.Info.Version}`");
         builder.AppendLine($"- OpenCLI: `{document.Source.OpenCliVersion}`");
 
-        var summary = overviewFormatter.BuildSummary(document);
+        var summary = overviewFormatter.BuildSummary(document, ResolveTitle(document, markdownOptions));
         if (!string.IsNullOrWhiteSpace(summary))
         {
             builder.AppendLine();
@@ -105,13 +116,18 @@ public sealed class MarkdownRenderer(
         AppendCommandToc(document.Commands, builder, 1);
     }
 
-    private void AppendOverview(NormalizedCliDocument document, StringBuilder builder, string? currentPagePath, HybridLinkContext? hybridContext = null)
+    private void AppendOverview(
+        NormalizedCliDocument document,
+        StringBuilder builder,
+        string? currentPagePath,
+        HybridLinkContext? hybridContext = null,
+        MarkdownRenderOptions? markdownOptions = null)
     {
         builder.AppendLine();
         builder.AppendLine("<a id=\"overview\"></a>");
         builder.AppendLine("## Overview");
         builder.AppendLine();
-        sectionRenderer.AppendInfoSection(document.Source, builder);
+        sectionRenderer.AppendInfoSection(document.Source, builder, markdownOptions?.CommandPrefix);
         AppendOverviewFacts(document, builder);
         AppendAvailableCommands(document.Commands, builder, currentPagePath, hybridContext);
     }
@@ -154,7 +170,13 @@ public sealed class MarkdownRenderer(
         }
     }
 
-    private void AppendCommandSections(IEnumerable<NormalizedCommand> commands, StringBuilder builder, bool includeMetadata, int headingLevel, HybridLinkContext? hybridContext = null)
+    private void AppendCommandSections(
+        IEnumerable<NormalizedCommand> commands,
+        StringBuilder builder,
+        bool includeMetadata,
+        int headingLevel,
+        HybridLinkContext? hybridContext = null,
+        MarkdownRenderOptions? markdownOptions = null)
     {
         if (!commands.Any())
         {
@@ -181,16 +203,19 @@ public sealed class MarkdownRenderer(
             builder.AppendLine($"<a id=\"command-{pathResolver.CreateAnchorId(command.Path)}\"></a>");
             builder.AppendLine($"{new string('#', headingLevel)} `{command.Path}`");
             builder.AppendLine();
-            sectionRenderer.AppendCommandBody(command, builder, includeMetadata, headingLevel + 1, currentPagePath: null, hybridContext);
-            AppendCommandSections(command.Commands, builder, includeMetadata, headingLevel + 1, hybridContext);
+            sectionRenderer.AppendCommandBody(command, builder, includeMetadata, headingLevel + 1, currentPagePath: null, hybridContext, markdownOptions?.CommandPrefix);
+            AppendCommandSections(command.Commands, builder, includeMetadata, headingLevel + 1, hybridContext, markdownOptions);
         }
     }
 
-    private string RenderRootPage(NormalizedCliDocument document, bool includeMetadata)
+    private string RenderRootPage(
+        NormalizedCliDocument document,
+        bool includeMetadata,
+        MarkdownRenderOptions? markdownOptions)
     {
         var builder = new StringBuilder();
-        AppendHeader(document, builder);
-        AppendOverview(document, builder, "index.md");
+        AppendHeader(document, builder, markdownOptions);
+        AppendOverview(document, builder, "index.md", markdownOptions: markdownOptions);
         if (document.RootArguments.Count > 0)
         {
             builder.AppendLine();
@@ -269,18 +294,26 @@ public sealed class MarkdownRenderer(
         builder.AppendLine();
     }
 
-    private void AppendCommandPages(NormalizedCommand command, bool includeMetadata, ICollection<RelativeRenderedFile> files)
+    private void AppendCommandPages(
+        NormalizedCommand command,
+        bool includeMetadata,
+        ICollection<RelativeRenderedFile> files,
+        MarkdownRenderOptions? markdownOptions)
     {
         var relativePath = pathResolver.GetCommandRelativePath(command, "md");
-        files.Add(new RelativeRenderedFile(relativePath, RenderCommandPage(command, includeMetadata, relativePath)));
+        files.Add(new RelativeRenderedFile(relativePath, RenderCommandPage(command, includeMetadata, relativePath, markdownOptions)));
 
         foreach (var child in command.Commands)
         {
-            AppendCommandPages(child, includeMetadata, files);
+            AppendCommandPages(child, includeMetadata, files, markdownOptions);
         }
     }
 
-    private string RenderCommandPage(NormalizedCommand command, bool includeMetadata, string relativePath)
+    private string RenderCommandPage(
+        NormalizedCommand command,
+        bool includeMetadata,
+        string relativePath,
+        MarkdownRenderOptions? markdownOptions)
     {
         var builder = new StringBuilder();
         builder.AppendLine($"# `{command.Path}`");
@@ -294,18 +327,19 @@ public sealed class MarkdownRenderer(
         }
 
         builder.AppendLine();
-        sectionRenderer.AppendCommandBody(command, builder, includeMetadata, 2, relativePath);
+        sectionRenderer.AppendCommandBody(command, builder, includeMetadata, 2, relativePath, commandPrefix: markdownOptions?.CommandPrefix);
         return builder.ToString().TrimEnd() + Environment.NewLine;
     }
 
     private string RenderHybridReadme(
         NormalizedCliDocument document,
         bool includeMetadata,
-        HybridLinkContext context)
+        HybridLinkContext context,
+        MarkdownRenderOptions? markdownOptions)
     {
         var builder = new StringBuilder();
-        AppendHeader(document, builder);
-        AppendOverview(document, builder, context.CurrentPagePath, context);
+        AppendHeader(document, builder, markdownOptions);
+        AppendOverview(document, builder, context.CurrentPagePath, context, markdownOptions);
 
         if (document.RootArguments.Count > 0)
         {
@@ -329,7 +363,7 @@ public sealed class MarkdownRenderer(
             builder.AppendLine();
             builder.AppendLine("## Commands");
             builder.AppendLine();
-            AppendCommandSections(inlinedTopLevel, builder, includeMetadata, 3, context);
+            AppendCommandSections(inlinedTopLevel, builder, includeMetadata, 3, context, markdownOptions);
         }
 
         if (includeMetadata)
@@ -344,7 +378,8 @@ public sealed class MarkdownRenderer(
         NormalizedCommand command,
         bool includeMetadata,
         HybridLinkContext parentContext,
-        ICollection<RelativeRenderedFile> files)
+        ICollection<RelativeRenderedFile> files,
+        MarkdownRenderOptions? markdownOptions)
     {
         if (!parentContext.HasOwnFile(command))
         {
@@ -353,18 +388,19 @@ public sealed class MarkdownRenderer(
 
         var relativePath = pathResolver.GetCommandRelativePath(command, "md");
         var pageContext = parentContext.ForPage(relativePath);
-        files.Add(new RelativeRenderedFile(relativePath, RenderHybridGroupPage(command, includeMetadata, pageContext)));
+        files.Add(new RelativeRenderedFile(relativePath, RenderHybridGroupPage(command, includeMetadata, pageContext, markdownOptions)));
 
         foreach (var child in command.Commands)
         {
-            AppendHybridGroupFiles(child, includeMetadata, pageContext, files);
+            AppendHybridGroupFiles(child, includeMetadata, pageContext, files, markdownOptions);
         }
     }
 
     private string RenderHybridGroupPage(
         NormalizedCommand command,
         bool includeMetadata,
-        HybridLinkContext context)
+        HybridLinkContext context,
+        MarkdownRenderOptions? markdownOptions)
     {
         var builder = new StringBuilder();
         builder.AppendLine($"# `{command.Path}`");
@@ -372,11 +408,11 @@ public sealed class MarkdownRenderer(
         builder.AppendLine(BuildHybridBreadcrumb(command, context));
         builder.AppendLine();
 
-        sectionRenderer.AppendCommandBody(command, builder, includeMetadata, 2, currentPagePath: null, context);
+        sectionRenderer.AppendCommandBody(command, builder, includeMetadata, 2, currentPagePath: null, context, markdownOptions?.CommandPrefix);
 
         if (command.Commands.Count > 0)
         {
-            AppendCommandSections(command.Commands, builder, includeMetadata, 2, context);
+            AppendCommandSections(command.Commands, builder, includeMetadata, 2, context, markdownOptions);
         }
 
         return builder.ToString().TrimEnd() + Environment.NewLine;
@@ -399,5 +435,12 @@ public sealed class MarkdownRenderer(
 
         segments.Add($"`{parts[^1]}`");
         return string.Join(" › ", segments);
+    }
+
+    private static string ResolveTitle(NormalizedCliDocument document, MarkdownRenderOptions? markdownOptions)
+    {
+        return string.IsNullOrWhiteSpace(markdownOptions?.Title)
+            ? document.Source.Info.Title
+            : markdownOptions.Title;
     }
 }

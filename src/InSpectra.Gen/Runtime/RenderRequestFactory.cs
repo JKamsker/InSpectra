@@ -37,14 +37,19 @@ public static class RenderRequestFactory
             NormalizePath(outputDirectory));
     }
 
-    public static MarkdownRenderOptions? CreateMarkdownRenderOptions(RenderLayout layout, int? splitDepth)
+    public static MarkdownRenderOptions? CreateMarkdownRenderOptions(
+        MarkdownCommandSettingsBase settings,
+        RenderLayout layout,
+        int? splitDepth)
     {
-        if (layout != RenderLayout.Hybrid)
+        var title = NormalizeText(settings.Title);
+        var commandPrefix = NormalizeText(settings.CommandPrefix);
+        if (layout != RenderLayout.Hybrid && title is null && commandPrefix is null)
         {
             return null;
         }
 
-        return new MarkdownRenderOptions(splitDepth ?? 1);
+        return new MarkdownRenderOptions(splitDepth ?? 1, title, commandPrefix);
     }
 
     public static RenderExecutionOptions CreateHtmlOptions(
@@ -370,5 +375,12 @@ public static class RenderRequestFactory
         return string.IsNullOrWhiteSpace(path)
             ? null
             : Path.GetFullPath(path);
+    }
+
+    private static string? NormalizeText(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value)
+            ? null
+            : value.Trim();
     }
 }

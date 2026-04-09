@@ -23,7 +23,10 @@ public enum RenderLayout
     App,
 }
 
-public sealed record MarkdownRenderOptions(int HybridSplitDepth);
+public sealed record MarkdownRenderOptions(
+    int HybridSplitDepth,
+    string? Title = null,
+    string? CommandPrefix = null);
 
 public sealed record RenderExecutionOptions(
     RenderLayout Layout,

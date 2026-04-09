@@ -1,5 +1,6 @@
 using System.Text.Json.Nodes;
 using InSpectra.Gen.Models;
+using InSpectra.Gen.Runtime;
 using InSpectra.Gen.Services;
 using InSpectra.Gen.Tests.TestSupport;
 
@@ -79,6 +80,119 @@ public class OpenCliEnrichmentAndRenderingTests
         Assert.Contains("Metadata Appendix", markdown);
         Assert.Contains("Argument `EMAIL`", markdown);
         Assert.Contains("System.String", markdown);
+    }
+
+    [Fact]
+    public void Single_markdown_honors_title_override_and_prefixes_examples()
+    {
+        var document = new NormalizedCliDocument
+        {
+            Source = new OpenCliDocument
+            {
+                OpenCliVersion = "0.1-draft",
+                Info = new OpenCliInfo
+                {
+                    Title = "jf",
+                    Version = "1.0.0",
+                },
+                Examples = ["auth login --username demo"],
+            },
+            RootArguments = [],
+            RootOptions = [],
+            Commands =
+            [
+                new NormalizedCommand
+                {
+                    Path = "auth",
+                    Command = new OpenCliCommand
+                    {
+                        Name = "auth",
+                        Description = "Authentication commands.",
+                        Examples = ["auth whoami"],
+                    },
+                    Arguments = [],
+                    DeclaredOptions = [],
+                    InheritedOptions = [],
+                    Commands = [],
+                },
+            ],
+        };
+
+        var markdown = _renderer.RenderSingle(
+            document,
+            includeMetadata: false,
+            new MarkdownRenderOptions(HybridSplitDepth: 1, Title: "JellyfinCli", CommandPrefix: "jf"));
+
+        Assert.Contains("# JellyfinCli", markdown);
+        Assert.Contains("Command-line reference for `JellyfinCli`.", markdown);
+        Assert.Contains("- `jf auth login --username demo`", markdown);
+        Assert.Contains("- `jf auth whoami`", markdown);
+        Assert.DoesNotContain("# jf", markdown);
+    }
+
+    [Fact]
+    public void Hybrid_markdown_uses_title_override_in_readme_and_prefixes_group_examples()
+    {
+        var document = new NormalizedCliDocument
+        {
+            Source = new OpenCliDocument
+            {
+                OpenCliVersion = "0.1-draft",
+                Info = new OpenCliInfo
+                {
+                    Title = "jf",
+                    Version = "1.0.0",
+                },
+            },
+            RootArguments = [],
+            RootOptions = [],
+            Commands =
+            [
+                new NormalizedCommand
+                {
+                    Path = "library",
+                    Command = new OpenCliCommand
+                    {
+                        Name = "library",
+                        Description = "Library commands.",
+                        Examples = ["library list"],
+                    },
+                    Arguments = [],
+                    DeclaredOptions = [],
+                    InheritedOptions = [],
+                    Commands =
+                    [
+                        new NormalizedCommand
+                        {
+                            Path = "library refresh",
+                            Command = new OpenCliCommand
+                            {
+                                Name = "refresh",
+                                Description = "Refresh library metadata.",
+                                Examples = ["library refresh --all"],
+                            },
+                            Arguments = [],
+                            DeclaredOptions = [],
+                            InheritedOptions = [],
+                            Commands = [],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        var files = _renderer.RenderHybrid(
+            document,
+            includeMetadata: false,
+            splitDepth: 1,
+            new MarkdownRenderOptions(HybridSplitDepth: 1, Title: "JellyfinCli", CommandPrefix: "jf"));
+        var readme = files.Single(file => file.RelativePath == "README.md").Content;
+        var group = files.Single(file => file.RelativePath == "library/index.md").Content;
+
+        Assert.Contains("# JellyfinCli", readme);
+        Assert.Contains("Command-line reference for `JellyfinCli`.", readme);
+        Assert.Contains("- `jf library list`", group);
+        Assert.Contains("- `jf library refresh --all`", group);
     }
 
     [Fact]

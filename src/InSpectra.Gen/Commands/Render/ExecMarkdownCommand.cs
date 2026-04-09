@@ -10,7 +10,7 @@ public sealed class ExecMarkdownCommand(MarkdownRenderService renderService) : A
     public override Task<int> ExecuteAsync(CommandContext context, ExecRenderSettings settings, CancellationToken cancellationToken)
     {
         var options = RenderRequestFactory.CreateMarkdownOptions(settings, settings.Layout, settings.OutputFile, settings.OutputDirectory, settings.TimeoutSeconds, hasTimeoutSupport: true, splitDepth: settings.SplitDepth);
-        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(options.Layout, settings.SplitDepth);
+        var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(settings, options.Layout, settings.SplitDepth);
         var workingDirectory = RenderRequestFactory.ResolveWorkingDirectory(settings.WorkingDirectory);
         var request = new ExecRenderRequest(
             settings.Source,
