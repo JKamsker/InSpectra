@@ -105,6 +105,10 @@ inputs:
     description: 'Override the CLI title shown in the viewer header and overview'
     required: false
 
+  command-prefix:
+    description: 'Override the CLI command prefix used in generated examples and the composer'
+    required: false
+
   single-file:
     description: 'Emit a single self-contained HTML file (works from file://)'
     required: false
@@ -367,6 +371,7 @@ runs:
         TIMEOUT: ${{ inputs.timeout }}
         LABEL: ${{ inputs.label }}
         TITLE: ${{ inputs.title }}
+        COMMAND_PREFIX: ${{ inputs.command-prefix }}
         SINGLE_FILE: ${{ inputs.single-file }}
         COMPRESSION_LEVEL: ${{ inputs.compression-level }}
         THEME: ${{ inputs.theme }}
@@ -496,6 +501,10 @@ runs:
 
         if [ -n "$TITLE" ]; then
           args+=(--title "$TITLE")
+        fi
+
+        if [ -n "$COMMAND_PREFIX" ]; then
+          args+=(--command-prefix "$COMMAND_PREFIX")
         fi
 
         # ── HTML-specific options ──

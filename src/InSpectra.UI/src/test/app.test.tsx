@@ -261,7 +261,7 @@ describe("InSpectraUI app", () => {
     expect(await screen.findByRole("heading", { name: "weikio-cli" })).toBeInTheDocument();
     await userEvent.setup().click(await screen.findByRole("button", { name: "Inspect" }));
 
-    expect(await screen.findAllByText("demo")).not.toHaveLength(0);
+    expect(await screen.findAllByText("alpha")).not.toHaveLength(0);
     expect(fetchMock).toHaveBeenCalledWith(openCliUrl, expect.anything());
   });
 

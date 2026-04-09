@@ -117,6 +117,7 @@ function readOptions(options: Partial<ViewerOptions> | ViewerOptions | undefined
     includeMetadata: options?.includeMetadata ?? defaults.includeMetadata,
     label: options?.label,
     title: options?.title,
+    commandPrefix: options?.commandPrefix,
     theme: options?.theme,
     colorTheme: options?.colorTheme,
     customAccent: options?.customAccent,

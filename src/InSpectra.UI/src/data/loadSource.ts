@@ -10,7 +10,13 @@ export interface LoadedSource {
   options: ViewerOptions;
   features: FeatureFlags;
   label: string;
+  commandPrefix?: string;
   mode: "inline" | "links" | "manual";
+}
+
+interface SourceIdentity {
+  title?: string;
+  commandPrefix?: string;
 }
 
 export async function loadFromStartupRequest(
@@ -30,6 +36,10 @@ export async function loadFromStartupRequest(
       options: request.options,
       features: request.features,
       label,
+      identity: {
+        title: request.options.title,
+        commandPrefix: request.options.commandPrefix,
+      },
       mode: "inline",
     });
   }
@@ -38,13 +48,23 @@ export async function loadFromStartupRequest(
   const xmlDocText = request.links.xmlDocUrl
     ? await fetchText(request.links.xmlDocUrl, request.links.xmlDocIsOptional, signal)
     : undefined;
+  const identity = await resolveLinkedSourceIdentity(request.links.openCliUrl, signal, {
+    title: request.options.title,
+    commandPrefix: request.options.commandPrefix,
+  });
+  const resolvedOptions = {
+    ...request.options,
+    title: identity.title,
+    commandPrefix: identity.commandPrefix,
+  };
 
   return buildLoadedSource({
     document: parseOpenCliDocument(openCliText),
     xmlDoc: xmlDocText,
-    options: request.options,
+    options: resolvedOptions,
     features: request.features,
     label: request.source === "bootstrap" ? "Injected links" : "URL parameters",
+    identity,
     mode: "links",
   });
 }
@@ -57,9 +77,10 @@ export async function loadFromFiles(files: File[], options: ViewerOptions, featu
   return buildLoadedSource({
     document: parseOpenCliDocument(openCliText),
     xmlDoc: xmlDocText,
-    options,
+    options: clearSourceIdentity(options),
     features,
     label: "Manual import",
+    identity: {},
     mode: "manual",
   });
 }
@@ -70,18 +91,28 @@ export async function loadFromUrls(
   options: ViewerOptions,
   label: string,
   features: FeatureFlags,
+  identity?: SourceIdentity,
 ): Promise<LoadedSource> {
   const openCliText = await fetchRequiredText(opencliUrl);
   const xmlDocText = xmldocUrl
     ? await fetchText(xmldocUrl, true)
     : undefined;
+  const resolvedIdentity = await resolveLinkedSourceIdentity(opencliUrl, undefined, {
+    title: identity?.title ?? options.title,
+    commandPrefix: identity?.commandPrefix ?? options.commandPrefix,
+  });
 
   return buildLoadedSource({
     document: parseOpenCliDocument(openCliText),
     xmlDoc: xmlDocText,
-    options,
+    options: {
+      ...options,
+      title: resolvedIdentity.title,
+      commandPrefix: resolvedIdentity.commandPrefix,
+    },
     features,
     label,
+    identity: resolvedIdentity,
     mode: "links",
   });
 }
@@ -126,12 +157,13 @@ function buildLoadedSource(params: {
   options: ViewerOptions;
   features: FeatureFlags;
   label: string;
+  identity: SourceIdentity;
   mode: LoadedSource["mode"];
 }): LoadedSource {
   const document = cloneOpenCliDocument(params.document);
   const warnings: string[] = [];
 
-  applyTitleOverride(document, params.options.title);
+  applyTitleOverride(document, params.identity.title);
 
   if (params.xmlDoc) {
     const enrichment = enrichDocumentFromXml(document, params.xmlDoc);
@@ -145,6 +177,7 @@ function buildLoadedSource(params: {
     options: params.options,
     features: params.features,
     label: params.label,
+    commandPrefix: params.identity.commandPrefix,
     mode: params.mode,
   };
 }
@@ -184,4 +217,73 @@ async function fetchText(url: string, optional: boolean, signal?: AbortSignal): 
 
     throw error;
   }
+}
+
+async function resolveLinkedSourceIdentity(
+  openCliUrl: string,
+  signal: AbortSignal | undefined,
+  preferred: SourceIdentity,
+): Promise<SourceIdentity> {
+  if (preferred.title?.trim() && preferred.commandPrefix?.trim()) {
+    return normalizeIdentity(preferred);
+  }
+
+  const metadataUrl = buildSiblingMetadataUrl(openCliUrl);
+  if (!metadataUrl) {
+    return normalizeIdentity(preferred);
+  }
+
+  const metadataText = await fetchText(metadataUrl, true, signal);
+  if (!metadataText) {
+    return normalizeIdentity(preferred);
+  }
+
+  return normalizeIdentity({
+    title: preferred.title ?? readMetadataString(metadataText, "packageId"),
+    commandPrefix: preferred.commandPrefix ?? readMetadataString(metadataText, "command"),
+  });
+}
+
+function buildSiblingMetadataUrl(openCliUrl: string): string | undefined {
+  try {
+    const url = new URL(openCliUrl);
+    if (!url.pathname.toLowerCase().endsWith("/opencli.json")) {
+      return undefined;
+    }
+
+    url.pathname = url.pathname.slice(0, -"/opencli.json".length) + "/metadata.json";
+    return url.toString();
+  } catch {
+    return undefined;
+  }
+}
+
+function readMetadataString(metadataText: string, key: "packageId" | "command"): string | undefined {
+  try {
+    const parsed = JSON.parse(metadataText) as Record<string, unknown>;
+    const value = parsed[key];
+    return typeof value === "string" ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeIdentity(identity: SourceIdentity): SourceIdentity {
+  return {
+    title: normalizeOverride(identity.title),
+    commandPrefix: normalizeOverride(identity.commandPrefix),
+  };
+}
+
+function clearSourceIdentity(options: ViewerOptions): ViewerOptions {
+  return {
+    ...options,
+    title: undefined,
+    commandPrefix: undefined,
+  };
+}
+
+function normalizeOverride(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
 }

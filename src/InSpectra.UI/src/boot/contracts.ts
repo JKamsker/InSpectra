@@ -5,6 +5,7 @@ export interface ViewerOptions {
   includeMetadata: boolean;
   label?: string;
   title?: string;
+  commandPrefix?: string;
   /** Preset light/dark mode (overrides localStorage on load). */
   theme?: "light" | "dark";
   /** Preset color theme ID (overrides localStorage on load). */

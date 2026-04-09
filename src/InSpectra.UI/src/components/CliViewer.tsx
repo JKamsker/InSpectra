@@ -67,7 +67,7 @@ export function CliViewer({
     document.commands.length === 0 &&
     document.rootArguments.length === 0 &&
     document.rootOptions.length === 0;
-  const cliPrefix = packageContext?.command || toCliPrefix(document.source.info.title) || "cli";
+  const cliPrefix = packageContext?.command || viewerOptions.commandPrefix || toCliPrefix(document.source.info.title) || "cli";
 
   const gridRef = useRef<HTMLDivElement>(null);
   const [composerFloating, setComposerFloating] = useState(false);

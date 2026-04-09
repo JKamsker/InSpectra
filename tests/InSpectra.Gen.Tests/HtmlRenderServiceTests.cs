@@ -46,7 +46,7 @@ public class HtmlRenderServiceTests
                 OutputFile: null,
                 OutputDirectory: outputDirectory));
 
-        var result = await service.RenderFromFileAsync(request, DefaultFeatures, CancellationToken.None);
+        var result = await service.RenderFromFileAsync(request, DefaultFeatures, CancellationToken.None, title: "JellyfinCli", commandPrefix: "jf");
 
         var indexPath = Path.Combine(outputDirectory, "index.html");
         var index = await File.ReadAllTextAsync(indexPath);
@@ -58,6 +58,8 @@ public class HtmlRenderServiceTests
         Assert.Contains("\"mode\":\"inline\"", index);
         Assert.Contains("\"xmlDoc\":", index);
         Assert.Contains("\"includeMetadata\":true", index);
+        Assert.Contains("\"title\":\"JellyfinCli\"", index);
+        Assert.Contains("\"commandPrefix\":\"jf\"", index);
         Assert.Contains("jdr", index);
     }
 

@@ -148,6 +148,13 @@ public abstract class HtmlCommandSettingsBase : CommonCommandSettings
     public string? Title { get; init; }
 
     /// <summary>
+    /// Override the CLI command prefix used in generated examples and the composer.
+    /// </summary>
+    [Description("Override the CLI command prefix used in generated examples and the composer.")]
+    [CommandOption("--command-prefix <TEXT>")]
+    public string? CommandPrefix { get; init; }
+
+    /// <summary>
     /// Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.
     /// </summary>
     [Description("Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.")]
@@ -334,6 +341,13 @@ public abstract class SelfDocHtmlCommandSettingsBase : SelfDocCommandSettingsBas
     [Description("Override the CLI title shown in the viewer header and overview.")]
     [CommandOption("--title <TEXT>")]
     public string? Title { get; init; }
+
+    /// <summary>
+    /// Override the CLI command prefix used in generated examples and the composer.
+    /// </summary>
+    [Description("Override the CLI command prefix used in generated examples and the composer.")]
+    [CommandOption("--command-prefix <TEXT>")]
+    public string? CommandPrefix { get; init; }
 
     /// <summary>
     /// Emit a single self-contained HTML file with all assets inlined. Works from file:// without a web server.

@@ -82,12 +82,16 @@ export function WebsiteApp() {
       }
       const urls = resolvePackageUrls(pkg, resolvedVersion);
       const label = `${pkg.packageId} v${resolvedVersion}`;
-      const loaded = await loadFromUrls(urls.opencliUrl, urls.xmldocUrl, viewerOptions, label, featureFlags);
+      const command = pkg.versions.find((v) => v.version === resolvedVersion)?.command ?? pkg.versions[0]?.command;
+      const loaded = await loadFromUrls(urls.opencliUrl, urls.xmldocUrl, viewerOptions, label, featureFlags, {
+        title: pkg.packageId,
+        commandPrefix: command,
+      });
       applyLoadedSource(loaded);
       setPackageContext({
         packageId: pkg.packageId,
         version: resolvedVersion,
-        command: pkg.versions.find((v) => v.version === resolvedVersion)?.command ?? pkg.versions[0]?.command,
+        command,
       });
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
@@ -128,7 +132,10 @@ export function WebsiteApp() {
   ) {
     try {
       setLoadState({ status: "loading", message: `Loading ${label}` });
-      const loaded = await loadFromUrls(opencliUrl, xmldocUrl, viewerOptions, label, featureFlags);
+      const loaded = await loadFromUrls(opencliUrl, xmldocUrl, viewerOptions, label, featureFlags, {
+        title: packageId,
+        commandPrefix: command,
+      });
       applyLoadedSource(loaded);
       setPackageContext({ packageId, version, command });
       window.location.hash = buildPackageHash(packageId, version);

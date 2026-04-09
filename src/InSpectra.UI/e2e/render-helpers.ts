@@ -16,6 +16,7 @@ export function renderHtml(options: {
   xmldocPath?: string;
   outDir?: string;
   title?: string;
+  commandPrefix?: string;
 }): string {
   const outDir = options.outDir ?? fs.mkdtempSync(path.join(os.tmpdir(), "inspectra-e2e-"));
 
@@ -32,6 +33,10 @@ export function renderHtml(options: {
     args.push("--title", options.title);
   }
 
+  if (options.commandPrefix) {
+    args.push("--command-prefix", options.commandPrefix);
+  }
+
   args.push("--out-dir", outDir, "--overwrite");
 
   execFileSync("dotnet", args, { cwd: repoRoot, stdio: "pipe", timeout: 60_000 });
@@ -42,9 +47,9 @@ export function renderHtml(options: {
  * Renders the test fixture opencli.json to an HTML bundle.
  * Uses the pre-built output at e2e/.rendered only for the default no-override case.
  */
-export function renderTestFixture(options?: { outDir?: string; title?: string }): string {
+export function renderTestFixture(options?: { outDir?: string; title?: string; commandPrefix?: string }): string {
   const prebuilt = path.resolve(__dirname, ".rendered");
-  if (!options?.outDir && !options?.title && fs.existsSync(path.join(prebuilt, "index.html"))) {
+  if (!options?.outDir && !options?.title && !options?.commandPrefix && fs.existsSync(path.join(prebuilt, "index.html"))) {
     return prebuilt;
   }
 
@@ -53,5 +58,6 @@ export function renderTestFixture(options?: { outDir?: string; title?: string })
     xmldocPath: path.join(repoRoot, "examples/jellyfin-cli/xmldoc.xml"),
     outDir: options?.outDir ?? prebuilt,
     title: options?.title,
+    commandPrefix: options?.commandPrefix,
   });
 }

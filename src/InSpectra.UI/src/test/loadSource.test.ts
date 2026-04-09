@@ -10,6 +10,7 @@ describe("startup loading", () => {
   it("treats inferred xmldoc.xml as optional for directory links", async () => {
     const openCliUrl = "https://example.test/viewer/data/opencli.json";
     const xmlDocUrl = "https://example.test/viewer/data/xmldoc.xml";
+    const metadataUrl = "https://example.test/viewer/data/metadata.json";
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = input.toString();
       if (url === openCliUrl) {
@@ -17,6 +18,10 @@ describe("startup loading", () => {
       }
 
       if (url === xmlDocUrl) {
+        return new Response("", { status: 404, statusText: "Not Found" });
+      }
+
+      if (url === metadataUrl) {
         return new Response("", { status: 404, statusText: "Not Found" });
       }
 
@@ -41,7 +46,7 @@ describe("startup loading", () => {
     expect(result).not.toBeNull();
     expect(result?.xmlDoc).toBeUndefined();
     expect(result?.warnings).toEqual([]);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it("fails when an explicitly requested xmldoc URL cannot be loaded", async () => {
@@ -82,11 +87,47 @@ describe("startup loading", () => {
       options: {
         ...defaultViewerOptions(),
         title: "JellyfinCli",
+        commandPrefix: "jf",
       },
       features: defaultFeatureFlags(),
     });
 
     expect(result).not.toBeNull();
     expect(result?.document.info.title).toBe("JellyfinCli");
+    expect(result?.commandPrefix).toBe("jf");
+  });
+
+  it("infers package title and command prefix from sibling metadata for linked OpenCLI documents", async () => {
+    const openCliUrl = "https://inspectra-data.kamsker.at/packages/jellyfincli/latest/opencli.json";
+    const metadataUrl = "https://inspectra-data.kamsker.at/packages/jellyfincli/latest/metadata.json";
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = input.toString();
+      if (url === openCliUrl) {
+        return new Response(JSON.stringify(testDocument), { status: 200 });
+      }
+
+      if (url === metadataUrl) {
+        return new Response(JSON.stringify({ packageId: "JellyfinCli", command: "jf" }), { status: 200 });
+      }
+
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await loadFromStartupRequest({
+      kind: "links",
+      links: {
+        openCliUrl,
+        xmlDocIsOptional: true,
+      },
+      options: defaultViewerOptions(),
+      features: defaultFeatureFlags(),
+      source: "query",
+    });
+
+    expect(result).not.toBeNull();
+    expect(result?.document.info.title).toBe("JellyfinCli");
+    expect(result?.commandPrefix).toBe("jf");
   });
 });

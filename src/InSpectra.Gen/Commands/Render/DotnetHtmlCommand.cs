@@ -34,7 +34,7 @@ public sealed class DotnetHtmlCommand(HtmlRenderService renderService) : AsyncCo
         return CommandOutputHandler.ExecuteAsync(
             options.OutputMode,
             options.Verbose,
-            () => renderService.RenderFromExecAsync(request, features, cancellationToken, settings.Label, settings.Title, themeOptions));
+            () => renderService.RenderFromExecAsync(request, features, cancellationToken, settings.Label, settings.Title, settings.CommandPrefix, themeOptions));
     }
 }
 

@@ -26,6 +26,7 @@ test("rendered HTML honors an explicit title override", async ({ page }) => {
   const customDir = renderTestFixture({
     outDir: fs.mkdtempSync(path.join(os.tmpdir(), "inspectra-title-")),
     title: "JellyfinCli",
+    commandPrefix: "jf",
   });
   const customServer = await serveDirectory(customDir);
 
@@ -33,6 +34,9 @@ test("rendered HTML honors an explicit title override", async ({ page }) => {
     await page.goto(customServer.url);
     await expect(page.locator(".brand-title")).toHaveText("JellyfinCli");
     await expect(page.locator(".content-column h1")).toHaveText("JellyfinCli");
+    await page.locator(".sidebar-nav").getByRole("button", { name: "artists", exact: true }).click();
+    await expect(page.locator(".example-block").first()).toContainText("jf artists");
+    await expect(page.locator(".composer-output")).toContainText("jf artists");
   } finally {
     await customServer.close();
   }
