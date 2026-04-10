@@ -149,12 +149,16 @@ internal static class CommandTreeWalker
 
     private static List<string>? ReadAllowedValues(object source, Type? valueType)
     {
+        var normalizedType = valueType is null
+            ? null
+            : Nullable.GetUnderlyingType(valueType) ?? valueType;
+
         // If the value type is an enum, extract all enum names as allowed values.
-        if (valueType is null || !valueType.IsEnum) return null;
+        if (normalizedType is null || !normalizedType.IsEnum) return null;
 
         try
         {
-            return Enum.GetNames(valueType).ToList();
+            return Enum.GetNames(normalizedType).ToList();
         }
         catch
         {

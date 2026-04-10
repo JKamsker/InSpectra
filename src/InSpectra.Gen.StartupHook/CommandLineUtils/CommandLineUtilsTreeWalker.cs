@@ -77,6 +77,11 @@ internal static class CommandLineUtilsTreeWalker
     private static CapturedArgument WalkArgument(object argument)
     {
         var multipleValues = ReflectionValueReader.GetMemberValue<bool>(argument, "MultipleValues");
+        var required = ReflectionValueReader.GetMemberValue(argument, "Required") is bool requiredValue
+            ? requiredValue
+            : ReflectionValueReader.GetMemberValue(argument, "IsRequired") is bool isRequiredValue
+                ? isRequiredValue
+                : true;
         var maxArity = multipleValues ? int.MaxValue : 1;
         var defaultValue = ReadDefaultValue(argument);
 
@@ -85,7 +90,7 @@ internal static class CommandLineUtilsTreeWalker
             Name = ReflectionValueReader.GetMemberValue<string>(argument, "Name"),
             Description = ReflectionValueReader.GetMemberValue<string>(argument, "Description"),
             IsHidden = IsHidden(argument),
-            MinArity = 1,
+            MinArity = required ? 1 : 0,
             MaxArity = maxArity,
             ValueType = "String",
             HasDefaultValue = defaultValue.HasDefault,

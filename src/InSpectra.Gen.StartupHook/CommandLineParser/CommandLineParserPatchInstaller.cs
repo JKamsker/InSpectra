@@ -13,14 +13,16 @@ internal static class CommandLineParserPatchInstaller
     internal static string? CapturePath;
 
     private static readonly ConcurrentBag<string> PatchLog = [];
-    private static int _captured; // 0 = false, 1 = true
+    private static int _captured; // 0 = idle, 1 = capturing, 2 = captured
+    private static string? _noPatchableMethodDiagnostic;
 
     public static void Install(Assembly assembly, string capturePath)
     {
         FrameworkAssembly = assembly;
         CapturePath = capturePath;
         while (PatchLog.TryTake(out _)) { }
-        Volatile.Write(ref _captured, 0);
+        HookCaptureStateSupport.Reset(ref _captured);
+        _noPatchableMethodDiagnostic = null;
 
         var harmony = new Harmony("com.inspectra.discovery.startuphook.commandlineparser");
         var parsePostfix = new HarmonyMethod(typeof(CommandLineParserPatchInstaller), nameof(ParsePostfix));
@@ -29,18 +31,21 @@ internal static class CommandLineParserPatchInstaller
         patchCount += TryPatchNamedMethods(harmony, assembly.GetType("CommandLine.Parser"), parsePostfix);
         patchCount += TryPatchNamedMethods(harmony, assembly.GetType("CommandLine.ParserExtensions"), parsePostfix);
 
-        if (patchCount == 0 && CapturePath is not null)
+        AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
+        AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+
+        if (patchCount == 0)
         {
             var diagnostic = new System.Text.StringBuilder();
             diagnostic.AppendLine($"Assembly: {assembly.FullName}");
             diagnostic.AppendLine($"Patch log: {string.Join("; ", PatchLog)}");
-            CaptureFileWriter.WriteError(CapturePath, "no-patchable-method", diagnostic.ToString());
+            _noPatchableMethodDiagnostic = diagnostic.ToString();
         }
     }
 
     public static void ParsePostfix(MethodBase? __originalMethod, object? __result)
     {
-        if (Volatile.Read(ref _captured) != 0 || __result is null || FrameworkAssembly is null || CapturePath is null)
+        if (HookCaptureStateSupport.IsBusyOrCompleted(ref _captured) || __result is null || FrameworkAssembly is null || CapturePath is null)
         {
             return;
         }
@@ -50,21 +55,47 @@ internal static class CommandLineParserPatchInstaller
             return;
         }
 
+        if (!HookCaptureStateSupport.TryBegin(ref _captured))
+        {
+            return;
+        }
+
+        var completed = false;
+
         try
         {
-            CaptureFileWriter.Write(CapturePath, new CaptureResult
+            if (HookCaptureStateSupport.HasPreservedFailure(CapturePath))
+            {
+                HookCaptureStateSupport.Complete(ref _captured);
+                completed = true;
+                return;
+            }
+
+            if (!CaptureFileWriter.Write(CapturePath, new CaptureResult
             {
                 Status = "ok",
                 CliFramework = HookCliFrameworkSupport.CommandLineParser,
                 FrameworkVersion = FrameworkAssembly.GetName().Version?.ToString(),
                 PatchTarget = FormatPatchTarget(__originalMethod),
                 Root = root,
-            });
-            Interlocked.CompareExchange(ref _captured, 1, 0);
+            }))
+            {
+                return;
+            }
+
+            HookCaptureStateSupport.Complete(ref _captured);
+            completed = true;
         }
         catch (Exception ex)
         {
             CaptureFileWriter.WriteError(CapturePath, "capture-failed", ex.ToString());
+        }
+        finally
+        {
+            if (!completed)
+            {
+                HookCaptureStateSupport.Release(ref _captured);
+            }
         }
     }
 
@@ -110,5 +141,17 @@ internal static class CommandLineParserPatchInstaller
         return string.IsNullOrWhiteSpace(patchSummary)
             ? methodName
             : $"{methodName} ({patchSummary})";
+    }
+
+    private static void OnProcessExit(object? sender, EventArgs e)
+    {
+        if (HookCaptureStateSupport.IsBusyOrCompleted(ref _captured)
+            || string.IsNullOrWhiteSpace(_noPatchableMethodDiagnostic)
+            || CapturePath is null)
+        {
+            return;
+        }
+
+        CaptureFileWriter.WriteError(CapturePath, "no-patchable-method", _noPatchableMethodDiagnostic, overwrite: false);
     }
 }

@@ -1,6 +1,5 @@
 using InSpectra.Gen.StartupHook.Capture;
 using InSpectra.Gen.StartupHook.Frameworks;
-using InSpectra.Gen.StartupHook.Reflection;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading;
@@ -15,8 +14,8 @@ internal static class CommandLineUtilsPatchInstaller
     internal static string? CapturePath;
 
     private static readonly ConcurrentBag<string> PatchLog = [];
-    private static int _captured; // 0 = false, 1 = true
-    private static object? _capturedRootApplication;
+    private static readonly ConcurrentQueue<object> CapturedRootApplications = [];
+    private static int _captured; // 0 = idle, 1 = capturing, 2 = captured
     private static string? _noPatchableMethodDiagnostic;
 
     public static void Install(Assembly assembly, string cliFramework, string capturePath)
@@ -25,8 +24,8 @@ internal static class CommandLineUtilsPatchInstaller
         CliFramework = cliFramework;
         CapturePath = capturePath;
         while (PatchLog.TryTake(out _)) { }
-        Volatile.Write(ref _captured, 0);
-        _capturedRootApplication = null;
+        while (CapturedRootApplications.TryDequeue(out _)) { }
+        HookCaptureStateSupport.Reset(ref _captured);
         _noPatchableMethodDiagnostic = null;
 
         var harmony = new Harmony("com.inspectra.discovery.startuphook.commandlineutils");
@@ -36,11 +35,12 @@ internal static class CommandLineUtilsPatchInstaller
         var constructorPostfix = new HarmonyMethod(typeof(CommandLineUtilsPatchInstaller), nameof(CommandLineApplicationConstructorPostfix));
 
         var patchCount = 0;
-        patchCount += TryPatchNamedMethods(harmony, assembly, "Parse", parsePostfix);
-        patchCount += TryPatchNamedMethods(harmony, assembly, "Execute", executePostfix, executeFinalizer);
-        patchCount += TryPatchNamedMethods(harmony, assembly, "ExecuteAsync", executePostfix, executeFinalizer);
-        patchCount += TryPatchConstructors(harmony, assembly, constructorPostfix);
+        patchCount += CommandLineUtilsPatchingSupport.TryPatchNamedMethods(harmony, assembly, "Parse", parsePostfix, cliFramework, PatchLog.Add);
+        patchCount += CommandLineUtilsPatchingSupport.TryPatchNamedMethods(harmony, assembly, "Execute", executePostfix, cliFramework, PatchLog.Add, executeFinalizer);
+        patchCount += CommandLineUtilsPatchingSupport.TryPatchNamedMethods(harmony, assembly, "ExecuteAsync", executePostfix, cliFramework, PatchLog.Add, executeFinalizer);
+        patchCount += CommandLineUtilsPatchingSupport.TryPatchConstructors(harmony, assembly, constructorPostfix, cliFramework, PatchLog.Add);
 
+        AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
         AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
         if (patchCount == 0)
@@ -55,17 +55,17 @@ internal static class CommandLineUtilsPatchInstaller
 
     public static void CommandLineApplicationConstructorPostfix(object __instance)
     {
-        if (Volatile.Read(ref _captured) != 0 || __instance is null)
+        if (HookCaptureStateSupport.IsBusyOrCompleted(ref _captured) || __instance is null)
         {
             return;
         }
 
-        _capturedRootApplication = NavigateToRoot(__instance);
+        CapturedRootApplications.Enqueue(CommandLineUtilsApplicationSupport.NavigateToRoot(__instance, CliFramework));
     }
 
     public static void ParsePostfix(object? __instance)
     {
-        if (Volatile.Read(ref _captured) != 0 || __instance is null)
+        if (HookCaptureStateSupport.IsBusyOrCompleted(ref _captured) || __instance is null)
         {
             return;
         }
@@ -75,7 +75,7 @@ internal static class CommandLineUtilsPatchInstaller
 
     public static void ExecutePostfix(object? __instance)
     {
-        if (Volatile.Read(ref _captured) != 0)
+        if (HookCaptureStateSupport.IsBusyOrCompleted(ref _captured))
         {
             return;
         }
@@ -85,34 +85,39 @@ internal static class CommandLineUtilsPatchInstaller
             return;
         }
 
-        if (_capturedRootApplication is not null)
-        {
-            TryCaptureFromObject(_capturedRootApplication, "Execute-postfix");
-        }
+        TryCaptureFromCapturedRoots("Execute-postfix");
     }
 
     private static void OnProcessExit(object? sender, EventArgs e)
     {
-        if (Volatile.Read(ref _captured) != 0)
+        if (HookCaptureStateSupport.IsBusyOrCompleted(ref _captured))
         {
             return;
         }
 
-        var rootApplication = _capturedRootApplication ?? FindRootApplicationFromLoadedTypes();
-        if (rootApplication is not null && TryCaptureFromObject(rootApplication, "ProcessExit-fallback"))
+        foreach (var rootApplication in CommandLineUtilsApplicationSupport.EnumerateCapturedRootApplications(CapturedRootApplications))
+        {
+            if (TryCaptureFromObject(rootApplication, "ProcessExit-fallback"))
+            {
+                return;
+            }
+        }
+
+        var reflectedRoot = CommandLineUtilsApplicationSupport.FindRootApplicationFromLoadedTypes(CliFramework);
+        if (reflectedRoot is not null && TryCaptureFromObject(reflectedRoot, "ProcessExit-fallback"))
         {
             return;
         }
 
         if (!string.IsNullOrWhiteSpace(_noPatchableMethodDiagnostic) && CapturePath is not null)
         {
-            CaptureFileWriter.WriteError(CapturePath, "no-patchable-method", _noPatchableMethodDiagnostic);
+            CaptureFileWriter.WriteError(CapturePath, "no-patchable-method", _noPatchableMethodDiagnostic, overwrite: false);
         }
     }
 
     public static Exception? ExecuteFinalizer(object? __instance, Exception? __exception)
     {
-        if (Volatile.Read(ref _captured) != 0)
+        if (HookCaptureStateSupport.IsBusyOrCompleted(ref _captured))
         {
             return __exception;
         }
@@ -122,83 +127,42 @@ internal static class CommandLineUtilsPatchInstaller
             return __exception;
         }
 
-        if (_capturedRootApplication is not null)
-        {
-            TryCaptureFromObject(_capturedRootApplication, "Execute-finalizer");
-        }
+        TryCaptureFromCapturedRoots("Execute-finalizer");
 
         return __exception;
     }
 
-    private static int TryPatchNamedMethods(Harmony harmony, Assembly assembly, string methodName, HarmonyMethod postfix, HarmonyMethod? finalizer = null)
-    {
-        var count = 0;
-        foreach (var type in assembly.GetExportedTypes().Where(IsCommandLineApplicationType))
-        {
-            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
-            {
-                if (!string.Equals(method.Name, methodName, StringComparison.Ordinal)
-                    || method.IsSpecialName)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    harmony.Patch(method, postfix: postfix, finalizer: finalizer);
-                    PatchLog.Add($"OK: {type.Name}.{method.Name}");
-                    count++;
-                }
-                catch (Exception ex)
-                {
-                    PatchLog.Add($"FAIL: {type.Name}.{method.Name}: {ex.Message}");
-                }
-            }
-        }
-
-        return count;
-    }
-
-    private static int TryPatchConstructors(Harmony harmony, Assembly assembly, HarmonyMethod postfix)
-    {
-        var count = 0;
-        foreach (var type in assembly.GetExportedTypes().Where(IsCommandLineApplicationType))
-        {
-            foreach (var constructor in type.GetConstructors())
-            {
-                try
-                {
-                    harmony.Patch(constructor, postfix: postfix);
-                    PatchLog.Add($"OK: {type.Name}.ctor({string.Join(", ", constructor.GetParameters().Select(parameter => parameter.ParameterType.Name))})");
-                    count++;
-                }
-                catch (Exception ex)
-                {
-                    PatchLog.Add($"FAIL: {type.Name}.ctor: {ex.Message}");
-                }
-            }
-        }
-
-        return count;
-    }
-
     private static bool TryCaptureFromObject(object target, string source)
     {
-        if (Volatile.Read(ref _captured) != 0 || FrameworkAssembly is null || CapturePath is null || string.IsNullOrWhiteSpace(CliFramework))
+        if (FrameworkAssembly is null || CapturePath is null || string.IsNullOrWhiteSpace(CliFramework))
         {
             return false;
         }
 
-        var rootApplication = ResolveRootApplication(target);
+        var rootApplication = CommandLineUtilsApplicationSupport.ResolveRootApplication(target, CapturedRootApplications, CliFramework);
         if (rootApplication is null)
         {
             return false;
         }
 
+        if (!HookCaptureStateSupport.TryBegin(ref _captured))
+        {
+            return HookCaptureStateSupport.IsBusyOrCompleted(ref _captured);
+        }
+
+        var completed = false;
+
         try
         {
+            if (HookCaptureStateSupport.HasPreservedFailure(CapturePath))
+            {
+                HookCaptureStateSupport.Complete(ref _captured);
+                completed = true;
+                return true;
+            }
+
             var version = FrameworkAssembly.GetName().Version?.ToString();
-            CaptureFileWriter.Write(CapturePath, new CaptureResult
+            if (!CaptureFileWriter.Write(CapturePath, new CaptureResult
             {
                 Status = "ok",
                 CliFramework = CliFramework,
@@ -208,8 +172,13 @@ internal static class CommandLineUtilsPatchInstaller
                     : null,
                 PatchTarget = $"{source} ({string.Join(", ", PatchLog.Where(entry => entry.StartsWith("OK", StringComparison.Ordinal)))})",
                 Root = CommandLineUtilsTreeWalker.Walk(rootApplication),
-            });
-            Interlocked.CompareExchange(ref _captured, 1, 0);
+            }))
+            {
+                return false;
+            }
+
+            HookCaptureStateSupport.Complete(ref _captured);
+            completed = true;
             return true;
         }
         catch (Exception ex)
@@ -217,90 +186,23 @@ internal static class CommandLineUtilsPatchInstaller
             CaptureFileWriter.WriteError(CapturePath, "capture-failed", ex.ToString());
             return false;
         }
-    }
-
-    private static object? ResolveRootApplication(object instance)
-    {
-        return IsCommandLineApplicationType(instance.GetType())
-            ? NavigateToRoot(instance)
-            : _capturedRootApplication ?? FindRootApplicationFromLoadedTypes();
-    }
-
-    private static object NavigateToRoot(object application)
-    {
-        var current = application;
-        // Cycle guard: real command trees are shallow; 20 levels is generous.
-        // If we exceed this, the tree is malformed or contains a cycle.
-        for (var i = 0; i < 20; i++)
+        finally
         {
-            var parent = ReflectionValueReader.GetMemberValue(current, "Parent");
-            if (parent is null || !IsCommandLineApplicationType(parent.GetType()))
+            if (!completed)
             {
-                break;
-            }
-
-            current = parent;
-        }
-
-        return current;
-    }
-
-    private static object? FindRootApplicationFromLoadedTypes()
-    {
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            if (assembly.IsDynamic)
-            {
-                continue;
-            }
-
-            try
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    foreach (var field in type.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                    {
-                        object? value;
-                        try
-                        {
-                            value = field.GetValue(null);
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-
-                        if (value is not null && IsCommandLineApplicationType(value.GetType()))
-                        {
-                            return NavigateToRoot(value);
-                        }
-                    }
-                }
-            }
-            catch
-            {
+                HookCaptureStateSupport.Release(ref _captured);
             }
         }
-
-        return null;
     }
 
-    private static bool IsCommandLineApplicationType(Type type)
+    private static void TryCaptureFromCapturedRoots(string source)
     {
-        for (var current = type; current is not null; current = current.BaseType)
+        foreach (var rootApplication in CommandLineUtilsApplicationSupport.EnumerateCapturedRootApplications(CapturedRootApplications))
         {
-            var fullName = current.FullName;
-            if (fullName is null || string.IsNullOrWhiteSpace(CliFramework))
+            if (TryCaptureFromObject(rootApplication, source))
             {
-                continue;
-            }
-
-            if (fullName.StartsWith(CliFramework + ".CommandLineApplication", StringComparison.Ordinal))
-            {
-                return true;
+                return;
             }
         }
-
-        return false;
     }
 }

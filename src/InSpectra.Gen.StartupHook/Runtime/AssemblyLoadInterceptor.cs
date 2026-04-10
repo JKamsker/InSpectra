@@ -18,21 +18,26 @@ internal static class AssemblyLoadInterceptor
         _expectedCliFramework = HookCliFrameworkSupport.NormalizeExpectedFramework(expectedCliFramework);
         _preferredFrameworkDirectory = preferredFrameworkDirectory;
 
+        // Watch for future loads before scanning already-loaded assemblies to avoid a missed-load race.
+        AppDomain.CurrentDomain.AssemblyLoad -= OnAssemblyLoad;
+        AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
+
+        // Surface target crashes so the caller gets a concrete classification instead of a missing file.
+        AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+
+        // If the tool exits without ever loading the expected framework, write a sentinel.
+        AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
+        AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+
         // Check assemblies already loaded.
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
             if (TryPatch(assembly))
-                return;
+            {
+                break;
+            }
         }
-
-        // Watch for future loads.
-        AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
-
-        // Surface target crashes so the caller gets a concrete classification instead of a missing file.
-        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-
-        // If the tool exits without ever loading System.CommandLine, write a sentinel.
-        AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
     }
 
     private static void OnAssemblyLoad(object? sender, AssemblyLoadEventArgs args)
@@ -81,6 +86,6 @@ internal static class AssemblyLoadInterceptor
 
         var error = args.ExceptionObject?.ToString()
             ?? "The target tool terminated with an unhandled exception before startup hook capture completed.";
-        CaptureFileWriter.WriteError(_capturePath, "target-unhandled-exception", error, overwrite: false);
+        CaptureFileWriter.WritePreservedError(_capturePath, "target-unhandled-exception", error);
     }
 }
