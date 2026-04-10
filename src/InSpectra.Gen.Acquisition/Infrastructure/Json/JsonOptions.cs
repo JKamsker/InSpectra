@@ -20,9 +20,5 @@ internal static class JsonOptions
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    public static readonly JsonSerializerOptions MinifiedRepositoryFiles = new(RepositoryFiles)
-    {
-        WriteIndented = false,
-    };
 }
 
