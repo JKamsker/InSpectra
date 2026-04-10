@@ -17,6 +17,10 @@ public static class CommandOutputHandler
             await WriteSuccessAsync(outputMode, result);
             return 0;
         }
+        catch (OperationCanceledException)
+        {
+            return 130;
+        }
         catch (CliException exception)
         {
             await WriteFailureAsync(outputMode, exception);

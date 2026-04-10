@@ -153,6 +153,10 @@ internal static class NonSpectreExecutionSupport
                 commandTimeoutSeconds,
                 cancellationToken);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             NonSpectreResultSupport.ApplyUnexpectedRetryableFailure(result, ex.Message);
