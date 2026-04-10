@@ -1,6 +1,7 @@
 using InSpectra.Gen.StartupHook.Capture;
 using InSpectra.Gen.StartupHook.Frameworks;
 using System.Reflection;
+using System.Threading;
 
 namespace InSpectra.Gen.StartupHook.Runtime;
 
@@ -9,7 +10,7 @@ internal static class AssemblyLoadInterceptor
     private static string? _capturePath;
     private static string _expectedCliFramework = HookCliFrameworkSupport.SystemCommandLine;
     private static string? _preferredFrameworkDirectory;
-    private static bool _patched;
+    private static int _patched; // 0 = false, 1 = true
 
     public static void Start(string capturePath, string? expectedCliFramework, string? preferredFrameworkDirectory)
     {
@@ -41,13 +42,14 @@ internal static class AssemblyLoadInterceptor
 
     private static bool TryPatch(Assembly assembly)
     {
-        if (_patched)
+        if (Volatile.Read(ref _patched) != 0)
             return true;
 
         if (!HookAssemblySelectionSupport.ShouldPatch(assembly, _expectedCliFramework, _preferredFrameworkDirectory))
             return false;
 
-        _patched = true;
+        if (Interlocked.CompareExchange(ref _patched, 1, 0) != 0)
+            return true;
         AppDomain.CurrentDomain.AssemblyLoad -= OnAssemblyLoad;
 
         try
@@ -64,7 +66,7 @@ internal static class AssemblyLoadInterceptor
 
     private static void OnProcessExit(object? sender, EventArgs e)
     {
-        if (!_patched && _capturePath is not null)
+        if (Volatile.Read(ref _patched) == 0 && _capturePath is not null)
         {
             CaptureFileWriter.WriteError(_capturePath, "no-assembly-loaded",
                 $"{HookCliFrameworkSupport.GetExpectedAssemblyName(_expectedCliFramework)} assembly was never loaded by the target tool.",

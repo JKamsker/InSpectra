@@ -1,6 +1,8 @@
 using InSpectra.Gen.StartupHook.Capture;
 using InSpectra.Gen.StartupHook.Frameworks;
+using System.Collections.Concurrent;
 using System.Reflection;
+using System.Threading;
 using HarmonyLib;
 
 namespace InSpectra.Gen.StartupHook.SystemCommandLine;
@@ -9,8 +11,8 @@ internal static class HarmonyPatchInstaller
 {
     internal static Assembly? SystemCommandLineAssembly;
     internal static string? CapturePath;
-    private static volatile bool _captured;
-    private static readonly List<string> _patchLog = [];
+    private static int _captured; // 0 = false, 1 = true
+    private static readonly ConcurrentBag<string> _patchLog = [];
     private static object? _capturedRootCommand;
 
     public static string GetPatchLog() => string.Join("\n", _patchLog);
@@ -133,7 +135,7 @@ internal static class HarmonyPatchInstaller
     /// </summary>
     private static void OnProcessExit(object? sender, EventArgs e)
     {
-        if (_captured || CapturePath is null || SystemCommandLineAssembly is null) return;
+        if (Volatile.Read(ref _captured) != 0 || CapturePath is null || SystemCommandLineAssembly is null) return;
 
         var root = _capturedRootCommand ?? FindRootCommandFromLoadedTypes();
         if (root is not null)
@@ -148,7 +150,7 @@ internal static class HarmonyPatchInstaller
     /// </summary>
     public static void ParsePostfix(object? __instance, object? __result)
     {
-        if (_captured || __result is null) return;
+        if (Volatile.Read(ref _captured) != 0 || __result is null) return;
         TryCaptureFromObject(__result, "Parse-postfix");
     }
 
@@ -157,13 +159,13 @@ internal static class HarmonyPatchInstaller
     /// </summary>
     public static void InvokePostfix(object? __instance)
     {
-        if (_captured || __instance is null) return;
+        if (Volatile.Read(ref _captured) != 0 || __instance is null) return;
         TryCaptureFromObject(__instance, "Invoke-postfix");
     }
 
     private static bool TryCaptureFromObject(object? target, string source)
     {
-        if (_captured || target is null || SystemCommandLineAssembly is null || CapturePath is null)
+        if (Volatile.Read(ref _captured) != 0 || target is null || SystemCommandLineAssembly is null || CapturePath is null)
             return false;
 
         var rootCommand = ResolveRootCommand(target);
@@ -183,7 +185,7 @@ internal static class HarmonyPatchInstaller
                 PatchTarget = $"{source} ({string.Join(", ", _patchLog.Where(l => l.StartsWith("OK")))})",
                 Root = tree,
             });
-            _captured = true;
+            Interlocked.CompareExchange(ref _captured, 1, 0);
             return true;
         }
         catch (Exception ex)
@@ -254,7 +256,9 @@ internal static class HarmonyPatchInstaller
     private static object NavigateToRoot(object command)
     {
         var current = command;
-        for (var i = 0; i < 100; i++)
+        // Cycle guard: real command trees are shallow; 20 levels is generous.
+        // If we exceed this, the tree is malformed or contains a cycle.
+        for (var i = 0; i < 20; i++)
         {
             var parent = GetPropertyValue(current, "Parent");
             if (parent is null || !IsCommandType(parent.GetType()))

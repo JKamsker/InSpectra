@@ -1,7 +1,9 @@
 using InSpectra.Gen.StartupHook.Capture;
 using InSpectra.Gen.StartupHook.Frameworks;
 using InSpectra.Gen.StartupHook.Reflection;
+using System.Collections.Concurrent;
 using System.Reflection;
+using System.Threading;
 using HarmonyLib;
 
 namespace InSpectra.Gen.StartupHook.CommandLineUtils;
@@ -12,8 +14,8 @@ internal static class CommandLineUtilsPatchInstaller
     internal static string? CliFramework;
     internal static string? CapturePath;
 
-    private static readonly List<string> PatchLog = [];
-    private static volatile bool _captured;
+    private static readonly ConcurrentBag<string> PatchLog = [];
+    private static int _captured; // 0 = false, 1 = true
     private static object? _capturedRootApplication;
     private static string? _noPatchableMethodDiagnostic;
 
@@ -22,8 +24,8 @@ internal static class CommandLineUtilsPatchInstaller
         FrameworkAssembly = assembly;
         CliFramework = cliFramework;
         CapturePath = capturePath;
-        PatchLog.Clear();
-        _captured = false;
+        while (PatchLog.TryTake(out _)) { }
+        Volatile.Write(ref _captured, 0);
         _capturedRootApplication = null;
         _noPatchableMethodDiagnostic = null;
 
@@ -53,7 +55,7 @@ internal static class CommandLineUtilsPatchInstaller
 
     public static void CommandLineApplicationConstructorPostfix(object __instance)
     {
-        if (_captured || __instance is null)
+        if (Volatile.Read(ref _captured) != 0 || __instance is null)
         {
             return;
         }
@@ -63,7 +65,7 @@ internal static class CommandLineUtilsPatchInstaller
 
     public static void ParsePostfix(object? __instance)
     {
-        if (_captured || __instance is null)
+        if (Volatile.Read(ref _captured) != 0 || __instance is null)
         {
             return;
         }
@@ -73,7 +75,7 @@ internal static class CommandLineUtilsPatchInstaller
 
     public static void ExecutePostfix(object? __instance)
     {
-        if (_captured)
+        if (Volatile.Read(ref _captured) != 0)
         {
             return;
         }
@@ -91,7 +93,7 @@ internal static class CommandLineUtilsPatchInstaller
 
     private static void OnProcessExit(object? sender, EventArgs e)
     {
-        if (_captured)
+        if (Volatile.Read(ref _captured) != 0)
         {
             return;
         }
@@ -110,7 +112,7 @@ internal static class CommandLineUtilsPatchInstaller
 
     public static Exception? ExecuteFinalizer(object? __instance, Exception? __exception)
     {
-        if (_captured)
+        if (Volatile.Read(ref _captured) != 0)
         {
             return __exception;
         }
@@ -182,7 +184,7 @@ internal static class CommandLineUtilsPatchInstaller
 
     private static bool TryCaptureFromObject(object target, string source)
     {
-        if (_captured || FrameworkAssembly is null || CapturePath is null || string.IsNullOrWhiteSpace(CliFramework))
+        if (Volatile.Read(ref _captured) != 0 || FrameworkAssembly is null || CapturePath is null || string.IsNullOrWhiteSpace(CliFramework))
         {
             return false;
         }
@@ -207,7 +209,7 @@ internal static class CommandLineUtilsPatchInstaller
                 PatchTarget = $"{source} ({string.Join(", ", PatchLog.Where(entry => entry.StartsWith("OK", StringComparison.Ordinal)))})",
                 Root = CommandLineUtilsTreeWalker.Walk(rootApplication),
             });
-            _captured = true;
+            Interlocked.CompareExchange(ref _captured, 1, 0);
             return true;
         }
         catch (Exception ex)
@@ -227,7 +229,9 @@ internal static class CommandLineUtilsPatchInstaller
     private static object NavigateToRoot(object application)
     {
         var current = application;
-        for (var i = 0; i < 100; i++)
+        // Cycle guard: real command trees are shallow; 20 levels is generous.
+        // If we exceed this, the tree is malformed or contains a cycle.
+        for (var i = 0; i < 20; i++)
         {
             var parent = ReflectionValueReader.GetMemberValue(current, "Parent");
             if (parent is null || !IsCommandLineApplicationType(parent.GetType()))

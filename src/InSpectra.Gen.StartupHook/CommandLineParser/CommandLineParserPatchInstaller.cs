@@ -1,6 +1,8 @@
 using InSpectra.Gen.StartupHook.Capture;
 using InSpectra.Gen.StartupHook.Frameworks;
+using System.Collections.Concurrent;
 using System.Reflection;
+using System.Threading;
 using HarmonyLib;
 
 namespace InSpectra.Gen.StartupHook.CommandLineParser;
@@ -10,15 +12,15 @@ internal static class CommandLineParserPatchInstaller
     internal static Assembly? FrameworkAssembly;
     internal static string? CapturePath;
 
-    private static readonly List<string> PatchLog = [];
-    private static volatile bool _captured;
+    private static readonly ConcurrentBag<string> PatchLog = [];
+    private static int _captured; // 0 = false, 1 = true
 
     public static void Install(Assembly assembly, string capturePath)
     {
         FrameworkAssembly = assembly;
         CapturePath = capturePath;
-        PatchLog.Clear();
-        _captured = false;
+        while (PatchLog.TryTake(out _)) { }
+        Volatile.Write(ref _captured, 0);
 
         var harmony = new Harmony("com.inspectra.discovery.startuphook.commandlineparser");
         var parsePostfix = new HarmonyMethod(typeof(CommandLineParserPatchInstaller), nameof(ParsePostfix));
@@ -38,7 +40,7 @@ internal static class CommandLineParserPatchInstaller
 
     public static void ParsePostfix(MethodBase? __originalMethod, object? __result)
     {
-        if (_captured || __result is null || FrameworkAssembly is null || CapturePath is null)
+        if (Volatile.Read(ref _captured) != 0 || __result is null || FrameworkAssembly is null || CapturePath is null)
         {
             return;
         }
@@ -58,7 +60,7 @@ internal static class CommandLineParserPatchInstaller
                 PatchTarget = FormatPatchTarget(__originalMethod),
                 Root = root,
             });
-            _captured = true;
+            Interlocked.CompareExchange(ref _captured, 1, 0);
         }
         catch (Exception ex)
         {
