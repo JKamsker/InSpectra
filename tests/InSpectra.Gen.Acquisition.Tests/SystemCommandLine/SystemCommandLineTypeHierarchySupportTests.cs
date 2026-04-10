@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Tests.SystemCommandLine;
 
-using InSpectra.Gen.Acquisition.StaticAnalysis.Attributes;
+using InSpectra.Gen.Acquisition.StaticAnalysis.Attributes.SystemCommandLine;
 
 using dnlib.DotNet;
 

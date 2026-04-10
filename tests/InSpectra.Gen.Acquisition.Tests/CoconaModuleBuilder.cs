@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Tests;
 
-using InSpectra.Gen.Acquisition.StaticAnalysis.Attributes;
+using InSpectra.Gen.Acquisition.StaticAnalysis.Attributes.Cocona;
 using InSpectra.Gen.Acquisition.StaticAnalysis.Inspection;
 
 using dnlib.DotNet;

@@ -3,6 +3,7 @@ namespace InSpectra.Gen.Acquisition.Tests;
 using InSpectra.Gen.Acquisition.Frameworks;
 using InSpectra.Gen.Acquisition.NuGet;
 using InSpectra.Gen.Acquisition.StaticAnalysis.Attributes;
+using InSpectra.Gen.Acquisition.StaticAnalysis.Attributes.SystemCommandLine;
 
 using Xunit;
 

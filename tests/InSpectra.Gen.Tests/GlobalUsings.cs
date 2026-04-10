@@ -3,5 +3,7 @@ global using InSpectra.Gen.OpenCli.Acquisition;
 global using InSpectra.Gen.OpenCli.Documents;
 global using InSpectra.Gen.OpenCli.Processing;
 global using InSpectra.Gen.Rendering;
+global using InSpectra.Gen.Rendering.Html;
+global using InSpectra.Gen.Rendering.Markdown;
 global using InSpectra.Gen.Targets;
 global using InSpectra.Gen.Viewer;
