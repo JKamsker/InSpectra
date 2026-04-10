@@ -1,8 +1,7 @@
 namespace InSpectra.Gen.Acquisition.OpenCli.Documents;
 
 using InSpectra.Gen.Acquisition.OpenCli.Structure;
-
-using InSpectra.Gen.Acquisition.Promotion.Artifacts;
+using InSpectra.Gen.Acquisition.Infrastructure.Artifacts;
 
 using System.Text;
 using System.Text.Json.Nodes;
@@ -23,7 +22,7 @@ internal static class OpenCliDocumentValidator
             return false;
         }
 
-        if (!PromotionArtifactSupport.TryLoadJsonObject(path, out var parsedDocument) || parsedDocument is null)
+        if (!ArtifactFileSupport.TryLoadJsonObject(path, out var parsedDocument) || parsedDocument is null)
         {
             reason = "OpenCLI artifact is not a JSON object.";
             return false;

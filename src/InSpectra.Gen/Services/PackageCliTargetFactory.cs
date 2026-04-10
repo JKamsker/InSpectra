@@ -1,5 +1,4 @@
 using InSpectra.Gen.Acquisition.Analysis.Tools;
-using InSpectra.Gen.Acquisition.Catalog.Filtering.SpectreConsole;
 using InSpectra.Gen.Acquisition.Infrastructure.Commands;
 using InSpectra.Gen.Acquisition.Infrastructure.Host;
 using InSpectra.Gen.Acquisition.Infrastructure.Paths;

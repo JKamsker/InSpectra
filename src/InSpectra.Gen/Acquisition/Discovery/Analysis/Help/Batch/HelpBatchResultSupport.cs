@@ -1,8 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Analysis.Help.Batch;
 
 using InSpectra.Gen.Acquisition.OpenCli.Documents;
-
-using InSpectra.Gen.Acquisition.Promotion.Artifacts;
 using InSpectra.Gen.Acquisition.Infrastructure.Artifacts;
 
 using InSpectra.Gen.Acquisition.Infrastructure.Json;
@@ -132,13 +130,13 @@ internal static class HelpBatchResultSupport
 
     private static bool HasUsableCrawlArtifact(string artifactDirectory, string? artifactName)
     {
-        var artifactPath = PromotionArtifactSupport.ResolveOptionalArtifactPath(artifactDirectory, artifactName);
+        var artifactPath = ArtifactFileSupport.ResolveOptionalArtifactPath(artifactDirectory, artifactName);
         return artifactPath is not null && CrawlArtifactValidationSupport.TryLoadValidatedJsonObject(artifactPath, out _, out _);
     }
 
     private static bool HasUsableOpenCliArtifact(string artifactDirectory, string? artifactName)
     {
-        var artifactPath = PromotionArtifactSupport.ResolveOptionalArtifactPath(artifactDirectory, artifactName);
+        var artifactPath = ArtifactFileSupport.ResolveOptionalArtifactPath(artifactDirectory, artifactName);
         return artifactPath is not null && OpenCliDocumentValidator.TryLoadValidDocument(artifactPath, out _, out _);
     }
 

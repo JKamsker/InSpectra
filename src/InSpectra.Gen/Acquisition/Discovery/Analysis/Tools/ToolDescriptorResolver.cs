@@ -10,8 +10,6 @@ using InSpectra.Gen.Acquisition.Infrastructure.Host;
 
 using InSpectra.Discovery.Tool.Analysis;
 
-using InSpectra.Gen.Acquisition.Catalog.Filtering.SpectreConsole;
-
 using InSpectra.Gen.Acquisition.NuGet;
 
 internal interface IToolDescriptorResolver

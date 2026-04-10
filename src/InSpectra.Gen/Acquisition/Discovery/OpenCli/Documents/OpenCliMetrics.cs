@@ -1,7 +1,6 @@
 namespace InSpectra.Gen.Acquisition.OpenCli.Documents;
 
-using InSpectra.Gen.Acquisition.Promotion.Artifacts;
-
+using InSpectra.Gen.Acquisition.Infrastructure.Artifacts;
 using InSpectra.Gen.Acquisition.OpenCli.Artifacts;
 
 
@@ -100,7 +99,7 @@ internal static class OpenCliMetrics
             latestPaths?["metadataPath"]?.GetValue<string>());
         if (metadataPath is not null)
         {
-            if (PromotionArtifactSupport.TryLoadJsonObject(metadataPath, out var metadata) && metadata is not null
+            if (ArtifactFileSupport.TryLoadJsonObject(metadataPath, out var metadata) && metadata is not null
                 && OpenCliArtifactLoadSupport.TryLoadFirstValidOpenCliDocument(
                     repositoryRoot,
                     [

@@ -1,9 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Docs.Indexing;
+namespace InSpectra.Gen.Acquisition.Indexing;
 
 using InSpectra.Gen.Acquisition.Infrastructure.Json;
-
-using InSpectra.Gen.Acquisition.Indexing;
-
 
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -17,7 +14,7 @@ internal sealed record BrowserIndexDocument(
     int? IncludedPackageCount,
     IReadOnlyList<JsonObject> Packages);
 
-internal static class DocsBrowserIndexSupport
+internal static class BrowserIndexSupport
 {
     public const int MinBrowserIndexPackageLimit = 200;
 
@@ -34,23 +31,18 @@ internal static class DocsBrowserIndexSupport
         foreach (var packageNode in packageNodes)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            if (packageNode is not JsonObject package)
+            if (packageNode is JsonObject package)
             {
-                continue;
+                packages.Add(CreatePackageEntry(package));
             }
-
-            packages.Add(CreatePackageEntry(package));
         }
-
-        var createdAt = ResolveDocumentCreatedAt(
-            outputFile,
-            allIndex["createdAt"]?.GetValue<string>() ?? allIndex["generatedAt"]?.GetValue<string>(),
-            now);
 
         return new BrowserIndexDocument(
             SchemaVersion: 1,
-            CreatedAt: createdAt,
+            CreatedAt: ResolveDocumentCreatedAt(
+                outputFile,
+                allIndex["createdAt"]?.GetValue<string>() ?? allIndex["generatedAt"]?.GetValue<string>(),
+                now),
             UpdatedAt: now,
             GeneratedAt: now,
             PackageCount: packages.Count,
@@ -80,13 +72,10 @@ internal static class DocsBrowserIndexSupport
             Packages: topPackages);
     }
 
-    public static JsonObject ToJsonObject(BrowserIndexDocument document)
-        => JsonSerializer.SerializeToNode(document, JsonOptions.RepositoryFiles)?.AsObject()
-           ?? throw new InvalidOperationException("Browser index document could not be serialized.");
-
     public static JsonObject StabilizeVolatileTimestamps(string outputPath, BrowserIndexDocument document)
     {
-        var json = ToJsonObject(document);
+        var json = JsonSerializer.SerializeToNode(document, JsonOptions.RepositoryFiles)?.AsObject()
+            ?? throw new InvalidOperationException("Browser index document could not be serialized.");
         JsonDocumentStabilitySupport.TryPreserveTopLevelProperties(
             json,
             JsonNodeFileLoader.TryLoadJsonObject(outputPath),
@@ -117,7 +106,13 @@ internal static class DocsBrowserIndexSupport
             ["commandCount"] = package["commandCount"]?.GetValue<int?>() ?? 0,
             ["commandGroupCount"] = package["commandGroupCount"]?.GetValue<int?>() ?? 0,
         };
-        SetOptionalString(packageEntry, "cliFramework", package["cliFramework"]?.GetValue<string>());
+
+        var cliFramework = package["cliFramework"]?.GetValue<string>();
+        if (!string.IsNullOrWhiteSpace(cliFramework))
+        {
+            packageEntry["cliFramework"] = cliFramework;
+        }
+
         return packageEntry;
     }
 
@@ -128,14 +123,6 @@ internal static class DocsBrowserIndexSupport
             "partial" => "partial",
             _ => latestStatus ?? string.Empty,
         };
-
-    private static void SetOptionalString(JsonObject target, string propertyName, string? value)
-    {
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            target[propertyName] = value;
-        }
-    }
 
     private static int GetOptionalInt(JsonObject package, string propertyName)
         => package[propertyName]?.GetValue<int?>() ?? 0;
@@ -156,11 +143,8 @@ internal static class DocsBrowserIndexSupport
             return parsedGeneratedAt.ToUniversalTime();
         }
 
-        if (DateTimeOffset.TryParse(fallback, out var parsedFallback))
-        {
-            return parsedFallback.ToUniversalTime();
-        }
-
-        return now;
+        return DateTimeOffset.TryParse(fallback, out var parsedFallback)
+            ? parsedFallback.ToUniversalTime()
+            : now;
     }
 }

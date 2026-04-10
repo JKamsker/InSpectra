@@ -1,7 +1,5 @@
 namespace InSpectra.Gen.Acquisition.Infrastructure.Paths;
 
-using InSpectra.Gen.Acquisition.Catalog.Indexing;
-
 using InSpectra.Gen.Acquisition.NuGet;
 
 internal static class PackageVersionResolver
@@ -12,7 +10,7 @@ internal static class PackageVersionResolver
         string version,
         CancellationToken cancellationToken)
     {
-        var resources = await apiClient.GetServiceResourcesAsync(BootstrapOptions.DefaultServiceIndexUrl, cancellationToken);
+        var resources = await apiClient.GetServiceResourcesAsync(NuGetDefaults.ServiceIndexUrl, cancellationToken);
         var registrationBaseUrl = resources.GetRequiredResource(
             "RegistrationsBaseUrl/3.6.0",
             "RegistrationsBaseUrl/3.4.0",

@@ -1,14 +1,8 @@
 namespace InSpectra.Gen.Acquisition.Indexing;
 
 using InSpectra.Gen.Acquisition.OpenCli.Documents;
-
-using InSpectra.Gen.Acquisition.Docs.Indexing;
-
 using InSpectra.Gen.Acquisition.Infrastructure.Json;
-
 using InSpectra.Gen.Acquisition.Infrastructure.Paths;
-
-
 using System.Text.Json.Nodes;
 
 internal static class RepositoryPackageIndexBuilder
@@ -36,19 +30,19 @@ internal static class RepositoryPackageIndexBuilder
         {
             browserIndexPath = Path.Combine(indexRoot, "index.json");
             browserMinIndexPath = Path.Combine(indexRoot, "index.min.json");
-            var browserIndex = DocsBrowserIndexSupport.BuildBrowserIndex(
+            var browserIndex = BrowserIndexSupport.BuildBrowserIndex(
                 allIndex,
                 browserIndexPath,
                 CancellationToken.None,
                 now);
-            var minBrowserIndex = DocsBrowserIndexSupport.BuildMinBrowserIndex(browserIndex);
+            var minBrowserIndex = BrowserIndexSupport.BuildMinBrowserIndex(browserIndex);
 
             RepositoryPathResolver.WriteJsonFile(
                 browserIndexPath,
-                DocsBrowserIndexSupport.StabilizeVolatileTimestamps(browserIndexPath, browserIndex));
+                BrowserIndexSupport.StabilizeVolatileTimestamps(browserIndexPath, browserIndex));
             RepositoryPathResolver.WriteJsonFile(
                 browserMinIndexPath,
-                DocsBrowserIndexSupport.StabilizeVolatileTimestamps(browserMinIndexPath, minBrowserIndex));
+                BrowserIndexSupport.StabilizeVolatileTimestamps(browserMinIndexPath, minBrowserIndex));
         }
 
         return new RepositoryPackageIndexBuildResult(packageSummaries.Count, versionRecordCount, allIndexPath, browserIndexPath, browserMinIndexPath);

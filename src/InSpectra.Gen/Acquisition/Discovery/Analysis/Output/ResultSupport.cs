@@ -1,8 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Analysis.Output;
 
 using InSpectra.Gen.Acquisition.Infrastructure.Json;
-
-using InSpectra.Gen.Acquisition.Catalog.Filtering.SpectreConsole;
+using InSpectra.Gen.Acquisition.Packages;
 
 using InSpectra.Gen.Acquisition.NuGet;
 
