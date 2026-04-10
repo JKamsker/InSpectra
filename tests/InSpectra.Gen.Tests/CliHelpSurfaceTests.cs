@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using InSpectra.Gen.Runtime;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests;
@@ -18,6 +20,20 @@ public class CliHelpSurfaceTests
         Assert.DoesNotContain("dotnet", helpText);
         Assert.DoesNotContain("package", helpText);
         Assert.DoesNotContain("self", helpText);
+    }
+
+    [Fact]
+    public async Task Version_command_uses_the_assembly_version()
+    {
+        var result = await RunRendererAsync(["--version"]);
+        var reportedVersion = result.StandardOutput.Trim();
+        var assemblyVersion = typeof(RenderRequestFactory).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion
+            ?.Split('+')[0];
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(assemblyVersion, reportedVersion);
     }
 
     [Fact]
@@ -61,18 +77,14 @@ public class CliHelpSurfaceTests
         AssertOption(helpText, "--with-xmldoc", string.Empty);
         AssertOption(helpText, "--xmldoc-arg", "<ARG>");
         AssertOption(helpText, "--crawl-out", "<PATH>");
+        AssertOption(helpText, "--overwrite", string.Empty);
+        AssertNoOption(helpText, "--quiet", string.Empty);
+        AssertNoOption(helpText, "--no-color", string.Empty);
     }
 
     private static async Task<ProcessResult> RunRendererAsync(IReadOnlyList<string> arguments)
     {
-        var dllPath = Path.Combine(
-            FixturePaths.RepoRoot,
-            "src",
-            "InSpectra.Gen",
-            "bin",
-            "Release",
-            "net10.0",
-            "inspectra.dll");
+        var dllPath = ResolveBuiltRendererPath();
 
         var startInfo = new ProcessStartInfo
         {
@@ -104,6 +116,19 @@ public class CliHelpSurfaceTests
             process.ExitCode,
             await stdoutTask,
             await stderrTask);
+    }
+
+    private static string ResolveBuiltRendererPath()
+    {
+        var candidatePaths = new[]
+        {
+            Path.Combine(FixturePaths.RepoRoot, "src", "InSpectra.Gen", "bin", "Debug", "net10.0", "inspectra.dll"),
+            Path.Combine(FixturePaths.RepoRoot, "src", "InSpectra.Gen", "bin", "Release", "net10.0", "inspectra.dll"),
+        };
+
+        var existingPath = candidatePaths.FirstOrDefault(File.Exists);
+        return existingPath
+            ?? throw new FileNotFoundException("Could not locate a built inspectra.dll.", candidatePaths[0]);
     }
 
     private sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError);
@@ -139,4 +164,5 @@ public class CliHelpSurfaceTests
             $@"(?<!\S){Regex.Escape(optionName)}\s+{Regex.Escape(argumentName)}(?!\S)",
             RegexOptions.CultureInvariant);
     }
+
 }

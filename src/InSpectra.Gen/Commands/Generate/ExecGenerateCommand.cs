@@ -1,7 +1,6 @@
 using InSpectra.Gen.Runtime;
 using InSpectra.Gen.Runtime.Acquisition;
 using InSpectra.Gen.Runtime.Output;
-using InSpectra.Gen.Services;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Generate;
@@ -22,11 +21,11 @@ public sealed class ExecGenerateCommand(IOpenCliGenerationService generationServ
             settings.XmlDocArguments.Length > 0 ? settings.XmlDocArguments : ["cli", "xmldoc"],
             RenderRequestFactory.ResolveWorkingDirectory(settings.WorkingDirectory),
             RenderRequestFactory.ResolveTimeoutSeconds(settings.TimeoutSeconds),
-            new OpenCliArtifactOptions(null, settings.CrawlOutputPath));
+            new OpenCliArtifactOptions(null, settings.CrawlOutputPath, settings.Overwrite));
 
         return GenerateOutputHandler.ExecuteAsync(
             outputMode,
             settings.Verbose,
-            () => generationService.GenerateFromExecAsync(request, settings.OutputFile, cancellationToken));
+            () => generationService.GenerateFromExecAsync(request, settings.OutputFile, settings.Overwrite, cancellationToken));
     }
 }

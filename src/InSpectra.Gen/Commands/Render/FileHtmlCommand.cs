@@ -1,7 +1,6 @@
 using InSpectra.Gen.Runtime;
 using InSpectra.Gen.Runtime.Output;
 using InSpectra.Gen.Runtime.Rendering;
-using InSpectra.Gen.Services;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Render;

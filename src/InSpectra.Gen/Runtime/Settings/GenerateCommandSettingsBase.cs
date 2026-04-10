@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Runtime.Settings;
 
-public abstract class GenerateCommandSettingsBase : CommonCommandSettings
+public abstract class GenerateCommandSettingsBase : OutputCommandSettingsBase
 {
     [Description("OpenCLI acquisition mode: native, auto, help, clifx, static, or hook.")]
     [CommandOption("--opencli-mode <MODE>")]
@@ -17,7 +17,7 @@ public abstract class GenerateCommandSettingsBase : CommonCommandSettings
     [CommandOption("--cli-framework <NAME>")]
     public string? CliFramework { get; init; }
 
-    [Description("Enrich the generated OpenCLI document with XML documentation when the source CLI exposes it.")]
+    [Description("Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output.")]
     [CommandOption("--with-xmldoc")]
     public bool WithXmlDoc { get; init; }
 
@@ -28,6 +28,10 @@ public abstract class GenerateCommandSettingsBase : CommonCommandSettings
     [Description("Write the generated OpenCLI JSON to this file instead of stdout.")]
     [CommandOption("--out <FILE>")]
     public string? OutputFile { get; init; }
+
+    [Description("Allow an existing OpenCLI output file to be replaced.")]
+    [CommandOption("--overwrite")]
+    public bool Overwrite { get; init; }
 
     [Description("Write crawl.json when the selected acquisition mode produces crawl data.")]
     [CommandOption("--crawl-out <PATH>")]

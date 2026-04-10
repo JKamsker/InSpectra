@@ -1,6 +1,6 @@
 # inspectra
 
-- Version: `0.1.0`
+- Version: `0.0.0`
 - OpenCLI: `0.1-draft`
 
 Command-line reference for `inspectra`. Available command areas include generate and render.
@@ -16,5 +16,5 @@ Command-line reference for `inspectra`. Available command areas include generate
 
 ### Available Commands
 
-- [generate](generate/index.md) — Generate raw OpenCLI JSON from a package, executable, or  .NET project.
+- [generate](generate/index.md) — Generate validated OpenCLI JSON from a package, executable, or  .NET project.
 - [render](render/index.md) — Render documentation from OpenCLI exports.

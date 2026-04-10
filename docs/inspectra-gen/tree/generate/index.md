@@ -3,7 +3,7 @@
 - Root: [index](../index.md)
 - Parent: [](../index.md)
 
-Generate raw OpenCLI JSON from a package, executable, or  .NET project.
+Generate validated OpenCLI JSON from a package, executable, or  .NET project.
 
 ## Subcommands
 

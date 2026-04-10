@@ -24,14 +24,13 @@ Generate opencli.json from a .NET project.
 | --json | — | flag | No | No | Declared | — | Emit the stable machine-readable JSON envelope  instead of human output. | — |
 | --launch-profile | — | <NAME> | No | No | Declared | — | Launch profile to use for dotnet run native  mode. | NAME · required · arity 1 |
 | --no-build | — | flag | No | No | Declared | — | Skip the implicit build step for dotnet  run/build. | — |
-| --no-color | — | flag | No | No | Declared | — | Disable ANSI color sequences in human-readable  console output. | — |
 | --no-restore | — | flag | No | No | Declared | — | Skip the implicit restore step for dotnet  run/build. | — |
 | --opencli-arg | — | <ARG> | No | No | Declared | — | Override the arguments used to invoke the  project's OpenCLI export command. | ARG · required · arity 1 |
 | --opencli-mode | — | <MODE> | No | No | Declared | — | OpenCLI acquisition mode: native, auto, help,  clifx, static, or hook. | MODE · required · arity 1 |
 | --out | — | <FILE> | No | No | Declared | — | Write the generated OpenCLI JSON to this file  instead of stdout. | FILE · required · arity 1 |
+| --overwrite | — | flag | No | No | Declared | — | Allow an existing OpenCLI output file to be  replaced. | — |
 | --output | — | <MODE> | No | No | Declared | — | Override the output mode. Supported values are  human and json. | MODE · required · arity 1 |
-| --quiet | -q | flag | No | No | Declared | — | Suppress non-essential console output. | — |
 | --timeout | — | <SECONDS> | No | No | Declared | — | Timeout in seconds for dotnet execution. | SECONDS · required · arity 1 |
-| --verbose | — | flag | No | No | Declared | — | Increase diagnostic detail in machine-readable  failures. | — |
-| --with-xmldoc | — | flag | No | No | Declared | — | Enrich the generated OpenCLI document with XML  documentation when the source CLI exposes it. | — |
+| --verbose | — | flag | No | No | Declared | — | Increase diagnostic detail in command failures. | — |
+| --with-xmldoc | — | flag | No | No | Declared | — | Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output. | — |
 | --xmldoc-arg | — | <ARG> | No | No | Declared | — | Override the arguments used to invoke the source  CLI's XML documentation export command. | ARG · required · arity 1 |

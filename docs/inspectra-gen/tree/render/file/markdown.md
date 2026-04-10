@@ -29,5 +29,5 @@ Render Markdown from an OpenCLI JSON file and  optional XML enrichment file.
 | --quiet | -q | flag | No | No | Declared | — | Suppress non-essential console output. | — |
 | --split-depth | — | <DEPTH> | No | No | Declared | — | Depth at which hybrid layout emits one file  per command group (defaults to 1). | DEPTH · required · arity 1 |
 | --title | — | <TEXT> | No | No | Declared | — | Override the CLI title shown in Markdown  headings and overview text. | TEXT · required · arity 1 |
-| --verbose | — | flag | No | No | Declared | — | Increase diagnostic detail in the rendered  summary output. | — |
+| --verbose | — | flag | No | No | Declared | — | Increase diagnostic detail in command failures. | — |
 | --xmldoc | — | <PATH> | No | No | Declared | — | Optional XML documentation file used to enrich missing descriptions. | PATH · required · arity 1 |

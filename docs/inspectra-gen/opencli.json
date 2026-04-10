@@ -2,7 +2,7 @@
   "opencli": "0.1-draft",
   "info": {
     "title": "inspectra",
-    "version": "0.1.0"
+    "version": "0.0.0"
   },
   "arguments": [],
   "options": [],
@@ -231,16 +231,6 @@
               "metadata": []
             },
             {
-              "name": "--no-color",
-              "required": false,
-              "aliases": [],
-              "arguments": [],
-              "description": "Disable ANSI color sequences in human-readable  console output.",
-              "recursive": false,
-              "hidden": false,
-              "metadata": []
-            },
-            {
               "name": "--no-restore",
               "required": false,
               "aliases": [],
@@ -272,7 +262,7 @@
                   ]
                 }
               ],
-              "description": "Override the arguments used to invoke the  project\u0027s OpenCLI export command.",
+              "description": "Override the arguments used to invoke the  project's OpenCLI export command.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -332,6 +322,16 @@
               "metadata": []
             },
             {
+              "name": "--overwrite",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Allow an existing OpenCLI output file to be replaced.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
               "name": "--output",
               "required": false,
               "aliases": [],
@@ -359,18 +359,6 @@
               "metadata": []
             },
             {
-              "name": "--quiet",
-              "required": false,
-              "aliases": [
-                "-q"
-              ],
-              "arguments": [],
-              "description": "Suppress non-essential console output.",
-              "recursive": false,
-              "hidden": false,
-              "metadata": []
-            },
-            {
               "name": "--timeout",
               "required": false,
               "aliases": [],
@@ -387,7 +375,7 @@
                   "metadata": [
                     {
                       "name": "ClrType",
-                      "value": "System.Nullable\u003CSystem.Int32\u003E"
+                      "value": "System.Nullable<System.Int32>"
                     }
                   ]
                 }
@@ -402,7 +390,7 @@
               "required": false,
               "aliases": [],
               "arguments": [],
-              "description": "Increase diagnostic detail in machine-readable  failures.",
+              "description": "Increase diagnostic detail in command failures.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -412,7 +400,7 @@
               "required": false,
               "aliases": [],
               "arguments": [],
-              "description": "Enrich the generated OpenCLI document with XML  documentation when the source CLI exposes it.",
+              "description": "Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -439,7 +427,7 @@
                   ]
                 }
               ],
-              "description": "Override the arguments used to invoke the source  CLI\u0027s XML documentation export command.",
+              "description": "Override the arguments used to invoke the source  CLI's XML documentation export command.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -595,16 +583,6 @@
               "metadata": []
             },
             {
-              "name": "--no-color",
-              "required": false,
-              "aliases": [],
-              "arguments": [],
-              "description": "Disable ANSI color sequences in human-readable  console output.",
-              "recursive": false,
-              "hidden": false,
-              "metadata": []
-            },
-            {
               "name": "--opencli-arg",
               "required": false,
               "aliases": [],
@@ -626,7 +604,7 @@
                   ]
                 }
               ],
-              "description": "Override the arguments used to invoke the source  CLI\u0027s OpenCLI export command.",
+              "description": "Override the arguments used to invoke the source  CLI's OpenCLI export command.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -686,6 +664,16 @@
               "metadata": []
             },
             {
+              "name": "--overwrite",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Allow an existing OpenCLI output file to be replaced.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
               "name": "--output",
               "required": false,
               "aliases": [],
@@ -708,18 +696,6 @@
                 }
               ],
               "description": "Override the output mode. Supported values are  human and json.",
-              "recursive": false,
-              "hidden": false,
-              "metadata": []
-            },
-            {
-              "name": "--quiet",
-              "required": false,
-              "aliases": [
-                "-q"
-              ],
-              "arguments": [],
-              "description": "Suppress non-essential console output.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -768,7 +744,7 @@
                   "metadata": [
                     {
                       "name": "ClrType",
-                      "value": "System.Nullable\u003CSystem.Int32\u003E"
+                      "value": "System.Nullable<System.Int32>"
                     }
                   ]
                 }
@@ -783,7 +759,7 @@
               "required": false,
               "aliases": [],
               "arguments": [],
-              "description": "Increase diagnostic detail in machine-readable  failures.",
+              "description": "Increase diagnostic detail in command failures.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -793,7 +769,7 @@
               "required": false,
               "aliases": [],
               "arguments": [],
-              "description": "Enrich the generated OpenCLI document with XML  documentation when the source CLI exposes it.",
+              "description": "Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -820,7 +796,7 @@
                   ]
                 }
               ],
-              "description": "Override the arguments used to invoke the source  CLI\u0027s XML documentation export command.",
+              "description": "Override the arguments used to invoke the source  CLI's XML documentation export command.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -949,16 +925,6 @@
               "metadata": []
             },
             {
-              "name": "--no-color",
-              "required": false,
-              "aliases": [],
-              "arguments": [],
-              "description": "Disable ANSI color sequences in human-readable  console output.",
-              "recursive": false,
-              "hidden": false,
-              "metadata": []
-            },
-            {
               "name": "--opencli-arg",
               "required": false,
               "aliases": [],
@@ -980,7 +946,7 @@
                   ]
                 }
               ],
-              "description": "Override the arguments used to invoke the  installed tool\u0027s OpenCLI export command.",
+              "description": "Override the arguments used to invoke the  installed tool's OpenCLI export command.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -1040,6 +1006,16 @@
               "metadata": []
             },
             {
+              "name": "--overwrite",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Allow an existing OpenCLI output file to be replaced.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
               "name": "--output",
               "required": false,
               "aliases": [],
@@ -1067,18 +1043,6 @@
               "metadata": []
             },
             {
-              "name": "--quiet",
-              "required": false,
-              "aliases": [
-                "-q"
-              ],
-              "arguments": [],
-              "description": "Suppress non-essential console output.",
-              "recursive": false,
-              "hidden": false,
-              "metadata": []
-            },
-            {
               "name": "--timeout",
               "required": false,
               "aliases": [],
@@ -1095,7 +1059,7 @@
                   "metadata": [
                     {
                       "name": "ClrType",
-                      "value": "System.Nullable\u003CSystem.Int32\u003E"
+                      "value": "System.Nullable<System.Int32>"
                     }
                   ]
                 }
@@ -1110,7 +1074,7 @@
               "required": false,
               "aliases": [],
               "arguments": [],
-              "description": "Increase diagnostic detail in machine-readable  failures.",
+              "description": "Increase diagnostic detail in command failures.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -1147,7 +1111,7 @@
               "required": false,
               "aliases": [],
               "arguments": [],
-              "description": "Enrich the generated OpenCLI document with XML  documentation when the source CLI exposes it.",
+              "description": "Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -1174,7 +1138,7 @@
                   ]
                 }
               ],
-              "description": "Override the arguments used to invoke the source  CLI\u0027s XML documentation export command.",
+              "description": "Override the arguments used to invoke the source  CLI's XML documentation export command.",
               "recursive": false,
               "hidden": false,
               "metadata": []
@@ -1209,7 +1173,7 @@
         }
       ],
       "exitCodes": [],
-      "description": "Generate raw OpenCLI JSON from a package, executable, or  .NET project.",
+      "description": "Generate validated OpenCLI JSON from a package, executable, or  .NET project.",
       "hidden": false,
       "examples": [],
       "interactive": false,
@@ -1253,7 +1217,7 @@
                       ]
                     }
                   ],
-                  "description": "Custom accent color for light mode (hex, e.g.  \u0022#7c3aed\u0022).",
+                  "description": "Custom accent color for light mode (hex, e.g.  \"#7c3aed\").",
                   "recursive": false,
                   "hidden": false,
                   "metadata": []
@@ -1356,12 +1320,12 @@
                       "metadata": [
                         {
                           "name": "ClrType",
-                          "value": "System.Nullable\u003CSystem.Int32\u003E"
+                          "value": "System.Nullable<System.Int32>"
                         }
                       ]
                     }
                   ],
-                  "description": "Compression level: 0 = none, 1 = compress  embedded JSON, 2 = self-extracting bundle (default 2).",
+                  "description": "Compression level: 0 = none, 1 = compress embedded JSON (default bundle mode), 2 = self-extracting single-file bundle.",
                   "recursive": false,
                   "hidden": false,
                   "metadata": []
@@ -1668,7 +1632,7 @@
                   "required": false,
                   "aliases": [],
                   "arguments": [],
-                  "description": "Increase diagnostic detail in the rendered  summary output.",
+                  "description": "Increase diagnostic detail in command failures.",
                   "recursive": false,
                   "hidden": false,
                   "metadata": []
@@ -1956,7 +1920,7 @@
                       "metadata": [
                         {
                           "name": "ClrType",
-                          "value": "System.Nullable\u003CSystem.Int32\u003E"
+                          "value": "System.Nullable<System.Int32>"
                         }
                       ]
                     }
@@ -1998,7 +1962,7 @@
                   "required": false,
                   "aliases": [],
                   "arguments": [],
-                  "description": "Increase diagnostic detail in the rendered  summary output.",
+                  "description": "Increase diagnostic detail in command failures.",
                   "recursive": false,
                   "hidden": false,
                   "metadata": []

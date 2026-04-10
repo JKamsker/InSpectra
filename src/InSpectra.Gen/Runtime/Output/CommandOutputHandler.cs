@@ -21,7 +21,9 @@ public static class CommandOutputHandler
         }
         catch (OperationCanceledException)
         {
-            return 130;
+            var cliException = new CliException("Operation cancelled.", "cancelled", 130);
+            await WriteFailureAsync(outputMode, cliException);
+            return cliException.ExitCode;
         }
         catch (CliException exception)
         {
@@ -53,6 +55,7 @@ public static class CommandOutputHandler
                     format = result.Format == DocumentFormat.Html ? "html" : "markdown",
                     layout = result.Layout switch
                     {
+                        RenderLayout.Hybrid => "hybrid",
                         RenderLayout.Tree => "tree",
                         RenderLayout.App => "app",
                         _ => "single",
@@ -112,6 +115,8 @@ public static class CommandOutputHandler
             return;
         }
 
+        await WriteWarningsAsync(result.Warnings);
+
         if (!string.IsNullOrWhiteSpace(result.StdoutDocument))
         {
             await Console.Out.WriteAsync(result.StdoutDocument);
@@ -154,6 +159,14 @@ public static class CommandOutputHandler
         foreach (var detail in exception.Details)
         {
             await Console.Error.WriteLineAsync($"- {detail}");
+        }
+    }
+
+    private static async Task WriteWarningsAsync(IReadOnlyList<string> warnings)
+    {
+        foreach (var warning in warnings)
+        {
+            await Console.Error.WriteLineAsync($"Warning: {warning}");
         }
     }
 }

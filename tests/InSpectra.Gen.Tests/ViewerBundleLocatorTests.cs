@@ -1,4 +1,3 @@
-using InSpectra.Gen.Services;
 using InSpectra.Gen.Acquisition.Runtime;
 using InSpectra.Gen.Tests.TestSupport;
 using Microsoft.Extensions.Options;
@@ -42,7 +41,9 @@ public class ViewerBundleLocatorTests
         var staleTime = DateTime.UtcNow.AddMinutes(-5);
         var freshTime = DateTime.UtcNow;
         File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "index.html"), staleTime);
+        File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "static.html"), staleTime);
         File.SetLastWriteTimeUtc(Path.Combine(packagedRoot, "index.html"), staleTime);
+        File.SetLastWriteTimeUtc(Path.Combine(packagedRoot, "static.html"), staleTime);
         File.SetLastWriteTimeUtc(staleSourcePath, freshTime);
 
         var locator = new TestViewerBundleLocator(
@@ -68,6 +69,9 @@ public class ViewerBundleLocatorTests
         var frontendRoot = CreateFrontendInputs(repositoryRoot);
         File.SetLastWriteTimeUtc(
             Path.Combine(frontendRoot, "dist", "index.html"),
+            DateTime.UtcNow.AddMinutes(1));
+        File.SetLastWriteTimeUtc(
+            Path.Combine(frontendRoot, "dist", "static.html"),
             DateTime.UtcNow.AddMinutes(1));
 
         var locator = new ViewerBundleLocator(
@@ -97,6 +101,7 @@ public class ViewerBundleLocatorTests
         var staleTime = DateTime.UtcNow.AddMinutes(-5);
         var freshTime = DateTime.UtcNow;
         File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "index.html"), staleTime);
+        File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "static.html"), staleTime);
         File.SetLastWriteTimeUtc(staleSourcePath, freshTime);
 
         var locator = new TestViewerBundleLocator(
@@ -167,6 +172,7 @@ public class ViewerBundleLocatorTests
     {
         Directory.CreateDirectory(bundleRoot);
         File.WriteAllText(Path.Combine(bundleRoot, "index.html"), "<!doctype html>");
+        File.WriteAllText(Path.Combine(bundleRoot, "static.html"), "<!doctype html>");
         return bundleRoot;
     }
 
@@ -175,6 +181,7 @@ public class ViewerBundleLocatorTests
         var bundleRoot = Path.Combine(repositoryRoot, "src", "InSpectra.UI", "dist");
         Directory.CreateDirectory(bundleRoot);
         File.WriteAllText(Path.Combine(bundleRoot, "index.html"), "<!doctype html>");
+        File.WriteAllText(Path.Combine(bundleRoot, "static.html"), "<!doctype html>");
         return repositoryRoot;
     }
 
@@ -203,6 +210,7 @@ public class ViewerBundleLocatorTests
             BuildInvoked = true;
             Directory.CreateDirectory(repositoryDist);
             File.WriteAllText(Path.Combine(repositoryDist, "index.html"), "<!doctype html>");
+            File.WriteAllText(Path.Combine(repositoryDist, "static.html"), "<!doctype html>");
             return Task.CompletedTask;
         }
     }

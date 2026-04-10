@@ -19,7 +19,7 @@ Render an HTML app bundle from an OpenCLI JSON  file and optional XML enrichment
 | --accent-dark | — | <COLOR> | No | No | Declared | — | Custom accent color for dark mode (hex). Falls back to --accent if omitted. | COLOR · required · arity 1 |
 | --color-theme | — | <NAME> | No | No | Declared | — | Set the color theme (cyan, indigo, emerald,  amber, rose, blue). | NAME · required · arity 1 |
 | --command-prefix | — | <TEXT> | No | No | Declared | — | Override the CLI command prefix used in  generated examples and the composer. | TEXT · required · arity 1 |
-| --compression-level | — | <LEVEL> | No | No | Declared | — | Compression level: 0 = none, 1 = compress  embedded JSON, 2 = self-extracting bundle (default 2). | LEVEL · required · arity 1 |
+| --compression-level | — | <LEVEL> | No | No | Declared | — | Compression level: 0 = none, 1 = compress  embedded JSON (default bundle mode), 2 = self-extracting single-file bundle. | LEVEL · required · arity 1 |
 | --dry-run | — | flag | No | No | Declared | — | Preview the resolved render plan without  writing files. | — |
 | --enable-nuget-browser | — | flag | No | No | Declared | — | Enable the NuGet package browser on the viewer home screen. | — |
 | --enable-package-upload | — | flag | No | No | Declared | — | Enable local package upload on the viewer home screen. | — |
@@ -41,5 +41,5 @@ Render an HTML app bundle from an OpenCLI JSON  file and optional XML enrichment
 | --single-file | — | flag | No | No | Declared | — | Emit a single self-contained HTML file with  all assets inlined. Works from file:// without a web server. | — |
 | --theme | — | <MODE> | No | No | Declared | — | Set the initial theme mode (light or dark). | MODE · required · arity 1 |
 | --title | — | <TEXT> | No | No | Declared | — | Override the CLI title shown in the viewer  header and overview. | TEXT · required · arity 1 |
-| --verbose | — | flag | No | No | Declared | — | Increase diagnostic detail in the rendered  summary output. | — |
+| --verbose | — | flag | No | No | Declared | — | Increase diagnostic detail in command failures. | — |
 | --xmldoc | — | <PATH> | No | No | Declared | — | Optional XML documentation file used to enrich missing descriptions. | PATH · required · arity 1 |

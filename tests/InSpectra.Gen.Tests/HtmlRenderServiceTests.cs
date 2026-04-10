@@ -1,5 +1,4 @@
 using InSpectra.Gen.Runtime.Rendering;
-using InSpectra.Gen.Services;
 using InSpectra.Gen.Tests.TestSupport;
 using Microsoft.Extensions.Options;
 
@@ -103,6 +102,61 @@ public class HtmlRenderServiceTests
         Assert.Contains("3 files planned", result.Summary);
     }
 
+    [Fact]
+    public async Task Dry_run_does_not_build_stale_repo_bundle()
+    {
+        using var temp = new TempDirectory();
+        var repositoryRoot = CreateRepositoryBundle(Path.Combine(temp.Path, "repo"));
+        var frontendRoot = CreateFrontendInputs(repositoryRoot);
+        var staleSourcePath = Path.Combine(frontendRoot, "src", "viewer.ts");
+        Directory.CreateDirectory(Path.GetDirectoryName(staleSourcePath)!);
+        File.WriteAllText(staleSourcePath, "export const viewer = true;");
+
+        var staleTime = DateTime.UtcNow.AddMinutes(-5);
+        File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "index.html"), staleTime);
+        File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "static.html"), staleTime);
+        File.SetLastWriteTimeUtc(staleSourcePath, DateTime.UtcNow);
+
+        var locator = new TestViewerBundleLocator(
+            new ExecutableResolver(),
+            new ProcessRunner(),
+            Options.Create(new ViewerBundleLocatorOptions
+            {
+                PackagedRootPath = Path.Combine(temp.Path, "missing"),
+                RepositoryRootPath = repositoryRoot,
+            }));
+        var service = new HtmlRenderService(
+            RendererFactory.CreateDocumentRenderService(),
+            new OpenCliNormalizer(),
+            locator,
+            new RenderStatsFactory());
+
+        var outputDirectory = Path.Combine(temp.Path, "html");
+        var request = new FileRenderRequest(
+            FixturePaths.OpenCliJson,
+            FixturePaths.XmlDoc,
+            new RenderExecutionOptions(
+                RenderLayout.App,
+                ResolvedOutputMode.Human,
+                DryRun: true,
+                Quiet: false,
+                Verbose: false,
+                NoColor: false,
+                IncludeHidden: false,
+                IncludeMetadata: false,
+                Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 1,
+                OutputFile: null,
+                OutputDirectory: outputDirectory));
+
+        var result = await service.RenderFromFileAsync(request, DefaultFeatures, CancellationToken.None);
+
+        Assert.False(locator.BuildInvoked);
+        Assert.True(result.IsDryRun);
+        Assert.False(Directory.Exists(outputDirectory));
+    }
+
     private static HtmlRenderService CreateHtmlRenderService(ViewerBundleLocatorOptions options)
     {
         return new HtmlRenderService(
@@ -122,5 +176,40 @@ public class HtmlRenderServiceTests
         File.WriteAllText(Path.Combine(bundleRoot, "assets", "app.js"), "console.log('bundle');");
         File.WriteAllText(Path.Combine(bundleRoot, "assets", "app.css"), "body { color: black; }");
         return bundleRoot;
+    }
+
+    private static string CreateRepositoryBundle(string repositoryRoot)
+    {
+        CreateBundle(Path.Combine(repositoryRoot, "src", "InSpectra.UI"), "dist");
+        return repositoryRoot;
+    }
+
+    private static string CreateFrontendInputs(string repositoryRoot)
+    {
+        var frontendRoot = Path.Combine(repositoryRoot, "src", "InSpectra.UI");
+        Directory.CreateDirectory(Path.Combine(frontendRoot, "src"));
+        File.WriteAllText(Path.Combine(frontendRoot, "package.json"), "{}");
+        File.WriteAllText(Path.Combine(frontendRoot, "package-lock.json"), "{}");
+        File.WriteAllText(Path.Combine(frontendRoot, "vite.config.ts"), "export default {};");
+        File.WriteAllText(Path.Combine(frontendRoot, "tsconfig.json"), "{}");
+        return frontendRoot;
+    }
+
+    private sealed class TestViewerBundleLocator(
+        ExecutableResolver executableResolver,
+        IProcessRunner processRunner,
+        IOptions<ViewerBundleLocatorOptions> options)
+        : ViewerBundleLocator(executableResolver, processRunner, options)
+    {
+        public bool BuildInvoked { get; private set; }
+
+        protected override Task BuildBundleAsync(string frontendRoot, string repositoryDist, CancellationToken cancellationToken)
+        {
+            BuildInvoked = true;
+            Directory.CreateDirectory(repositoryDist);
+            File.WriteAllText(Path.Combine(repositoryDist, "index.html"), "<!doctype html>");
+            File.WriteAllText(Path.Combine(repositoryDist, "static.html"), "<!doctype html>");
+            return Task.CompletedTask;
+        }
     }
 }

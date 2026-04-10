@@ -21,7 +21,9 @@ public static class GenerateOutputHandler
         }
         catch (OperationCanceledException)
         {
-            return 130;
+            var cliException = new CliException("Operation cancelled.", "cancelled", 130);
+            await WriteFailureAsync(outputMode, cliException);
+            return cliException.ExitCode;
         }
         catch (CliException exception)
         {
@@ -53,6 +55,7 @@ public static class GenerateOutputHandler
                     {
                         kind = result.Source.Kind,
                         openCli = result.Source.OpenCliOrigin,
+                        xmlDoc = result.Source.XmlDocOrigin,
                         executablePath = result.Source.ExecutablePath,
                     },
                     acquisition = new
@@ -83,6 +86,8 @@ public static class GenerateOutputHandler
             await Console.Out.WriteLineAsync(JsonSerializer.Serialize(envelope, JsonOutput.SerializerOptions));
             return;
         }
+
+        await WriteWarningsAsync(result.Warnings);
 
         if (string.IsNullOrWhiteSpace(result.OutputFile))
         {
@@ -123,6 +128,14 @@ public static class GenerateOutputHandler
         foreach (var detail in exception.Details)
         {
             await Console.Error.WriteLineAsync($"- {detail}");
+        }
+    }
+
+    private static async Task WriteWarningsAsync(IReadOnlyList<string> warnings)
+    {
+        foreach (var warning in warnings)
+        {
+            await Console.Error.WriteLineAsync($"Warning: {warning}");
         }
     }
 }
