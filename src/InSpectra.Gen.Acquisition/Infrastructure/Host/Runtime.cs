@@ -2,8 +2,6 @@ namespace InSpectra.Gen.Acquisition.Infrastructure.Host;
 
 using InSpectra.Gen.Acquisition.NuGet;
 
-using InSpectra.Gen.Acquisition.App.Machine;
-
 using System.Net;
 
 internal static class Runtime
@@ -26,9 +24,6 @@ internal static class Runtime
             CancellationSource.Cancel();
         };
     }
-
-    public static CommandOutput CreateOutput()
-        => new(Console.Out, Console.Error);
 
     public static NuGetApiClientScope CreateNuGetApiClientScope()
         => new();
