@@ -15,7 +15,7 @@ public static class RendererFactory
             new LocalCliTargetFactory(new LocalCliFrameworkDetector()),
             new PackageCliTargetFactory(),
             new DotnetBuildOutputResolver(processRunner),
-            new DiscoveryAnalyzerBridge());
+            new AcquisitionAnalyzerService());
         return new DocumentRenderService(
             documentLoader,
             new OpenCliDocumentCloner(),

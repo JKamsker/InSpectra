@@ -8,7 +8,7 @@ public sealed class OpenCliAcquisitionService(
     LocalCliTargetFactory localTargetFactory,
     PackageCliTargetFactory packageCliTargetFactory,
     DotnetBuildOutputResolver dotnetBuildOutputResolver,
-    DiscoveryAnalyzerBridge discoveryAnalyzerBridge)
+    AcquisitionAnalyzerService acquisitionAnalyzerService)
 {
     public async Task<OpenCliAcquisitionResult> AcquireFromExecAsync(
         ExecAcquisitionRequest request,
@@ -244,7 +244,7 @@ public sealed class OpenCliAcquisitionService(
         foreach (var plannedAttempt in plannedAttempts)
         {
             var analysisMode = ParseMode(plannedAttempt.Mode);
-            var outcome = await discoveryAnalyzerBridge.TryAnalyzeAsync(
+            var outcome = await acquisitionAnalyzerService.TryAnalyzeAsync(
                 target,
                 analysisMode,
                 plannedAttempt.Framework,

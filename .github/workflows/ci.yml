@@ -63,7 +63,7 @@ jobs:
           set -euo pipefail
           test -f artifacts/publish/InSpectra.UI/dist/index.html
           test -f artifacts/publish/InSpectra.UI/dist/static.html
-          test -f artifacts/publish/hooks/InSpectra.Discovery.StartupHook.dll
+          test -f artifacts/publish/hooks/InSpectra.Gen.StartupHook.dll
           test -f artifacts/publish/hooks/0Harmony.dll
           compgen -G 'artifacts/publish/InSpectra.UI/dist/assets/*.css' > /dev/null
           compgen -G 'artifacts/publish/InSpectra.UI/dist/assets/*.js' > /dev/null

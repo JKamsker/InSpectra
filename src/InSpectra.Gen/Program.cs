@@ -19,7 +19,7 @@ services.AddSingleton<LocalCliFrameworkDetector>();
 services.AddSingleton<LocalCliTargetFactory>();
 services.AddSingleton<PackageCliTargetFactory>();
 services.AddSingleton<DotnetBuildOutputResolver>();
-services.AddSingleton<DiscoveryAnalyzerBridge>();
+services.AddSingleton<AcquisitionAnalyzerService>();
 services.AddSingleton<OpenCliAcquisitionService>();
 services.AddSingleton<OpenCliGenerationService>();
 services.AddSingleton(new ViewerBundleLocatorOptions());
