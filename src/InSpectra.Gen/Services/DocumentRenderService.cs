@@ -22,6 +22,7 @@ public sealed class DocumentRenderService(
     OpenCliDocumentLoader documentLoader,
     OpenCliDocumentCloner documentCloner,
     OpenCliXmlEnricher xmlEnricher)
+    : IDocumentRenderService
 {
     public async Task<AcquiredRenderDocument> LoadFromFileAsync(
         FileRenderRequest request,

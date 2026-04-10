@@ -1,6 +1,6 @@
 using InSpectra.Gen.Runtime;
 
-using InSpectra.Discovery.Tool.Analysis;
+using InSpectra.Gen.Acquisition.Analysis;
 
 namespace InSpectra.Gen.Services;
 
@@ -11,6 +11,7 @@ public sealed class OpenCliAcquisitionService(
     PackageCliTargetFactory packageCliTargetFactory,
     DotnetBuildOutputResolver dotnetBuildOutputResolver,
     AcquisitionAnalyzerService acquisitionAnalyzerService)
+    : IOpenCliAcquisitionService
 {
     public async Task<OpenCliAcquisitionResult> AcquireFromExecAsync(
         ExecAcquisitionRequest request,

@@ -4,7 +4,7 @@ using InSpectra.Gen.Runtime;
 namespace InSpectra.Gen.Services;
 
 public sealed class MarkdownRenderService(
-    DocumentRenderService documentService,
+    IDocumentRenderService documentService,
     OpenCliNormalizer normalizer,
     MarkdownRenderer renderer,
     RenderStatsFactory statsFactory)

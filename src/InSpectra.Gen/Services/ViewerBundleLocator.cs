@@ -1,4 +1,5 @@
 using InSpectra.Gen.Runtime;
+using Microsoft.Extensions.Options;
 
 namespace InSpectra.Gen.Services;
 
@@ -16,7 +17,8 @@ public sealed class ViewerBundleLocatorOptions
 public class ViewerBundleLocator(
     ExecutableResolver executableResolver,
     IProcessRunner processRunner,
-    ViewerBundleLocatorOptions options)
+    IOptions<ViewerBundleLocatorOptions> options)
+    : IViewerBundleLocator
 {
     private const string FrontendBuildHint = "Run `npm ci` and `npm run build` in `src/InSpectra.UI` to build the viewer bundle.";
     private static readonly string[] FrontendInputFiles =
@@ -31,8 +33,8 @@ public class ViewerBundleLocator(
 
     public async Task<string> ResolveAsync(CancellationToken cancellationToken)
     {
-        var packagedPath = options.PackagedRootPath ?? Path.Combine(AppContext.BaseDirectory, "InSpectra.UI", "dist");
-        var repositoryRoot = options.RepositoryRootPath ?? FindRepositoryRoot();
+        var packagedPath = options.Value.PackagedRootPath ?? Path.Combine(AppContext.BaseDirectory, "InSpectra.UI", "dist");
+        var repositoryRoot = options.Value.RepositoryRootPath ?? FindRepositoryRoot();
         var frontendRoot = repositoryRoot is null
             ? null
             : Path.Combine(repositoryRoot, "src", "InSpectra.UI");
@@ -67,7 +69,7 @@ public class ViewerBundleLocator(
         string npmExecutable;
         try
         {
-            npmExecutable = options.NpmExecutablePath ?? executableResolver.Resolve("npm", frontendRoot);
+            npmExecutable = options.Value.NpmExecutablePath ?? executableResolver.Resolve("npm", frontendRoot);
         }
         catch (CliException)
         {
@@ -79,14 +81,14 @@ public class ViewerBundleLocator(
             switch (GetNodeModulesState(frontendRoot))
             {
                 case NodeModulesState.Missing:
-                    await processRunner.RunAsync(npmExecutable, frontendRoot, ["ci"], options.NpmTimeoutSeconds, cancellationToken);
+                    await processRunner.RunAsync(npmExecutable, frontendRoot, ["ci"], options.Value.NpmTimeoutSeconds, cancellationToken);
                     break;
                 case NodeModulesState.Incomplete:
-                    await processRunner.RunAsync(npmExecutable, frontendRoot, ["install"], options.NpmTimeoutSeconds, cancellationToken);
+                    await processRunner.RunAsync(npmExecutable, frontendRoot, ["install"], options.Value.NpmTimeoutSeconds, cancellationToken);
                     break;
             }
 
-            await processRunner.RunAsync(npmExecutable, frontendRoot, ["run", "build"], options.NpmTimeoutSeconds, cancellationToken);
+            await processRunner.RunAsync(npmExecutable, frontendRoot, ["run", "build"], options.Value.NpmTimeoutSeconds, cancellationToken);
         }
         catch (CliException exception)
         {

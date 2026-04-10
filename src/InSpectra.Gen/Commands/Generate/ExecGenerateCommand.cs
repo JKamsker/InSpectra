@@ -5,7 +5,7 @@ using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Generate;
 
-public sealed class ExecGenerateCommand(OpenCliGenerationService generationService) : AsyncCommand<ExecGenerateSettings>
+public sealed class ExecGenerateCommand(IOpenCliGenerationService generationService) : AsyncCommand<ExecGenerateSettings>
 {
     public override Task<int> ExecuteAsync(CommandContext context, ExecGenerateSettings settings, CancellationToken cancellationToken)
     {

@@ -1,6 +1,7 @@
 using InSpectra.Gen.Runtime;
 using InSpectra.Gen.Services;
 using InSpectra.Gen.Tests.TestSupport;
+using Microsoft.Extensions.Options;
 
 namespace InSpectra.Gen.Tests;
 
@@ -107,7 +108,7 @@ public class HtmlRenderServiceTests
         return new HtmlRenderService(
             RendererFactory.CreateDocumentRenderService(),
             new OpenCliNormalizer(),
-            new ViewerBundleLocator(new ExecutableResolver(), new ProcessRunner(), options),
+            new ViewerBundleLocator(new ExecutableResolver(), new ProcessRunner(), Options.Create(options)),
             new RenderStatsFactory());
     }
 

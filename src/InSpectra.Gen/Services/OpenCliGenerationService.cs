@@ -3,10 +3,11 @@ using InSpectra.Gen.Runtime;
 namespace InSpectra.Gen.Services;
 
 public sealed class OpenCliGenerationService(
-    OpenCliAcquisitionService acquisitionService,
+    IOpenCliAcquisitionService acquisitionService,
     OpenCliDocumentLoader documentLoader,
     OpenCliXmlEnricher xmlEnricher,
     OpenCliDocumentSerializer documentSerializer)
+    : IOpenCliGenerationService
 {
     public Task<GenerateExecutionResult> GenerateFromExecAsync(ExecAcquisitionRequest request, string? outputFile, CancellationToken cancellationToken)
         => GenerateAsync(() => acquisitionService.AcquireFromExecAsync(request, cancellationToken), outputFile, cancellationToken);

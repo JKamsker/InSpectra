@@ -5,7 +5,7 @@ using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Generate;
 
-public sealed class DotnetGenerateCommand(OpenCliGenerationService generationService) : AsyncCommand<DotnetGenerateSettings>
+public sealed class DotnetGenerateCommand(IOpenCliGenerationService generationService) : AsyncCommand<DotnetGenerateSettings>
 {
     public override Task<int> ExecuteAsync(CommandContext context, DotnetGenerateSettings settings, CancellationToken cancellationToken)
     {

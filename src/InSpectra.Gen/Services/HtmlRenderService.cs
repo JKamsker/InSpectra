@@ -4,9 +4,9 @@ using InSpectra.Gen.Runtime;
 namespace InSpectra.Gen.Services;
 
 public sealed class HtmlRenderService(
-    DocumentRenderService documentService,
+    IDocumentRenderService documentService,
     OpenCliNormalizer normalizer,
-    ViewerBundleLocator bundleLocator,
+    IViewerBundleLocator bundleLocator,
     RenderStatsFactory statsFactory)
 {
     private const string BootstrapPlaceholder = "__INSPECTRA_BOOTSTRAP__";

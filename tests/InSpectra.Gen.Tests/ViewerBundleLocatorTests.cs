@@ -1,6 +1,7 @@
 using InSpectra.Gen.Services;
 using InSpectra.Gen.Runtime;
 using InSpectra.Gen.Tests.TestSupport;
+using Microsoft.Extensions.Options;
 
 namespace InSpectra.Gen.Tests;
 
@@ -16,11 +17,11 @@ public class ViewerBundleLocatorTests
         var locator = new ViewerBundleLocator(
             new ExecutableResolver(),
             new ProcessRunner(),
-            new ViewerBundleLocatorOptions
+            Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
                 RepositoryRootPath = repositoryRoot,
-            });
+            }));
 
         var resolved = await locator.ResolveAsync(CancellationToken.None);
 
@@ -47,11 +48,11 @@ public class ViewerBundleLocatorTests
         var locator = new TestViewerBundleLocator(
             new ExecutableResolver(),
             new ProcessRunner(),
-            new ViewerBundleLocatorOptions
+            Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
                 RepositoryRootPath = repositoryRoot,
-            });
+            }));
 
         var resolved = await locator.ResolveAsync(CancellationToken.None);
 
@@ -72,11 +73,11 @@ public class ViewerBundleLocatorTests
         var locator = new ViewerBundleLocator(
             new ExecutableResolver(),
             new ProcessRunner(),
-            new ViewerBundleLocatorOptions
+            Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
                 RepositoryRootPath = repositoryRoot,
-            });
+            }));
 
         var resolved = await locator.ResolveAsync(CancellationToken.None);
 
@@ -101,11 +102,11 @@ public class ViewerBundleLocatorTests
         var locator = new TestViewerBundleLocator(
             new ExecutableResolver(),
             new ProcessRunner(),
-            new ViewerBundleLocatorOptions
+            Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
                 RepositoryRootPath = repositoryRoot,
-            });
+            }));
 
         var resolved = await locator.ResolveAsync(CancellationToken.None);
 
@@ -126,11 +127,11 @@ public class ViewerBundleLocatorTests
         var locator = new TestViewerBundleLocator(
             new ExecutableResolver(),
             new ProcessRunner(),
-            new ViewerBundleLocatorOptions
+            Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
                 RepositoryRootPath = repositoryRoot,
-            });
+            }));
 
         var resolved = await locator.ResolveAsync(CancellationToken.None);
 
@@ -149,11 +150,11 @@ public class ViewerBundleLocatorTests
         var locator = new ViewerBundleLocator(
             new ExecutableResolver(),
             new ProcessRunner(),
-            new ViewerBundleLocatorOptions
+            Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
                 RepositoryRootPath = repositoryRoot,
-            });
+            }));
 
         var exception = await Assert.ThrowsAsync<CliUsageException>(() => locator.ResolveAsync(CancellationToken.None));
 
@@ -192,7 +193,7 @@ public class ViewerBundleLocatorTests
     private sealed class TestViewerBundleLocator(
         ExecutableResolver executableResolver,
         IProcessRunner processRunner,
-        ViewerBundleLocatorOptions options)
+        IOptions<ViewerBundleLocatorOptions> options)
         : ViewerBundleLocator(executableResolver, processRunner, options)
     {
         public bool BuildInvoked { get; private set; }
