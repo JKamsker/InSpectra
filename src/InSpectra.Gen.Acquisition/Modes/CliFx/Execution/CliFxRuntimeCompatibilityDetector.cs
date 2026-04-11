@@ -1,7 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Modes.CliFx.Execution;
 
 using InSpectra.Gen.Acquisition.Modes.CliFx.Crawling;
-using InSpectra.Gen.Acquisition.Infrastructure.Commands;
+using InSpectra.Gen.Acquisition.Tooling.Process;
 
 internal sealed class CliFxRuntimeCompatibilityDetector
 {

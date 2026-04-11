@@ -1,4 +1,4 @@
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using InSpectra.Gen.Runtime.Rendering;
 using InSpectra.Gen.Runtime.Settings;
 

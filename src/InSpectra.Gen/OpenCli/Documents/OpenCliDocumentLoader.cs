@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Schema;
 using InSpectra.Gen.Models;
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 
 namespace InSpectra.Gen.OpenCli.Documents;
 

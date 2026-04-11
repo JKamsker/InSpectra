@@ -1,7 +1,7 @@
-using InSpectra.Gen.Acquisition.Analysis.Tools;
-using InSpectra.Gen.Acquisition.Infrastructure.Commands;
-using InSpectra.Gen.Acquisition.Infrastructure.Paths;
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Tooling.Tools;
+using InSpectra.Gen.Acquisition.Tooling.Process;
+using InSpectra.Gen.Acquisition.Tooling.Paths;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 
 namespace InSpectra.Gen.Targets;
 

@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.Hook;
 
-using InSpectra.Gen.Acquisition.Analysis.Results;
+using InSpectra.Gen.Acquisition.Contracts.Results;
 
 using System.Text.Json.Nodes;
 

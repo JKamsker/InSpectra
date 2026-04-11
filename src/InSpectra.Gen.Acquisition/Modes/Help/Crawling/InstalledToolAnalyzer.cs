@@ -1,17 +1,17 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 
-using InSpectra.Gen.Acquisition.Infrastructure.Paths;
+using InSpectra.Gen.Acquisition.Tooling.Paths;
 
 using InSpectra.Gen.Acquisition.OpenCli.Documents;
 
-using InSpectra.Gen.Acquisition.Analysis.Results;
+using InSpectra.Gen.Acquisition.Contracts.Results;
 
 using InSpectra.Gen.Acquisition.Modes.Help.Projection;
 using InSpectra.Gen.Acquisition.Modes.Help.Documents;
 
-using InSpectra.Gen.Acquisition.Infrastructure.Commands;
+using InSpectra.Gen.Acquisition.Tooling.Process;
 
-using InSpectra.Gen.Acquisition.Analysis;
+using InSpectra.Gen.Acquisition.Contracts;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
 

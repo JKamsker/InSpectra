@@ -1,5 +1,5 @@
-using InSpectra.Gen.Acquisition.Analysis;
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Contracts;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using InSpectra.Gen.Runtime.Acquisition;
 
 namespace InSpectra.Gen.OpenCli.Acquisition;

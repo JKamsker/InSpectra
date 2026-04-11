@@ -1,4 +1,4 @@
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using Microsoft.Extensions.Options;
 
 namespace InSpectra.Gen.Viewer;

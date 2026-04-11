@@ -1,7 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Modes.Hook;
 
 using InSpectra.Gen.Acquisition.Modes.Hook.Models;
-using InSpectra.Gen.Acquisition.Infrastructure;
+using InSpectra.Gen.Acquisition.Contracts;
 using InSpectra.Gen.Acquisition.OpenCli.Documents;
 
 using System.Text.Json.Nodes;

@@ -10,8 +10,8 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// interfaces" (docs/architecture/ARCHITECTURE.md).
 ///
 /// Currently skipped: <c>src/InSpectra.Gen/Composition/ServiceCollectionExtensions.cs</c>
-/// still reaches into <c>InSpectra.Gen.Acquisition.Analysis.*</c>,
-/// <c>InSpectra.Gen.Acquisition.Runtime</c>, etc. (Task.md line 570). Step 11 lands the
+/// still reaches into <c>InSpectra.Gen.Acquisition.Contracts.*</c>,
+/// <c>InSpectra.Gen.Acquisition.Contracts.Exceptions</c>, etc. (Task.md line 570). Step 11 lands the
 /// public composition entry points and removes the deep <c>using</c> statements.
 /// </summary>
 public sealed class ArchitectureAppShellTests

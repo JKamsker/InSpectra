@@ -2,7 +2,7 @@ namespace InSpectra.Gen.Acquisition.Tests.Hook;
 
 using InSpectra.Gen.Acquisition.Modes.Hook;
 using InSpectra.Gen.Acquisition.Modes.Hook.Models;
-using InSpectra.Gen.Acquisition.Infrastructure;
+using InSpectra.Gen.Acquisition.Contracts;
 
 using System.Text.Json.Nodes;
 using Xunit;

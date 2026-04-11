@@ -1,7 +1,7 @@
-using InSpectra.Gen.Acquisition.Frameworks;
+using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 using InSpectra.Gen.Runtime.Acquisition;
 
-using InSpectra.Gen.Acquisition.Analysis;
+using InSpectra.Gen.Acquisition.Contracts;
 
 namespace InSpectra.Gen.OpenCli.Acquisition;
 

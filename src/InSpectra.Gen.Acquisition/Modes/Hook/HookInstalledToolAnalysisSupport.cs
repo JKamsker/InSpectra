@@ -1,14 +1,14 @@
 namespace InSpectra.Gen.Acquisition.Modes.Hook;
 
 using InSpectra.Gen.Acquisition.Modes.Hook.Models;
-using InSpectra.Gen.Acquisition.Frameworks;
-using InSpectra.Gen.Acquisition.Infrastructure.Paths;
+using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
+using InSpectra.Gen.Acquisition.Tooling.Paths;
 
 using InSpectra.Gen.Acquisition.OpenCli.Documents;
 
-using InSpectra.Gen.Acquisition.Analysis.Results;
+using InSpectra.Gen.Acquisition.Contracts.Results;
 
-using InSpectra.Gen.Acquisition.Infrastructure.Commands;
+using InSpectra.Gen.Acquisition.Tooling.Process;
 
 using System.Diagnostics;
 using System.Reflection;

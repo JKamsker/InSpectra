@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.Static.Inspection;
 
-using InSpectra.Gen.Acquisition.Frameworks;
+using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 
 using InSpectra.Gen.Acquisition.Modes.Static.Models;
 

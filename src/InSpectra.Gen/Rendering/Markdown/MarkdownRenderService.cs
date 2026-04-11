@@ -1,5 +1,5 @@
 using InSpectra.Gen.Models;
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using InSpectra.Gen.Runtime.Rendering;
 
 namespace InSpectra.Gen.Rendering.Markdown;

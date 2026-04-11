@@ -1,4 +1,4 @@
-using InSpectra.Gen.Acquisition.Frameworks;
+using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 
 namespace InSpectra.Gen.Targets;
 

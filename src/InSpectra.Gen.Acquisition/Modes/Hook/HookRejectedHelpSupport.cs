@@ -1,7 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Modes.Hook;
 
 using InSpectra.Gen.Acquisition.Modes.Help.Inference.Text;
-using InSpectra.Gen.Acquisition.Infrastructure.Commands;
+using InSpectra.Gen.Acquisition.Tooling.Process;
 
 internal static class HookRejectedHelpSupport
 {

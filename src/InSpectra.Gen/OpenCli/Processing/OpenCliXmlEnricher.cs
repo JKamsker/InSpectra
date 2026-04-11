@@ -1,7 +1,7 @@
 using System.Xml;
 using System.Xml.Linq;
 using InSpectra.Gen.Models;
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 
 namespace InSpectra.Gen.OpenCli.Processing;
 

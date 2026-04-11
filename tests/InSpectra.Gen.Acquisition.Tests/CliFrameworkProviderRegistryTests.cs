@@ -1,7 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Tests;
 
-using InSpectra.Gen.Acquisition.Frameworks;
-using InSpectra.Gen.Acquisition.NuGet;
+using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
+using InSpectra.Gen.Acquisition.Tooling.NuGet;
 using InSpectra.Gen.Acquisition.Modes.Static.Attributes;
 using InSpectra.Gen.Acquisition.Modes.Static.Attributes.SystemCommandLine;
 

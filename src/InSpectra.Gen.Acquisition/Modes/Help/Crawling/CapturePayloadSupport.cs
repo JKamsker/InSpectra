@@ -5,7 +5,7 @@ using InSpectra.Gen.Acquisition.Modes.Help.Projection;
 using InSpectra.Gen.Acquisition.Modes.Help.Documents;
 using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
 
-using InSpectra.Gen.Acquisition.Infrastructure.Commands;
+using InSpectra.Gen.Acquisition.Tooling.Process;
 
 using InSpectra.Gen.Acquisition.Modes.Help.Parsing;
 

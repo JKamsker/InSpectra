@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using InSpectra.Gen.Acquisition.Runtime;
+using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 
 namespace InSpectra.Gen.Execution;
 

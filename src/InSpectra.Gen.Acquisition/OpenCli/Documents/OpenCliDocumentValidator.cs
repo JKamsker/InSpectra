@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.OpenCli.Documents;
 
-using InSpectra.Gen.Acquisition.Infrastructure.Json;
+using InSpectra.Gen.Acquisition.Tooling.Json;
 using InSpectra.Gen.Acquisition.OpenCli.Structure;
 
 using System.Text;
