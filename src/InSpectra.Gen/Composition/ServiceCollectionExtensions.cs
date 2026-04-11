@@ -1,13 +1,4 @@
-using InSpectra.Gen.Acquisition.Analysis.CliFx.Execution;
-using InSpectra.Gen.Acquisition.Analysis.CliFx.Metadata;
-using InSpectra.Gen.Acquisition.Analysis.CliFx.OpenCli;
-using InSpectra.Gen.Acquisition.Analysis.Hook;
-using InSpectra.Gen.Acquisition.Analysis.Tools;
-using InSpectra.Gen.Acquisition.Help.Crawling;
-using InSpectra.Gen.Acquisition.Help.OpenCli;
-using InSpectra.Gen.Acquisition.Infrastructure.Commands;
-using InSpectra.Gen.Acquisition.StaticAnalysis.Inspection;
-using InSpectra.Gen.Acquisition.StaticAnalysis.OpenCli;
+using InSpectra.Gen.Acquisition.Composition;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InSpectra.Gen.Composition;
@@ -19,7 +10,7 @@ internal static class ServiceCollectionExtensions
         services.AddOpenCliServices();
         services.AddTargetServices();
         services.AddRenderingServices();
-        services.AddAcquisitionAnalyzers();
+        services.AddInSpectraAcquisition();
         services.Configure<ViewerBundleLocatorOptions>(_ => { });
 
         return services;
@@ -67,27 +58,6 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<IViewerBundleLocator, ViewerBundleLocator>();
         services.AddSingleton<MarkdownRenderService>();
         services.AddSingleton<HtmlRenderService>();
-
-        return services;
-    }
-
-    private static IServiceCollection AddAcquisitionAnalyzers(this IServiceCollection services)
-    {
-        services.AddSingleton<CommandRuntime>();
-        services.AddSingleton<OpenCliBuilder>();
-        services.AddSingleton<IToolDescriptorResolver, ToolDescriptorResolver>();
-        services.AddSingleton<CliFxMetadataInspector>();
-        services.AddSingleton<CliFxOpenCliBuilder>();
-        services.AddSingleton<CliFxCoverageClassifier>();
-        services.AddSingleton<StaticAnalysisRuntime>();
-        services.AddSingleton<DnlibAssemblyScanner>();
-        services.AddSingleton<StaticAnalysisAssemblyInspectionSupport>();
-        services.AddSingleton<StaticAnalysisOpenCliBuilder>();
-        services.AddSingleton<StaticAnalysisCoverageClassifier>();
-        services.AddSingleton<InstalledToolAnalyzer>();
-        services.AddSingleton<CliFxInstalledToolAnalysisSupport>();
-        services.AddSingleton<StaticInstalledToolAnalysisSupport>();
-        services.AddSingleton<HookInstalledToolAnalysisSupport>();
 
         return services;
     }
