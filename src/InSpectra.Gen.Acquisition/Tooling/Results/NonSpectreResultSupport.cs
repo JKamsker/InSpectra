@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Contracts.Results;
+namespace InSpectra.Gen.Acquisition.Tooling.Results;
 
 using InSpectra.Gen.Acquisition.Contracts;
 

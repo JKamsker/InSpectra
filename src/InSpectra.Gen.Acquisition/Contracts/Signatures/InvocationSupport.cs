@@ -1,7 +1,5 @@
 namespace InSpectra.Gen.Acquisition.Contracts.Signatures;
 
-using InSpectra.Gen.Acquisition.Contracts.Documents;
-
 internal static class InvocationSupport
 {
     public static IReadOnlyList<string[]> BuildHelpInvocations(IReadOnlyList<string> commandSegments)
@@ -46,5 +44,22 @@ internal static class InvocationSupport
         }
 
         yield return commandSegments.Concat(new[] { "help" }).ToArray();
+    }
+
+    private sealed class InvocationComparer : IEqualityComparer<string[]>
+    {
+        public bool Equals(string[]? x, string[]? y)
+            => x is not null && y is not null && x.SequenceEqual(y, StringComparer.OrdinalIgnoreCase);
+
+        public int GetHashCode(string[] obj)
+        {
+            var hash = new HashCode();
+            foreach (var item in obj)
+            {
+                hash.Add(item, StringComparer.OrdinalIgnoreCase);
+            }
+
+            return hash.ToHashCode();
+        }
     }
 }

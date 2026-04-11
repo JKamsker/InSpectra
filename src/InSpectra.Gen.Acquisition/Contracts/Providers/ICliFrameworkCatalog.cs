@@ -3,8 +3,8 @@ namespace InSpectra.Gen.Acquisition.Contracts.Providers;
 /// <summary>
 /// Contracts-level description of a single known CLI framework provider. Only the fields
 /// the app shell needs to plan acquisition attempts and detect locally installed tools
-/// are exposed here; the full provider record stays inside
-/// <c>InSpectra.Gen.Acquisition.Tooling.FrameworkDetection</c>.
+/// are exposed here; the full provider record stays inside the tooling framework
+/// detection layer and is not reachable from this contract.
 /// </summary>
 public sealed record CliFrameworkCatalogEntry(
     string Name,
@@ -15,8 +15,8 @@ public sealed record CliFrameworkCatalogEntry(
 
 /// <summary>
 /// Public composition seam for the CLI framework detection catalog. Lets the app shell
-/// plan acquisition attempts and detect locally installed tools without touching
-/// <c>InSpectra.Gen.Acquisition.Tooling.FrameworkDetection</c> directly.
+/// plan acquisition attempts and detect locally installed tools without touching the
+/// tooling framework detection layer directly.
 /// </summary>
 public interface ICliFrameworkCatalog
 {

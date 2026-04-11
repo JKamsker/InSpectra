@@ -2,12 +2,12 @@ using System.Text.Json.Nodes;
 using InSpectra.Gen.Acquisition.Contracts;
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using InSpectra.Gen.Acquisition.Contracts.Providers;
-using InSpectra.Gen.Acquisition.Contracts.Results;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Execution;
 using InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 using InSpectra.Gen.Acquisition.Modes.Hook;
 using InSpectra.Gen.Acquisition.Modes.Static.Inspection;
 using InSpectra.Gen.Acquisition.Tooling.Process;
+using InSpectra.Gen.Acquisition.Tooling.Results;
 
 namespace InSpectra.Gen.Acquisition.Orchestration;
 

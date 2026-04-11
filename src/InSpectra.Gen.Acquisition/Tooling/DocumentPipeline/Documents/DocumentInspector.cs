@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Contracts.Documents;
+namespace InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
-using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 using InSpectra.Gen.Acquisition.Tooling.Process;
 
@@ -177,21 +177,4 @@ internal static partial class DocumentInspector
 
     [GeneratedRegex(@"\bcurrently only supported on\b|\bplatform\s+\S+\s+not supported\b", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline)]
     private static partial Regex PlatformBlockedPayloadRegex();
-}
-
-internal sealed class InvocationComparer : IEqualityComparer<string[]>
-{
-    public bool Equals(string[]? x, string[]? y)
-        => x is not null && y is not null && x.SequenceEqual(y, StringComparer.OrdinalIgnoreCase);
-
-    public int GetHashCode(string[] obj)
-    {
-        var hash = new HashCode();
-        foreach (var item in obj)
-        {
-            hash.Add(item, StringComparer.OrdinalIgnoreCase);
-        }
-
-        return hash.ToHashCode();
-    }
 }

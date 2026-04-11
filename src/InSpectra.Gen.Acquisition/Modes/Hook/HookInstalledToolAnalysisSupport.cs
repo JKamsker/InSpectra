@@ -6,7 +6,7 @@ using InSpectra.Gen.Acquisition.Tooling.Paths;
 
 using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
-using InSpectra.Gen.Acquisition.Contracts.Results;
+using InSpectra.Gen.Acquisition.Tooling.Results;
 
 using InSpectra.Gen.Acquisition.Tooling.Process;
 

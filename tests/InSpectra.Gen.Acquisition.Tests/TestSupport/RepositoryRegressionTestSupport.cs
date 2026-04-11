@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Tests.TestSupport;
 
-using InSpectra.Gen.Acquisition.Contracts;
+using InSpectra.Gen.Acquisition.Tooling;
 using InSpectra.Gen.Acquisition.Tooling.Paths;
 
 using System.Text.Json.Nodes;

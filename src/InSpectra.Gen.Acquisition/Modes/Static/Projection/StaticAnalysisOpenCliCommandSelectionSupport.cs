@@ -1,7 +1,5 @@
 namespace InSpectra.Gen.Acquisition.Modes.Static.Projection;
 
-using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
-
 using InSpectra.Gen.Acquisition.Contracts.Documents;
 using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;

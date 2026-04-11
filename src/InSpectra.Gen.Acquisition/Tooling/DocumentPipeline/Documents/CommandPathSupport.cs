@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Contracts.CommandPaths;
+namespace InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
 using InSpectra.Gen.Acquisition.Contracts.Documents;
 

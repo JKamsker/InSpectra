@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Contracts.Documents;
+namespace InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
-using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 internal static class EmbeddedCommandDocumentExpansionSupport
 {
@@ -18,7 +18,8 @@ internal static class EmbeddedCommandDocumentExpansionSupport
             {
                 var commandKey = CommandPathSupport.ResolveChildKey(rootCommandName, pair.Key, embedded.Key);
                 if (expanded.TryGetValue(commandKey, out var existing)
-                    && DocumentInspector.Score(existing) >= DocumentInspector.Score(embedded.Value))
+                    && DocumentInspector.Score(existing)
+                        >= DocumentInspector.Score(embedded.Value))
                 {
                     continue;
                 }

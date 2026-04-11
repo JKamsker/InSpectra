@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Contracts;
+namespace InSpectra.Gen.Acquisition.Tooling;
 
 using InSpectra.Gen.Acquisition.Tooling.NuGet;
 
