@@ -13,12 +13,10 @@ public sealed class LocalCliTargetFactoryTests
     }
 
     [Fact]
+    [Trait("Category", "WindowsOnly")]
     public void Create_Escapes_Percent_Signs_In_Windows_Wrappers()
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            return;
-        }
+        Assert.True(OperatingSystem.IsWindows(), "This test must run on a Windows agent.");
 
         using var temp = new TempDirectory();
         var sourcePath = Path.Combine(temp.Path, "demo.exe");

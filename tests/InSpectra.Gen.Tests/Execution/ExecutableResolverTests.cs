@@ -20,12 +20,10 @@ public class ExecutableResolverTests
     }
 
     [Fact]
+    [Trait("Category", "WindowsOnly")]
     public void Resolve_prefers_pathext_match_over_extensionless_file_on_windows()
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            return;
-        }
+        Assert.True(OperatingSystem.IsWindows(), "This test must run on a Windows agent.");
 
         using var temp = new TempDirectory();
         File.WriteAllText(System.IO.Path.Combine(temp.Path, "npm"), "shim");

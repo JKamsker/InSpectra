@@ -41,18 +41,47 @@ public sealed class ArchitectureProjectDependencyTests
     public void Project_dependency_direction_follows_charter()
     {
         var projects = ArchitecturePolicyScanner.EnumerateBackendProjects();
+        Assert.NotEmpty(projects);
 
-        var tracked = projects
-            .Where(project => AllowedReferences.ContainsKey(project.Name))
+        var expectedProjectNames = AllowedReferences.Keys
+            .OrderBy(static name => name, StringComparer.Ordinal)
+            .ToList();
+        var actualProjectNames = projects
+            .Select(project => project.Name)
+            .OrderBy(static name => name, StringComparer.Ordinal)
+            .ToList();
+        var missingProjects = expectedProjectNames
+            .Where(expected => !actualProjectNames.Contains(expected, StringComparer.Ordinal))
+            .ToList();
+        var unexpectedProjects = projects
+            .Where(project => !AllowedReferences.ContainsKey(project.Name))
+            .Select(project =>
+                $"{project.Name} ({ArchitecturePolicyScanner.GetRelativeRepoPath(project.CsProjPath)})")
+            .OrderBy(static project => project, StringComparer.Ordinal)
             .ToList();
 
         Assert.True(
-            tracked.Count == AllowedReferences.Count,
-            $"Expected to find all charter-tracked projects ({string.Join(", ", AllowedReferences.Keys)})"
-            + $" but found only {string.Join(", ", tracked.Select(p => p.Name))}.");
+            missingProjects.Count == 0 && unexpectedProjects.Count == 0,
+            "Expected backend project policy coverage to match the charter exactly."
+            + Environment.NewLine
+            + $"Expected: [{string.Join(", ", expectedProjectNames)}]"
+            + Environment.NewLine
+            + $"Actual:   [{string.Join(", ", actualProjectNames)}]"
+            + Environment.NewLine
+            + (missingProjects.Count == 0
+                ? "Missing:  (none)"
+                : $"Missing:  [{string.Join(", ", missingProjects)}]")
+            + Environment.NewLine
+            + (unexpectedProjects.Count == 0
+                ? "Unexpected: (none)"
+                : $"Unexpected: [{string.Join(", ", unexpectedProjects)}]"));
+
+        var trackedProjects = projects
+            .Where(project => AllowedReferences.ContainsKey(project.Name))
+            .ToList();
 
         var violations = new List<string>();
-        foreach (var project in tracked)
+        foreach (var project in trackedProjects)
         {
             var allowed = AllowedReferences[project.Name];
             var actual = ArchitecturePolicyScanner.GetProjectReferences(project);

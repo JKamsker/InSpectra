@@ -29,11 +29,13 @@ public sealed class ArchitectureForbiddenBucketsTests
         Assert.NotEmpty(projects);
 
         var violations = new List<string>();
+        var topLevelDirectoriesScanned = 0;
 
         foreach (var project in projects)
         {
             foreach (var directory in Directory.EnumerateDirectories(project.Directory))
             {
+                topLevelDirectoriesScanned++;
                 var name = Path.GetFileName(directory);
                 if (ForbiddenTopLevelFolders.Contains(name))
                 {
@@ -41,6 +43,10 @@ public sealed class ArchitectureForbiddenBucketsTests
                 }
             }
         }
+
+        Assert.True(
+            topLevelDirectoriesScanned > 0,
+            "Expected backend projects to contain at least one top-level directory to scan for forbidden buckets, but found none.");
 
         Assert.True(
             violations.Count == 0,

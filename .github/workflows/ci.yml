@@ -51,7 +51,7 @@ jobs:
         run: dotnet build InSpectra.Gen.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test InSpectra.Gen.sln --configuration Release --no-build
+        run: dotnet test InSpectra.Gen.sln --configuration Release --no-build --filter "Category!=WindowsOnly"
 
       - name: Pack tool
         run: dotnet pack src/InSpectra.Gen/InSpectra.Gen.csproj --configuration Release --no-build -p:Version=0.0.${{ github.run_number }}
@@ -147,6 +147,22 @@ jobs:
         with:
           name: nupkg
           path: src/InSpectra.Gen/bin/Release/*.nupkg
+
+  windows-backend-tests:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run Windows-only backend tests
+        run: dotnet test tests/InSpectra.Gen.Tests/InSpectra.Gen.Tests.csproj --configuration Release --filter "Category=WindowsOnly"
 
   live-tests:
     # Runs the ~35 end-to-end regression tests against real NuGet packages.
