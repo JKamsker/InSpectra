@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.CliFx.Projection;
 
-using InSpectra.Gen.Acquisition.OpenCli.Documents;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
 using InSpectra.Gen.Acquisition.Modes.CliFx.Metadata;
 using InSpectra.Gen.Acquisition.Contracts;

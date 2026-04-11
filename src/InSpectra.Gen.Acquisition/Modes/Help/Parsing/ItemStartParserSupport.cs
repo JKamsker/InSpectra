@@ -7,7 +7,7 @@ using InSpectra.Gen.Acquisition.Modes.Help.Inference.Descriptions;
 using InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 using InSpectra.Gen.Acquisition.Contracts.Documents;
-using InSpectra.Gen.Acquisition.OpenCli.Structure;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Structure;
 
 using System.Text.RegularExpressions;
 

@@ -3,7 +3,7 @@ namespace InSpectra.Gen.Acquisition.Tooling.Introspection;
 using InSpectra.Gen.Acquisition.Tooling.Paths;
 using InSpectra.Gen.Acquisition.Tooling.Process;
 
-using InSpectra.Gen.Acquisition.OpenCli.Documents;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
 using InSpectra.Gen.Acquisition.Contracts;
 

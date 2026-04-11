@@ -3,7 +3,7 @@ namespace InSpectra.Gen.Acquisition.Modes.Static.Inspection;
 using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 using InSpectra.Gen.Acquisition.Tooling.Paths;
 
-using InSpectra.Gen.Acquisition.OpenCli.Documents;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
 using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Acquisition.Contracts.Results;

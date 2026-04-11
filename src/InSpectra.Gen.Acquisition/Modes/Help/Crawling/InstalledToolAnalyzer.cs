@@ -2,7 +2,7 @@ namespace InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 
 using InSpectra.Gen.Acquisition.Tooling.Paths;
 
-using InSpectra.Gen.Acquisition.OpenCli.Documents;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
 using InSpectra.Gen.Acquisition.Contracts.Results;
 

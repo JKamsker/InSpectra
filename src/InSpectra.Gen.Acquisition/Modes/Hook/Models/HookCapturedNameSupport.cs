@@ -1,7 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Modes.Hook.Models;
 
 using InSpectra.Gen.Acquisition.Contracts.Signatures;
-using InSpectra.Gen.Acquisition.OpenCli.Structure;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Structure;
 
 internal static class HookCapturedNameSupport
 {

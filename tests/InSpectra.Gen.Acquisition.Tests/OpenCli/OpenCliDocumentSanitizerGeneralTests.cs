@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Tests.OpenCli;
 
-using InSpectra.Gen.Acquisition.OpenCli.Documents;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
 using System.Text.Json.Nodes;
 

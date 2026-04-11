@@ -1,7 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Projection;
 
 using InSpectra.Gen.Acquisition.Contracts;
-using InSpectra.Gen.Acquisition.OpenCli.Documents;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 
 using InSpectra.Gen.Acquisition.Contracts.Documents;
 using InSpectra.Gen.Acquisition.Modes.Help.Inference.Usage.Commands;

@@ -4,8 +4,8 @@ using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
 
 using InSpectra.Gen.Acquisition.Contracts.Documents;
 using InSpectra.Gen.Acquisition.Contracts.Providers;
-using InSpectra.Gen.Acquisition.OpenCli.Documents;
-using InSpectra.Gen.Acquisition.OpenCli.Structure;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
+using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Structure;
 using InSpectra.Gen.Acquisition.Modes.Static.Models;
 
 internal static class StaticAnalysisOpenCliCommandSelectionSupport
