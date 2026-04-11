@@ -147,6 +147,38 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
     }
 
     [Fact]
+    public async Task Newer_stale_repo_bundle_is_used_when_rebuild_fails()
+    {
+        using var temp = new TempDirectory();
+        var packagedRoot = CreateBundle(Path.Combine(temp.Path, "packaged"));
+        var repositoryRoot = CreateRepositoryBundle(Path.Combine(temp.Path, "repo"));
+        var frontendRoot = CreateFrontendInputs(repositoryRoot);
+        var sourcePath = CreateStaleSource(frontendRoot);
+
+        var packagedTime = DateTime.UtcNow.AddMinutes(-5);
+        var repositoryTime = DateTime.UtcNow.AddMinutes(-3);
+        File.SetLastWriteTimeUtc(Path.Combine(packagedRoot, "index.html"), packagedTime);
+        File.SetLastWriteTimeUtc(Path.Combine(packagedRoot, "static.html"), packagedTime);
+        File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "index.html"), repositoryTime);
+        File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "static.html"), repositoryTime);
+        File.SetLastWriteTimeUtc(sourcePath, DateTime.UtcNow);
+
+        var locator = new FailingViewerBundleLocator(
+            new ExecutableResolver(),
+            new ProcessRunner(),
+            Options.Create(new ViewerBundleLocatorOptions
+            {
+                PackagedRootPath = packagedRoot,
+                RepositoryRootPath = repositoryRoot,
+            }));
+
+        var resolved = await locator.ResolveAsync(CancellationToken.None);
+
+        Assert.True(locator.BuildInvoked);
+        Assert.Equal(Path.Combine(frontendRoot, "dist"), resolved);
+    }
+
+    [Fact]
     public async Task Missing_repo_sources_fail_with_build_hint()
     {
         using var temp = new TempDirectory();

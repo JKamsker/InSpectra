@@ -18,6 +18,7 @@ internal static class OpenCliArtifactWriter
         StagedArtifact? stagedCrawl = null;
         CommittedArtifact? committedOpenCli = null;
         CommittedArtifact? committedCrawl = null;
+        var commitCompleted = false;
         try
         {
             stagedOpenCli = await StageArtifactAsync(openCliArtifact, cancellationToken);
@@ -31,20 +32,25 @@ internal static class OpenCliArtifactWriter
 
             var openCliPath = committedOpenCli?.Path;
             var crawlPath = committedCrawl?.Path;
-            DeleteBackupArtifact(committedOpenCli);
-            DeleteBackupArtifact(committedCrawl);
+            commitCompleted = true;
             return new OpenCliArtifactOptions(openCliPath, crawlPath);
         }
         catch
         {
-            RollBackCommittedArtifact(committedCrawl);
-            RollBackCommittedArtifact(committedOpenCli);
+            if (!commitCompleted)
+            {
+                RollBackCommittedArtifact(committedCrawl);
+                RollBackCommittedArtifact(committedOpenCli);
+            }
+
             throw;
         }
         finally
         {
             DeleteStagedArtifact(stagedOpenCli);
             DeleteStagedArtifact(stagedCrawl);
+            TryDeleteBackupArtifact(committedOpenCli);
+            TryDeleteBackupArtifact(committedCrawl);
         }
     }
 
@@ -147,14 +153,23 @@ internal static class OpenCliArtifactWriter
         RestoreBackupArtifact(artifact.Path, artifact.BackupPath);
     }
 
-    private static void DeleteBackupArtifact(CommittedArtifact? artifact)
+    private static void TryDeleteBackupArtifact(CommittedArtifact? artifact)
     {
         if (artifact is null || string.IsNullOrWhiteSpace(artifact.BackupPath) || !File.Exists(artifact.BackupPath))
         {
             return;
         }
 
-        File.Delete(artifact.BackupPath);
+        try
+        {
+            File.Delete(artifact.BackupPath);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
     }
 
     private static void RestoreBackupArtifact(string path, string? backupPath)

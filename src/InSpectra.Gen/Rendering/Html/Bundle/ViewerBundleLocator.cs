@@ -184,9 +184,7 @@ public class ViewerBundleLocator(
 
         if (!allowBuild)
         {
-            return GetLatestWriteTimeUtc(repositoryDist) > GetLatestWriteTimeUtc(packagedPath)
-                ? repositoryDist
-                : packagedPath;
+            return SelectNewerBundle(packagedPath, repositoryDist);
         }
 
         return await ResolveRepositoryBundleOrUsePackagedAsync(packagedPath, frontendRoot, cancellationToken, allowBuild);
@@ -211,7 +209,10 @@ public class ViewerBundleLocator(
         }
         catch (CliUsageException)
         {
-            return packagedPath;
+            var repositoryDist = Path.Combine(frontendRoot, "dist");
+            return HasBundle(repositoryDist)
+                ? SelectNewerBundle(packagedPath, repositoryDist)
+                : packagedPath;
         }
     }
 
@@ -259,6 +260,11 @@ public class ViewerBundleLocator(
             .DefaultIfEmpty(DateTime.MinValue)
             .Max();
     }
+
+    private static string SelectNewerBundle(string packagedPath, string repositoryDist)
+        => GetLatestWriteTimeUtc(repositoryDist) > GetLatestWriteTimeUtc(packagedPath)
+            ? repositoryDist
+            : packagedPath;
 
     private enum NodeModulesState
     {
