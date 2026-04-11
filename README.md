@@ -542,13 +542,17 @@ At runtime, HTML assets are resolved in this order:
 ## Project Layout
 
 ```text
-src/InSpectra.Gen/               CLI tool and render services
-src/InSpectra.UI/                Vite + React + TypeScript viewer app
-tests/InSpectra.Gen.Tests/       xUnit test suite
-docs/                            Website and self-generated docs
-examples/                        Example renders (Jellyfin, JDownloader)
-.github/actions/render/          GitHub Action (composite)
-.github/workflows/               CI, Pages deployment, reusable workflow
+src/InSpectra.Gen/                          CLI tool, commands, rendering, and use cases
+src/InSpectra.Gen.Acquisition/              Acquisition modes (CliFx/Help/Hook/Static) and shared tooling
+src/InSpectra.Gen.Core/                     Foundational cross-module primitives (Cli*Exception types)
+src/InSpectra.Gen.StartupHook/              .NET startup hook for live command-tree capture
+src/InSpectra.UI/                           Vite + React + TypeScript viewer app
+tests/InSpectra.Gen.Tests/                  xUnit test suite + 14 architecture policy tests
+tests/InSpectra.Gen.Acquisition.Tests/      xUnit test suite for the acquisition module
+docs/                                       Website, architecture charter, self-generated docs
+examples/                                   Example renders (Jellyfin, JDownloader)
+.github/actions/render/                     GitHub Action (composite)
+.github/workflows/                          CI, Pages deployment, reusable workflow
 ```
 
 ## Contributing
