@@ -111,5 +111,3 @@ public sealed class ProcessRunner : IProcessRunner
         }
     }
 }
-
-public sealed record ProcessResult(string StandardOutput, string StandardError);
