@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Modes.Hook;
+namespace InSpectra.Gen.Acquisition.Modes.Hook.Execution;
 
-using InSpectra.Gen.Acquisition.Modes.Hook.Models;
+using InSpectra.Gen.Acquisition.Modes.Hook.Capture;
 using InSpectra.Gen.Acquisition.Tooling.Process;
 
 internal static class HookProcessRetrySupport

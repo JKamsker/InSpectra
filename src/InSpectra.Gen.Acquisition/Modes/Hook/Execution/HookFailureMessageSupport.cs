@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Hook;
+namespace InSpectra.Gen.Acquisition.Modes.Hook.Execution;
 
 using InSpectra.Gen.Acquisition.Tooling.Process;
 

@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Modes.Hook;
+namespace InSpectra.Gen.Acquisition.Modes.Hook.Projection;
 
-using InSpectra.Gen.Acquisition.Modes.Hook.Models;
+using InSpectra.Gen.Acquisition.Modes.Hook.Capture;
 using InSpectra.Gen.Acquisition.Contracts;
 using InSpectra.Gen.Acquisition.Tooling.DocumentPipeline.Documents;
 

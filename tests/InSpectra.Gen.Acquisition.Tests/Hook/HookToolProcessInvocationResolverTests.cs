@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Tests.Hook;
 
-using InSpectra.Gen.Acquisition.Modes.Hook;
+using InSpectra.Gen.Acquisition.Modes.Hook.Execution;
 
 public sealed class HookToolProcessInvocationResolverTests
 {

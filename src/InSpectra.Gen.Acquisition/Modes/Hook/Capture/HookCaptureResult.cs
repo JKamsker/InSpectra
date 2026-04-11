@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Hook.Models;
+namespace InSpectra.Gen.Acquisition.Modes.Hook.Capture;
 
 using System.Text.Json.Serialization;
 

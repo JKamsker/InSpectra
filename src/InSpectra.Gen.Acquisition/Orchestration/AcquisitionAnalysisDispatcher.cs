@@ -4,7 +4,7 @@ using InSpectra.Gen.Core;
 using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Execution;
 using InSpectra.Gen.Acquisition.Modes.Help.Crawling;
-using InSpectra.Gen.Acquisition.Modes.Hook;
+using InSpectra.Gen.Acquisition.Modes.Hook.Execution;
 using InSpectra.Gen.Acquisition.Modes.Static.Inspection;
 using InSpectra.Gen.Acquisition.Tooling.Process;
 using InSpectra.Gen.Acquisition.Tooling.Results;

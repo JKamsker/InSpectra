@@ -2,7 +2,7 @@ using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Execution;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Metadata;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Projection;
-using InSpectra.Gen.Acquisition.Modes.Hook;
+using InSpectra.Gen.Acquisition.Modes.Hook.Execution;
 using InSpectra.Gen.Acquisition.Orchestration;
 using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 using InSpectra.Gen.Acquisition.Tooling.Tools;

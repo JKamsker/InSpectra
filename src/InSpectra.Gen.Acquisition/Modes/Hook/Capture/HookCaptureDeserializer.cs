@@ -1,6 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Hook;
-
-using InSpectra.Gen.Acquisition.Modes.Hook.Models;
+namespace InSpectra.Gen.Acquisition.Modes.Hook.Capture;
 
 using System.Diagnostics;
 using System.Text.Json;

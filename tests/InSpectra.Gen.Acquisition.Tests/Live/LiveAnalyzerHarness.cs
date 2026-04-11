@@ -2,7 +2,7 @@ namespace InSpectra.Gen.Acquisition.Tests.Live;
 
 using InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 using InSpectra.Gen.Acquisition.Modes.Help.Projection;
-using InSpectra.Gen.Acquisition.Modes.Hook;
+using InSpectra.Gen.Acquisition.Modes.Hook.Execution;
 using InSpectra.Gen.Acquisition.Tooling;
 using InSpectra.Gen.Acquisition.Tooling.Paths;
 using InSpectra.Gen.Acquisition.Tooling.Process;
