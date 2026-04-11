@@ -1,6 +1,6 @@
 using System.Xml;
 using System.Xml.Linq;
-using InSpectra.Gen.Models;
+using InSpectra.Gen.Rendering.Pipeline.Model;
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 
 namespace InSpectra.Gen.OpenCli.Enrichment;

@@ -1,7 +1,7 @@
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using InSpectra.Gen.Execution;
 using InSpectra.Gen.UseCases.Generate;
-using InSpectra.Gen.Runtime.Acquisition;
+using InSpectra.Gen.UseCases.Generate.Requests;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.OpenCli;

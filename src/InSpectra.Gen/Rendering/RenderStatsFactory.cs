@@ -1,5 +1,5 @@
-using InSpectra.Gen.Models;
-using InSpectra.Gen.Runtime.Rendering;
+using InSpectra.Gen.Rendering.Pipeline.Model;
+using InSpectra.Gen.Rendering.Contracts;
 
 namespace InSpectra.Gen.Rendering;
 

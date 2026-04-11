@@ -1,7 +1,7 @@
-using InSpectra.Gen.Models;
+using InSpectra.Gen.Rendering.Pipeline.Model;
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
-using InSpectra.Gen.Runtime.Acquisition;
-using InSpectra.Gen.Runtime.Rendering;
+using InSpectra.Gen.UseCases.Generate.Requests;
+using InSpectra.Gen.Rendering.Contracts;
 
 namespace InSpectra.Gen.Rendering;
 

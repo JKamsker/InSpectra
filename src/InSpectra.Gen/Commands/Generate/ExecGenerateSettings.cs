@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using InSpectra.Gen.Runtime.Settings;
+using InSpectra.Gen.Commands.Common;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Generate;

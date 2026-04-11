@@ -8,7 +8,7 @@ using InSpectra.Gen.Acquisition.Contracts;
 using InSpectra.Gen.Acquisition.Modes.Static.Inspection;
 using InSpectra.Gen.Acquisition.Modes.Static.Projection;
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
-using InSpectra.Gen.Runtime.Acquisition;
+using InSpectra.Gen.UseCases.Generate.Requests;
 
 namespace InSpectra.Gen.UseCases.Generate;
 

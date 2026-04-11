@@ -1,7 +1,7 @@
 using System.Text.Json;
-using InSpectra.Gen.Models;
-using InSpectra.Gen.Runtime.Json;
-using InSpectra.Gen.Runtime.Rendering;
+using InSpectra.Gen.Rendering.Pipeline.Model;
+using InSpectra.Gen.Output.Json;
+using InSpectra.Gen.Rendering.Contracts;
 
 namespace InSpectra.Gen.Rendering.Html;
 

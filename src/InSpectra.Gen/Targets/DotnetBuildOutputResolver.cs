@@ -1,5 +1,5 @@
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
-using InSpectra.Gen.Runtime.Acquisition;
+using InSpectra.Gen.UseCases.Generate.Requests;
 
 namespace InSpectra.Gen.Targets;
 

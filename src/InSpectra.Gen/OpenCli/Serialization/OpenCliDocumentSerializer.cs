@@ -1,6 +1,6 @@
 using System.Text.Json;
-using InSpectra.Gen.Models;
-using InSpectra.Gen.Runtime.Json;
+using InSpectra.Gen.Rendering.Pipeline.Model;
+using InSpectra.Gen.Output.Json;
 
 namespace InSpectra.Gen.OpenCli.Serialization;
 

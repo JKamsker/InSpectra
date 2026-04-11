@@ -4,10 +4,6 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// Charter rule: "No new top-level <c>Runtime</c>, <c>Infrastructure</c>, <c>Models</c>,
 /// <c>Support</c>, <c>Helpers</c>, or <c>Misc</c> roots."
 /// (docs/architecture/ARCHITECTURE.md, "Naming rules").
-///
-/// Currently skipped: the legacy tree still has <c>Runtime/</c>, <c>Infrastructure/</c>,
-/// and <c>Models/</c> top-level folders that Phase 3 will remove. This test is unskipped
-/// once Step 9 (kill catch-all roots) lands.
 /// </summary>
 public sealed class ArchitectureForbiddenBucketsTests
 {
@@ -26,7 +22,7 @@ public sealed class ArchitectureForbiddenBucketsTests
             "Misc",
         };
 
-    [Fact(Skip = "Unskip after Step 9 — requires killing legacy Runtime/Infrastructure/Models roots first.")]
+    [Fact]
     public void No_forbidden_top_level_buckets()
     {
         var projects = ArchitecturePolicyScanner.EnumerateBackendProjects();

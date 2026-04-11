@@ -1,5 +1,5 @@
 using InSpectra.Gen.StartupHook.Capture;
-using InSpectra.Gen.StartupHook.Runtime;
+using InSpectra.Gen.StartupHook.Hooking;
 
 // No namespace - required by DOTNET_STARTUP_HOOKS contract.
 

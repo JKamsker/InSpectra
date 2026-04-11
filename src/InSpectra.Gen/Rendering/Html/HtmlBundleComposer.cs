@@ -1,8 +1,8 @@
 using System.IO.Compression;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using InSpectra.Gen.Runtime.Json;
-using InSpectra.Gen.Runtime.Rendering;
+using InSpectra.Gen.Output.Json;
+using InSpectra.Gen.Rendering.Contracts;
 
 namespace InSpectra.Gen.Rendering.Html;
 

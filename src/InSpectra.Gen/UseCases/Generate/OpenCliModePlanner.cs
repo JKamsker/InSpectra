@@ -1,5 +1,5 @@
 using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
-using InSpectra.Gen.Runtime.Acquisition;
+using InSpectra.Gen.UseCases.Generate.Requests;
 
 using InSpectra.Gen.Acquisition.Contracts;
 

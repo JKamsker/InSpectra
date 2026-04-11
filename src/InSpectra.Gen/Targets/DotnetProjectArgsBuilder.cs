@@ -1,4 +1,4 @@
-using InSpectra.Gen.Runtime.Acquisition;
+using InSpectra.Gen.UseCases.Generate.Requests;
 
 namespace InSpectra.Gen.Targets;
 

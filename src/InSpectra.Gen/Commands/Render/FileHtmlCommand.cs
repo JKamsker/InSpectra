@@ -1,6 +1,6 @@
-using InSpectra.Gen.Runtime;
-using InSpectra.Gen.Runtime.Output;
-using InSpectra.Gen.Runtime.Rendering;
+using InSpectra.Gen.UseCases.Render;
+using InSpectra.Gen.Output;
+using InSpectra.Gen.Rendering.Contracts;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Render;

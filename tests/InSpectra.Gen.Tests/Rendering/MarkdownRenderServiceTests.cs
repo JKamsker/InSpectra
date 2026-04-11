@@ -1,5 +1,5 @@
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
-using InSpectra.Gen.Runtime.Rendering;
+using InSpectra.Gen.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Rendering;

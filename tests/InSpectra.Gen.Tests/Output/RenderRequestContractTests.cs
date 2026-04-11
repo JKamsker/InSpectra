@@ -1,10 +1,10 @@
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using InSpectra.Gen.Commands.Generate;
 using InSpectra.Gen.Commands.Render;
-using InSpectra.Gen.Runtime;
-using InSpectra.Gen.Runtime.Acquisition;
-using InSpectra.Gen.Runtime.Rendering;
-using InSpectra.Gen.Runtime.Settings;
+using InSpectra.Gen.UseCases.Render;
+using InSpectra.Gen.UseCases.Generate.Requests;
+using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Commands.Common;
 
 namespace InSpectra.Gen.Tests.Output;
 

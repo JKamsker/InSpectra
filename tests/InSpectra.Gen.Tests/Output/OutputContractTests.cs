@@ -1,8 +1,8 @@
 using System.Text.Json.Nodes;
-using InSpectra.Gen.Runtime;
-using InSpectra.Gen.Runtime.Acquisition;
-using InSpectra.Gen.Runtime.Output;
-using InSpectra.Gen.Runtime.Rendering;
+using InSpectra.Gen.UseCases.Generate;
+using InSpectra.Gen.UseCases.Generate.Requests;
+using InSpectra.Gen.Output;
+using InSpectra.Gen.Rendering.Contracts;
 
 namespace InSpectra.Gen.Tests.Output;
 

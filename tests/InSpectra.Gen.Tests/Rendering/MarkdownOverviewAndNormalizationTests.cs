@@ -1,5 +1,5 @@
 using System.Text.Json.Nodes;
-using InSpectra.Gen.Models;
+using InSpectra.Gen.Rendering.Pipeline.Model;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Rendering;

@@ -1,5 +1,5 @@
 using System.Text;
-using InSpectra.Gen.Models;
+using InSpectra.Gen.Rendering.Pipeline.Model;
 
 namespace InSpectra.Gen.Rendering.Markdown;
 

@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using InSpectra.Gen.Runtime.Json;
+using InSpectra.Gen.Output.Json;
 
 namespace InSpectra.Gen.OpenCli.Validation;
 
