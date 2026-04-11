@@ -40,13 +40,15 @@ public sealed class HtmlRenderService(
             ?? throw new CliUsageException("HTML output requires `--out-dir`.");
         var normalized = normalizer.Normalize(prepared.RawDocument, options.IncludeHidden);
         var bundleRoot = await bundleLocator.ResolveAsync(cancellationToken, allowBuild: !options.DryRun);
-        var bundleFiles = Directory.EnumerateFiles(bundleRoot, "*", SearchOption.AllDirectories)
-            .Select(path => new BundleFile(path, Path.GetRelativePath(bundleRoot, path).Replace('\\', '/')))
-            .OrderBy(file => file.RelativePath, StringComparer.Ordinal)
-            .ToList();
+        var bundleFiles = options.SingleFile && !options.DryRun
+            ? []
+            : Directory.EnumerateFiles(bundleRoot, "*", SearchOption.AllDirectories)
+                .Select(path => new BundleFile(path, Path.GetRelativePath(bundleRoot, path).Replace('\\', '/')))
+                .OrderBy(file => file.RelativePath, StringComparer.Ordinal)
+                .ToList();
 
         // Only ship assets that static.html actually references — skip website-only files
-        var referencedAssets = HtmlBundleComposer.CollectReferencedAssets(bundleRoot);
+        var referencedAssets = await HtmlBundleAssetComposer.CollectReferencedAssetsAsync(bundleRoot, cancellationToken);
 
         if (options.DryRun)
         {
@@ -62,86 +64,35 @@ public sealed class HtmlRenderService(
 
         OutputPathHelper.PrepareDirectory(outputDirectory, options.Overwrite);
 
-        var bootstrapJson = HtmlBundleComposer.BuildInlineBootstrap(
-            prepared,
-            options.IncludeHidden,
-            options.IncludeMetadata,
-            features,
-            label,
-            title,
-            commandPrefix,
-            themeOptions,
-            options.CompressLevel);
-        var writtenFiles = new List<RenderedFile>();
-        foreach (var file in bundleFiles)
-        {
-            // Skip assets not referenced by the static bundle template
-            if (!referencedAssets.Contains(file.RelativePath))
-            {
-                continue;
-            }
-
-            // static.html is the static bundle template — inject bootstrap and write as index.html
-            if (string.Equals(file.RelativePath, "static.html", StringComparison.OrdinalIgnoreCase))
-            {
-                var html = await File.ReadAllTextAsync(file.SourcePath, cancellationToken);
-                html = html.Replace(BootstrapPlaceholder, bootstrapJson, StringComparison.Ordinal);
-                if (options.CompressLevel >= 1)
-                {
-                    html = HtmlBundleComposer.MinifyHtml(html);
-                }
-                var indexDestination = Path.Combine(outputDirectory, "index.html");
-                await File.WriteAllTextAsync(indexDestination, html, cancellationToken);
-                writtenFiles.Add(new RenderedFile("index.html", indexDestination, html));
-                continue;
-            }
-
-            var destinationPath = Path.Combine(outputDirectory, file.RelativePath);
-            var destinationDirectory = Path.GetDirectoryName(destinationPath);
-            if (!string.IsNullOrWhiteSpace(destinationDirectory))
-            {
-                Directory.CreateDirectory(destinationDirectory);
-            }
-
-            File.Copy(file.SourcePath, destinationPath, overwrite: true);
-            writtenFiles.Add(new RenderedFile(file.RelativePath, destinationPath, null));
-        }
-
+        List<RenderedFile> writtenFiles;
         if (options.SingleFile)
         {
-            var selfExtractingHtml = options.CompressLevel >= 2
-                ? HtmlBundleComposer.BuildSelfExtractingHtml(
-                    prepared,
-                    options,
-                    features,
-                    label,
-                    title,
-                    commandPrefix,
-                    themeOptions,
-                    bundleRoot,
-                    outputDirectory)
-                : HtmlBundleComposer.InlineAssets(
-                    writtenFiles.First(f => f.RelativePath == "index.html").Content!,
-                    outputDirectory);
-
-            // Remove all written files — we're replacing with a single self-extracting HTML
-            foreach (var file in writtenFiles)
-            {
-                if (File.Exists(file.FullPath))
-                {
-                    File.Delete(file.FullPath);
-                }
-            }
-
-            var assetsDir = Path.Combine(outputDirectory, "assets");
-            if (Directory.Exists(assetsDir) && !Directory.EnumerateFileSystemEntries(assetsDir).Any())
-            {
-                Directory.Delete(assetsDir);
-            }
-
-            var indexDestination = Path.Combine(outputDirectory, "index.html");
-            await File.WriteAllTextAsync(indexDestination, selfExtractingHtml, cancellationToken);
-            writtenFiles = [new RenderedFile("index.html", indexDestination, selfExtractingHtml)];
+            writtenFiles = await RenderSingleFileAsync(
+                prepared,
+                options,
+                features,
+                label,
+                title,
+                commandPrefix,
+                themeOptions,
+                bundleRoot,
+                outputDirectory,
+                cancellationToken);
+        }
+        else
+        {
+            writtenFiles = await RenderBundleAsync(
+                prepared,
+                options,
+                features,
+                label,
+                title,
+                commandPrefix,
+                themeOptions,
+                bundleFiles,
+                referencedAssets,
+                outputDirectory,
+                cancellationToken);
         }
 
         var summary = options.Quiet
@@ -199,5 +150,144 @@ public sealed class HtmlRenderService(
             Summary = summary,
             Stats = statsFactory.Create(normalized, files.Count),
         };
+    }
+
+    private async Task<List<RenderedFile>> RenderSingleFileAsync(
+        AcquiredRenderDocument prepared,
+        RenderExecutionOptions options,
+        HtmlFeatureFlags features,
+        string? label,
+        string? title,
+        string? commandPrefix,
+        HtmlThemeOptions? themeOptions,
+        string bundleRoot,
+        string outputDirectory,
+        CancellationToken cancellationToken)
+    {
+        string html;
+        if (options.CompressLevel >= 2)
+        {
+            html = await HtmlBundleAssetComposer.BuildSelfExtractingHtmlAsync(
+                prepared,
+                options,
+                features,
+                label,
+                title,
+                commandPrefix,
+                themeOptions,
+                bundleRoot,
+                cancellationToken);
+        }
+        else
+        {
+            var bootstrapJson = HtmlBundleComposer.BuildInlineBootstrap(
+                prepared,
+                options.IncludeHidden,
+                options.IncludeMetadata,
+                features,
+                label,
+                title,
+                commandPrefix,
+                themeOptions,
+                options.CompressLevel);
+            var indexTemplatePath = Path.Combine(bundleRoot, "static.html");
+            var indexHtml = await BuildIndexHtmlAsync(indexTemplatePath, bootstrapJson, options.CompressLevel, cancellationToken);
+            html = await HtmlBundleAssetComposer.InlineAssetsAsync(indexHtml, bundleRoot, cancellationToken);
+        }
+
+        var indexDestination = Path.Combine(outputDirectory, "index.html");
+        await File.WriteAllTextAsync(indexDestination, html, cancellationToken);
+        return [new RenderedFile("index.html", indexDestination, html)];
+    }
+
+    private async Task<List<RenderedFile>> RenderBundleAsync(
+        AcquiredRenderDocument prepared,
+        RenderExecutionOptions options,
+        HtmlFeatureFlags features,
+        string? label,
+        string? title,
+        string? commandPrefix,
+        HtmlThemeOptions? themeOptions,
+        IReadOnlyList<BundleFile> bundleFiles,
+        ISet<string> referencedAssets,
+        string outputDirectory,
+        CancellationToken cancellationToken)
+    {
+        var bootstrapJson = HtmlBundleComposer.BuildInlineBootstrap(
+            prepared,
+            options.IncludeHidden,
+            options.IncludeMetadata,
+            features,
+            label,
+            title,
+            commandPrefix,
+            themeOptions,
+            options.CompressLevel);
+        var writtenFiles = new List<RenderedFile>();
+        foreach (var file in bundleFiles)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!referencedAssets.Contains(file.RelativePath))
+            {
+                continue;
+            }
+
+            if (string.Equals(file.RelativePath, "static.html", StringComparison.OrdinalIgnoreCase))
+            {
+                var html = await BuildIndexHtmlAsync(file.SourcePath, bootstrapJson, options.CompressLevel, cancellationToken);
+                var indexDestination = Path.Combine(outputDirectory, "index.html");
+                await File.WriteAllTextAsync(indexDestination, html, cancellationToken);
+                writtenFiles.Add(new RenderedFile("index.html", indexDestination, html));
+                continue;
+            }
+
+            var destinationPath = Path.Combine(outputDirectory, file.RelativePath);
+            var destinationDirectory = Path.GetDirectoryName(destinationPath);
+            if (!string.IsNullOrWhiteSpace(destinationDirectory))
+            {
+                Directory.CreateDirectory(destinationDirectory);
+            }
+
+            await CopyFileAsync(file.SourcePath, destinationPath, cancellationToken);
+            writtenFiles.Add(new RenderedFile(file.RelativePath, destinationPath, null));
+        }
+
+        return writtenFiles;
+    }
+
+    private static async Task<string> BuildIndexHtmlAsync(
+        string templatePath,
+        string bootstrapJson,
+        int compressLevel,
+        CancellationToken cancellationToken)
+    {
+        var html = await File.ReadAllTextAsync(templatePath, cancellationToken);
+        html = html.Replace(BootstrapPlaceholder, bootstrapJson, StringComparison.Ordinal);
+        return compressLevel >= 1
+            ? HtmlBundleComposer.MinifyHtml(html)
+            : html;
+    }
+
+    private static async Task CopyFileAsync(
+        string sourcePath,
+        string destinationPath,
+        CancellationToken cancellationToken)
+    {
+        await using var source = new FileStream(
+            sourcePath,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            bufferSize: 81920,
+            FileOptions.Asynchronous);
+        await using var destination = new FileStream(
+            destinationPath,
+            FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            bufferSize: 81920,
+            FileOptions.Asynchronous);
+        await source.CopyToAsync(destination, cancellationToken);
     }
 }

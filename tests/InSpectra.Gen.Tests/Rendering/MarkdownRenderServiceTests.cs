@@ -6,11 +6,7 @@ namespace InSpectra.Gen.Tests.Rendering;
 
 public class MarkdownRenderServiceTests
 {
-    private readonly MarkdownRenderService _service = new(
-        RendererFactory.CreateDocumentRenderService(),
-        new OpenCliNormalizer(),
-        RendererFactory.CreateMarkdownRenderer(),
-        new RenderStatsFactory());
+    private readonly MarkdownRenderService _service = MarkdownRenderServiceTestSupport.CreateService();
 
     [Fact]
     public async Task Dry_run_does_not_write_single_output_file()
@@ -42,6 +38,37 @@ public class MarkdownRenderServiceTests
         Assert.Single(result.Files);
         Assert.Equal(DocumentFormat.Markdown, result.Format);
         Assert.Equal(RenderLayout.Single, result.Layout);
+    }
+
+    [Fact]
+    public async Task Single_render_writes_output_file()
+    {
+        using var temp = new TempDirectory();
+        var outputFile = Path.Combine(temp.Path, "docs.md");
+        var request = new FileRenderRequest(
+            FixturePaths.OpenCliJson,
+            null,
+            new RenderExecutionOptions(
+                RenderLayout.Single,
+                ResolvedOutputMode.Human,
+                DryRun: false,
+                Quiet: false,
+                Verbose: false,
+                NoColor: false,
+                IncludeHidden: false,
+                IncludeMetadata: false,
+                Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 0,
+                OutputFile: outputFile,
+                OutputDirectory: null));
+
+        var result = await _service.RenderFromFileAsync(request, CancellationToken.None);
+
+        Assert.True(File.Exists(outputFile));
+        Assert.Single(result.Files);
+        Assert.Equal(outputFile, result.Files[0].FullPath);
+        Assert.Equal(await File.ReadAllTextAsync(outputFile), result.Files[0].Content);
     }
 
     [Fact]
@@ -79,7 +106,7 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 1);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 1);
 
         Assert.Equal(RenderLayout.Hybrid, result.Layout);
         var relativePaths = result.Files.Select(file => file.RelativePath).ToList();
@@ -100,7 +127,7 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 2);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 2);
 
         var relativePaths = result.Files
             .Select(file => file.RelativePath.Replace('\\', '/'))
@@ -119,9 +146,9 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 1);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 1);
 
-        var readme = ReadFile(result, "README.md");
+        var readme = MarkdownRenderServiceTestSupport.ReadFile(result, "README.md");
         Assert.Contains("[accounts](accounts/index.md)", readme);
         // Top-level leaf uses an anchor, not a file link.
         Assert.Contains("[doctor](#command-doctor)", readme);
@@ -132,9 +159,9 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 1);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 1);
 
-        var group = ReadFile(result, "accounts/index.md");
+        var group = MarkdownRenderServiceTestSupport.ReadFile(result, "accounts/index.md");
         Assert.Contains("[README](../README.md)", group);
         Assert.DoesNotContain("[index](", group);
     }
@@ -144,9 +171,9 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 1);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 1);
 
-        var group = ReadFile(result, "accounts/index.md");
+        var group = MarkdownRenderServiceTestSupport.ReadFile(result, "accounts/index.md");
         // `accounts add` is a leaf → must be inlined with an anchor, not a file link.
         Assert.Contains("[add](#command-accounts-add)", group);
         Assert.DoesNotContain("[add](add.md)", group);
@@ -158,9 +185,9 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 2);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 2);
 
-        var group = ReadFile(result, "accounts/index.md");
+        var group = MarkdownRenderServiceTestSupport.ReadFile(result, "accounts/index.md");
         // `accounts basic-auth` is a group at depth 2 → has its own file; reference lives only in
         // the Subcommands list, no duplicate stub section or "See …" body.
         Assert.Contains("[basic-auth](basic-auth/index.md)", group);
@@ -175,9 +202,9 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 2);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 2);
 
-        var readme = ReadFile(result, "README.md");
+        var readme = MarkdownRenderServiceTestSupport.ReadFile(result, "README.md");
         // At depth=2 every top-level command in the fixture is a split group (or an inlined leaf).
         // With no top-level leaves to inline we want a clean README without a trailing `## Commands`.
         // The jdr fixture has `doctor` (top-level leaf) which keeps `## Commands`, so this assertion
@@ -191,9 +218,9 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 1);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 1);
 
-        var group = ReadFile(result, "accounts/index.md");
+        var group = MarkdownRenderServiceTestSupport.ReadFile(result, "accounts/index.md");
         // `accounts basic-auth` has children; at depth=1 they're inlined, so the subcommand list
         // should nest one level deeper with a two-space indent.
         Assert.Contains("- [basic-auth](#command-accounts-basic-auth)", group);
@@ -205,9 +232,9 @@ public class MarkdownRenderServiceTests
     {
         using var temp = new TempDirectory();
 
-        var result = await RenderHybridAsync(temp.Path, splitDepth: 2);
+        var result = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 2);
 
-        var nested = ReadFile(result, "accounts/basic-auth/index.md");
+        var nested = MarkdownRenderServiceTestSupport.ReadFile(result, "accounts/basic-auth/index.md");
         Assert.Contains("[README](../../README.md)", nested);
         Assert.Contains("[accounts](../index.md)", nested);
     }
@@ -250,47 +277,14 @@ public class MarkdownRenderServiceTests
         using var temp = new TempDirectory();
 
         // Fixture tree is at most 3 levels deep; asking for 10 should just emit every group.
-        var deep = await RenderHybridAsync(temp.Path, splitDepth: 10);
+        var deep = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, temp.Path, splitDepth: 10);
 
         using var shallow = new TempDirectory();
-        var two = await RenderHybridAsync(shallow.Path, splitDepth: 2);
-
-        // Clamping should produce a superset of depth-2 files but still be finite.
+        var two = await MarkdownRenderServiceTestSupport.RenderHybridAsync(_service, shallow.Path, splitDepth: 2);
         var deepPaths = deep.Files.Select(file => file.RelativePath.Replace('\\', '/')).ToHashSet();
         foreach (var file in two.Files)
         {
             Assert.Contains(file.RelativePath.Replace('\\', '/'), deepPaths);
         }
-    }
-
-    private async Task<RenderExecutionResult> RenderHybridAsync(string outputDirectory, int splitDepth)
-    {
-        var request = new FileRenderRequest(
-            FixturePaths.OpenCliJson,
-            null,
-            new RenderExecutionOptions(
-                RenderLayout.Hybrid,
-                ResolvedOutputMode.Human,
-                DryRun: false,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
-                IncludeHidden: false,
-                IncludeMetadata: false,
-                Overwrite: true,
-                SingleFile: false,
-                CompressLevel: 0,
-                OutputFile: null,
-                OutputDirectory: outputDirectory),
-            new MarkdownRenderOptions(HybridSplitDepth: splitDepth));
-
-        return await _service.RenderFromFileAsync(request, CancellationToken.None);
-    }
-
-    private static string ReadFile(RenderExecutionResult result, string relativePath)
-    {
-        var file = result.Files.Single(entry =>
-            string.Equals(entry.RelativePath, relativePath, StringComparison.Ordinal));
-        return file.Content ?? File.ReadAllText(file.FullPath);
     }
 }

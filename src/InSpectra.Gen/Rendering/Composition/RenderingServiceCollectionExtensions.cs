@@ -17,6 +17,7 @@ public static class RenderingServiceCollectionExtensions
     /// <returns>The same service collection for chaining.</returns>
     public static IServiceCollection AddInSpectraRendering(this IServiceCollection services)
     {
+        services.Configure<ViewerBundleLocatorOptions>(_ => { });
         services.AddSingleton<OpenCliNormalizer>();
         services.AddSingleton<RenderStatsFactory>();
         services.AddSingleton<RenderModelFormatter>();

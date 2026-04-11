@@ -15,30 +15,32 @@ public sealed class MarkdownRenderService(
         CancellationToken cancellationToken)
     {
         var prepared = await documentService.LoadFromFileAsync(request, cancellationToken);
-        return Render(prepared, request.Options, request.MarkdownOptions);
+        return await RenderAsync(prepared, request.Options, request.MarkdownOptions, cancellationToken);
     }
 
-    private RenderExecutionResult Render(
+    private Task<RenderExecutionResult> RenderAsync(
         AcquiredRenderDocument prepared,
         RenderExecutionOptions options,
-        MarkdownRenderOptions? markdownOptions)
+        MarkdownRenderOptions? markdownOptions,
+        CancellationToken cancellationToken)
     {
         var normalized = normalizer.Normalize(prepared.RenderDocument, options.IncludeHidden);
 
         return options.Layout switch
         {
-            RenderLayout.Single => HandleSingleLayout(prepared, normalized, options, markdownOptions),
-            RenderLayout.Tree => HandleTreeLayout(prepared, normalized, options, markdownOptions),
-            RenderLayout.Hybrid => HandleHybridLayout(prepared, normalized, options, markdownOptions),
+            RenderLayout.Single => HandleSingleLayoutAsync(prepared, normalized, options, markdownOptions, cancellationToken),
+            RenderLayout.Tree => HandleTreeLayoutAsync(prepared, normalized, options, markdownOptions, cancellationToken),
+            RenderLayout.Hybrid => HandleHybridLayoutAsync(prepared, normalized, options, markdownOptions, cancellationToken),
             _ => throw new CliUsageException("Markdown rendering supports `single`, `tree`, and `hybrid` layouts only."),
         };
     }
 
-    private RenderExecutionResult HandleHybridLayout(
+    private async Task<RenderExecutionResult> HandleHybridLayoutAsync(
         AcquiredRenderDocument prepared,
         NormalizedCliDocument document,
         RenderExecutionOptions options,
-        MarkdownRenderOptions? markdownOptions)
+        MarkdownRenderOptions? markdownOptions,
+        CancellationToken cancellationToken)
     {
         var outputDirectory = options.OutputDirectory
             ?? throw new CliUsageException("`--layout hybrid` requires `--out-dir`.");
@@ -61,29 +63,17 @@ public sealed class MarkdownRenderService(
 
         OutputPathHelper.PrepareDirectory(outputDirectory, options.Overwrite);
 
-        var writtenFiles = new List<RenderedFile>();
-        foreach (var file in files)
-        {
-            var fullPath = Path.Combine(outputDirectory, file.RelativePath);
-            var directory = Path.GetDirectoryName(fullPath);
-            if (!string.IsNullOrWhiteSpace(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            File.WriteAllText(fullPath, file.Content);
-            writtenFiles.Add(new RenderedFile(file.RelativePath, fullPath, file.Content));
-        }
-
+        var writtenFiles = await WriteRenderedFilesAsync(outputDirectory, files, cancellationToken);
         var summary = options.Quiet ? null : $"Wrote {writtenFiles.Count} hybrid Markdown files to `{outputDirectory}`.";
         return CreateResult(prepared, document, options, writtenFiles, summary);
     }
 
-    private RenderExecutionResult HandleSingleLayout(
+    private async Task<RenderExecutionResult> HandleSingleLayoutAsync(
         AcquiredRenderDocument prepared,
         NormalizedCliDocument document,
         RenderExecutionOptions options,
-        MarkdownRenderOptions? markdownOptions)
+        MarkdownRenderOptions? markdownOptions,
+        CancellationToken cancellationToken)
     {
         var content = renderer.RenderSingle(document, options.IncludeMetadata, markdownOptions);
 
@@ -115,18 +105,19 @@ public sealed class MarkdownRenderService(
             Directory.CreateDirectory(directory);
         }
 
-        File.WriteAllText(options.OutputFile, content);
+        await File.WriteAllTextAsync(options.OutputFile, content, cancellationToken);
 
         var written = new RenderedFile(Path.GetFileName(options.OutputFile), options.OutputFile, content);
         var summary = options.Quiet ? null : $"Wrote Markdown to `{options.OutputFile}`.";
         return CreateResult(prepared, document, options, [written], summary);
     }
 
-    private RenderExecutionResult HandleTreeLayout(
+    private async Task<RenderExecutionResult> HandleTreeLayoutAsync(
         AcquiredRenderDocument prepared,
         NormalizedCliDocument document,
         RenderExecutionOptions options,
-        MarkdownRenderOptions? markdownOptions)
+        MarkdownRenderOptions? markdownOptions,
+        CancellationToken cancellationToken)
     {
         var outputDirectory = options.OutputDirectory
             ?? throw new CliUsageException("`--layout tree` requires `--out-dir`.");
@@ -148,9 +139,21 @@ public sealed class MarkdownRenderService(
 
         OutputPathHelper.PrepareDirectory(outputDirectory, options.Overwrite);
 
+        var writtenFiles = await WriteRenderedFilesAsync(outputDirectory, files, cancellationToken);
+        var summary = options.Quiet ? null : $"Wrote {writtenFiles.Count} Markdown files to `{outputDirectory}`.";
+        return CreateResult(prepared, document, options, writtenFiles, summary);
+    }
+
+    private static async Task<List<RenderedFile>> WriteRenderedFilesAsync(
+        string outputDirectory,
+        IReadOnlyList<RelativeRenderedFile> files,
+        CancellationToken cancellationToken)
+    {
         var writtenFiles = new List<RenderedFile>();
         foreach (var file in files)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var fullPath = Path.Combine(outputDirectory, file.RelativePath);
             var directory = Path.GetDirectoryName(fullPath);
             if (!string.IsNullOrWhiteSpace(directory))
@@ -158,12 +161,11 @@ public sealed class MarkdownRenderService(
                 Directory.CreateDirectory(directory);
             }
 
-            File.WriteAllText(fullPath, file.Content);
+            await File.WriteAllTextAsync(fullPath, file.Content, cancellationToken);
             writtenFiles.Add(new RenderedFile(file.RelativePath, fullPath, file.Content));
         }
 
-        var summary = options.Quiet ? null : $"Wrote {writtenFiles.Count} Markdown files to `{outputDirectory}`.";
-        return CreateResult(prepared, document, options, writtenFiles, summary);
+        return writtenFiles;
     }
 
     private RenderExecutionResult CreateResult(

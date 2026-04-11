@@ -15,7 +15,6 @@ internal static class ServiceCollectionExtensions
         services.AddTargetServices();
         services.AddInSpectraRendering();
         services.AddInSpectraAcquisition();
-        services.Configure<ViewerBundleLocatorOptions>(_ => { });
 
         return services;
     }

@@ -157,6 +157,51 @@ public class HtmlRenderServiceTests
         Assert.False(Directory.Exists(outputDirectory));
     }
 
+    [Fact]
+    public async Task Single_file_render_writes_only_index_html_with_inlined_assets()
+    {
+        using var temp = new TempDirectory();
+        var bundleRoot = CreateBundle(temp.Path, "packaged");
+        var service = CreateHtmlRenderService(new ViewerBundleLocatorOptions
+        {
+            PackagedRootPath = bundleRoot,
+            RepositoryRootPath = temp.Path,
+        });
+
+        var outputDirectory = Path.Combine(temp.Path, "html");
+        var request = new FileRenderRequest(
+            FixturePaths.OpenCliJson,
+            FixturePaths.XmlDoc,
+            new RenderExecutionOptions(
+                RenderLayout.App,
+                ResolvedOutputMode.Human,
+                DryRun: false,
+                Quiet: false,
+                Verbose: false,
+                NoColor: false,
+                IncludeHidden: false,
+                IncludeMetadata: false,
+                Overwrite: false,
+                SingleFile: true,
+                CompressLevel: 1,
+                OutputFile: null,
+                OutputDirectory: outputDirectory));
+
+        var result = await service.RenderFromFileAsync(request, DefaultFeatures, CancellationToken.None);
+
+        var indexPath = Path.Combine(outputDirectory, "index.html");
+        var index = await File.ReadAllTextAsync(indexPath);
+
+        Assert.Single(result.Files);
+        Assert.Equal("index.html", result.Files[0].RelativePath);
+        Assert.True(File.Exists(indexPath));
+        Assert.False(Directory.Exists(Path.Combine(outputDirectory, "assets")));
+        Assert.DoesNotContain("src=\"./assets/app.js\"", index, StringComparison.Ordinal);
+        Assert.DoesNotContain("href=\"./assets/app.css\"", index, StringComparison.Ordinal);
+        Assert.Contains("console.log('bundle');", index);
+        Assert.Contains("body { color: black; }", index);
+    }
+
     private static HtmlRenderService CreateHtmlRenderService(ViewerBundleLocatorOptions options)
     {
         return new HtmlRenderService(
