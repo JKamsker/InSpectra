@@ -1,6 +1,7 @@
 using InSpectra.Gen.Acquisition.Composition;
 using InSpectra.Gen.OpenCli.Composition;
 using InSpectra.Gen.Rendering.Composition;
+using InSpectra.Gen.UseCases.Generate.Composition;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InSpectra.Gen.Composition;
@@ -10,6 +11,7 @@ internal static class ServiceCollectionExtensions
     public static IServiceCollection AddInSpectraGen(this IServiceCollection services)
     {
         services.AddInSpectraOpenCli();
+        services.AddInSpectraGenerateUseCases();
         services.AddTargetServices();
         services.AddInSpectraRendering();
         services.AddInSpectraAcquisition();
