@@ -3,6 +3,8 @@ using InSpectra.Gen.Acquisition.Modes.CliFx.Execution;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Metadata;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Projection;
 using InSpectra.Gen.Acquisition.Modes.Hook;
+using InSpectra.Gen.Acquisition.Orchestration;
+using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 using InSpectra.Gen.Acquisition.Tooling.Tools;
 using InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 using InSpectra.Gen.Acquisition.Modes.Help.Projection;
@@ -45,6 +47,14 @@ public static class AcquisitionServiceCollectionExtensions
         services.AddSingleton<CliFxInstalledToolAnalysisSupport>();
         services.AddSingleton<StaticInstalledToolAnalysisSupport>();
         services.AddSingleton<HookInstalledToolAnalysisSupport>();
+
+        // Public composition seams for the app shell. These adapters let
+        // `InSpectra.Gen` depend on `Contracts.Providers` only, with no reach-in
+        // via `InternalsVisibleTo`.
+        services.AddSingleton<ICliFrameworkCatalog, CliFrameworkCatalogAdapter>();
+        services.AddSingleton<ILocalCliFrameworkDetector, LocalCliFrameworkDetector>();
+        services.AddSingleton<IPackageCliToolInstaller, PackageCliToolInstaller>();
+        services.AddSingleton<IAcquisitionAnalysisDispatcher, AcquisitionAnalysisDispatcher>();
 
         return services;
     }

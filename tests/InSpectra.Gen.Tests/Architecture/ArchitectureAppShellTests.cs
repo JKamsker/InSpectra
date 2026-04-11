@@ -33,7 +33,7 @@ public sealed class ArchitectureAppShellTests
         @"^\s*using\s+(?<ns>InSpectra\.Gen\.Acquisition(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*;",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
-    [Fact(Skip = "Unskip after Step 11 — requires public composition entry points in Acquisition.")]
+    [Fact]
     public void App_shell_does_not_reference_deep_acquisition_internals()
     {
         var projects = ArchitecturePolicyScanner.EnumerateBackendProjects();

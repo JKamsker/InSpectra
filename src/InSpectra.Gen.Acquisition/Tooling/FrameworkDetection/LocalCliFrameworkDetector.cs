@@ -1,15 +1,16 @@
-using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
+using InSpectra.Gen.Acquisition.Contracts.Providers;
 
-namespace InSpectra.Gen.Targets;
+namespace InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 
-internal sealed record LocalCliFrameworkDetection(
-    string? CliFramework,
-    string? HookCliFramework,
-    bool HasManagedAssemblies);
-
-public sealed class LocalCliFrameworkDetector
+/// <summary>
+/// Scans a local install directory for managed CLI tool assemblies and determines
+/// which CLI framework(s) ship with the tool. Implements the public
+/// <see cref="ILocalCliFrameworkDetector"/> contract so the app shell can depend on
+/// Contracts only.
+/// </summary>
+internal sealed class LocalCliFrameworkDetector : ILocalCliFrameworkDetector
 {
-    internal LocalCliFrameworkDetection Detect(string installDirectory)
+    public LocalCliFrameworkDetection Detect(string installDirectory)
     {
         if (!Directory.Exists(installDirectory))
         {

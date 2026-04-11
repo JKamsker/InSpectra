@@ -1,21 +1,21 @@
-using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
-using InSpectra.Gen.UseCases.Generate.Requests;
-
 using InSpectra.Gen.Acquisition.Contracts;
+using InSpectra.Gen.Acquisition.Contracts.Providers;
+using InSpectra.Gen.UseCases.Generate.Requests;
 
 namespace InSpectra.Gen.UseCases.Generate;
 
 internal static class OpenCliModePlanner
 {
     public static IReadOnlyList<OpenCliAcquisitionAttempt> BuildAutoPlan(
+        ICliFrameworkCatalog catalog,
         string? cliFramework,
         string? hookCliFramework)
     {
         var attempts = new List<OpenCliAcquisitionAttempt>();
-        var hookFrameworks = CliFrameworkProviderRegistry.ResolveFrameworkNames(hookCliFramework)
+        var hookFrameworks = catalog.ResolveFrameworkNames(hookCliFramework)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var provider in CliFrameworkProviderRegistry.ResolveAnalysisProviders(cliFramework))
+        foreach (var provider in catalog.ResolveAnalysisProviders(cliFramework))
         {
             if (provider.SupportsCliFxAnalysis)
             {
@@ -27,7 +27,7 @@ internal static class OpenCliModePlanner
                 attempts.Add(new OpenCliAcquisitionAttempt(AnalysisMode.Hook, provider.Name, AnalysisDisposition.Planned));
             }
 
-            if (provider.StaticAnalysisAdapter is not null)
+            if (provider.SupportsStaticAnalysis)
             {
                 attempts.Add(new OpenCliAcquisitionAttempt(AnalysisMode.Static, provider.Name, AnalysisDisposition.Planned));
             }

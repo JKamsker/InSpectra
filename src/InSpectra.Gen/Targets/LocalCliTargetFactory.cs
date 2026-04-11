@@ -1,10 +1,11 @@
 using System.Diagnostics;
 using System.Reflection;
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
+using InSpectra.Gen.Acquisition.Contracts.Providers;
 
 namespace InSpectra.Gen.Targets;
 
-public sealed class LocalCliTargetFactory(LocalCliFrameworkDetector frameworkDetector)
+public sealed class LocalCliTargetFactory(ILocalCliFrameworkDetector frameworkDetector)
 {
     internal MaterializedCliTarget Create(
         string sourcePath,

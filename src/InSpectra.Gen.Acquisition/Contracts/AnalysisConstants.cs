@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Contracts;
 
-internal static class AnalysisMode
+public static class AnalysisMode
 {
     public const string Help = "help";
     public const string CliFx = "clifx";
@@ -10,7 +10,7 @@ internal static class AnalysisMode
     public const string Auto = "auto";
 }
 
-internal static class AnalysisDisposition
+public static class AnalysisDisposition
 {
     public const string Success = "success";
     public const string Failed = "failed";

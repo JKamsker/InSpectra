@@ -30,7 +30,6 @@ public static class OpenCliServiceCollectionExtensions
         services.AddSingleton<OpenCliNativeAcquisitionSupport>();
         services.AddSingleton<IOpenCliAcquisitionService, OpenCliAcquisitionService>();
         services.AddSingleton<IOpenCliGenerationService, OpenCliGenerationService>();
-        services.AddSingleton<AcquisitionAnalyzerService>();
 
         return services;
     }

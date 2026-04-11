@@ -24,7 +24,7 @@ public sealed class ArchitectureInternalsVisibleToTests
     /// <summary>Non-test assemblies must not appear as targets. Test assemblies end with this.</summary>
     private const string TestAssemblySuffix = ".Tests";
 
-    [Fact(Skip = "Unskip after Step 2 — requires replacing inspectra reach-in with public composition API.")]
+    [Fact]
     public void No_non_test_InternalsVisibleTo()
     {
         var projects = ArchitecturePolicyScanner.EnumerateBackendProjects();

@@ -1,3 +1,4 @@
+using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Tests.TestSupport;
 using InSpectra.Gen.Targets;
 
@@ -5,6 +6,12 @@ namespace InSpectra.Gen.Tests.Targets;
 
 public sealed class LocalCliTargetFactoryTests
 {
+    private sealed class StubFrameworkDetector : ILocalCliFrameworkDetector
+    {
+        public LocalCliFrameworkDetection Detect(string installDirectory)
+            => new(CliFramework: null, HookCliFramework: null, HasManagedAssemblies: false);
+    }
+
     [Fact]
     public void Create_Escapes_Percent_Signs_In_Windows_Wrappers()
     {
@@ -17,7 +24,7 @@ public sealed class LocalCliTargetFactoryTests
         var sourcePath = Path.Combine(temp.Path, "demo.exe");
         File.WriteAllText(sourcePath, string.Empty);
 
-        var factory = new LocalCliTargetFactory(new LocalCliFrameworkDetector());
+        var factory = new LocalCliTargetFactory(new StubFrameworkDetector());
         var target = factory.Create(
             sourcePath,
             ["%TEMP%", "literal"],

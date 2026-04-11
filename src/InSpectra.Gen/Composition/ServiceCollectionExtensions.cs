@@ -22,7 +22,6 @@ internal static class ServiceCollectionExtensions
     {
         services.AddSingleton<ExecutableResolver>();
         services.AddSingleton<IProcessRunner, ProcessRunner>();
-        services.AddSingleton<LocalCliFrameworkDetector>();
         services.AddSingleton<LocalCliTargetFactory>();
         services.AddSingleton<PackageCliTargetFactory>();
         services.AddSingleton<DotnetBuildOutputResolver>();

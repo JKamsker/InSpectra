@@ -1,5 +1,6 @@
 using InSpectra.Gen.Acquisition.Contracts;
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
+using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.UseCases.Generate.Requests;
 
 namespace InSpectra.Gen.UseCases.Generate;
@@ -10,7 +11,8 @@ internal sealed class OpenCliAcquisitionService(
     LocalCliTargetFactory localTargetFactory,
     PackageCliTargetFactory packageCliTargetFactory,
     DotnetBuildOutputResolver dotnetBuildOutputResolver,
-    AcquisitionAnalyzerService acquisitionAnalyzerService)
+    ICliFrameworkCatalog cliFrameworkCatalog,
+    IAcquisitionAnalysisDispatcher acquisitionAnalysisDispatcher)
     : IOpenCliAcquisitionService
 {
     public async Task<OpenCliAcquisitionResult> AcquireFromExecAsync(
@@ -186,19 +188,19 @@ internal sealed class OpenCliAcquisitionService(
         }
 
         var plannedAttempts = options.Mode == OpenCliMode.Auto
-            ? OpenCliModePlanner.BuildAutoPlan(target.CliFramework, target.HookCliFramework)
+            ? OpenCliModePlanner.BuildAutoPlan(cliFrameworkCatalog, target.CliFramework, target.HookCliFramework)
             : [new OpenCliAcquisitionAttempt(
                 OpenCliModePlanner.ToModeValue(options.Mode),
                 options.Mode == OpenCliMode.Hook ? target.HookCliFramework ?? target.CliFramework : target.CliFramework,
                 AnalysisDisposition.Planned)];
         var failureDetails = new List<string>();
+        var targetDescriptor = ToTargetDescriptor(target);
 
         foreach (var plannedAttempt in plannedAttempts)
         {
-            var analysisMode = ParseMode(plannedAttempt.Mode);
-            var outcome = await acquisitionAnalyzerService.TryAnalyzeAsync(
-                target,
-                analysisMode,
+            var outcome = await acquisitionAnalysisDispatcher.TryAnalyzeAsync(
+                targetDescriptor,
+                plannedAttempt.Mode,
                 plannedAttempt.Framework,
                 options.TimeoutSeconds,
                 cancellationToken);
@@ -238,13 +240,18 @@ internal sealed class OpenCliAcquisitionService(
             details: failureDetails);
     }
 
-    private static OpenCliMode ParseMode(string value)
-        => value switch
-        {
-            AnalysisMode.Help => OpenCliMode.Help,
-            AnalysisMode.CliFx => OpenCliMode.CliFx,
-            AnalysisMode.Static => OpenCliMode.Static,
-            AnalysisMode.Hook => OpenCliMode.Hook,
-            _ => throw new InvalidOperationException($"Unsupported acquisition mode `{value}`."),
-        };
+    private static CliTargetDescriptor ToTargetDescriptor(MaterializedCliTarget target)
+        => new(
+            DisplayName: target.DisplayName,
+            CommandPath: target.CommandPath,
+            CommandName: target.CommandName,
+            WorkingDirectory: target.WorkingDirectory,
+            InstallDirectory: target.InstallDirectory,
+            PreferredEntryPointPath: target.PreferredEntryPointPath,
+            Version: target.Version,
+            Environment: target.Environment,
+            CliFramework: target.CliFramework,
+            HookCliFramework: target.HookCliFramework,
+            PackageTitle: target.PackageTitle,
+            PackageDescription: target.PackageDescription);
 }
