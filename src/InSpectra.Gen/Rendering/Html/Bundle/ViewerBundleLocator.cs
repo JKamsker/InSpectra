@@ -28,15 +28,14 @@ public class ViewerBundleLocator(
             ? null
             : Path.Combine(repositoryRoot, "src", "InSpectra.UI");
 
-        if (frontendRoot is not null && HasFrontendProject(frontendRoot))
+        var hasPackagedBundle = HasBundle(packagedPath);
+        if (hasPackagedBundle)
         {
-            return await ResolveRepositoryBundleAsync(frontendRoot, cancellationToken, allowBuild);
+            return await ResolvePackagedBundleAsync(packagedPath, frontendRoot, cancellationToken, allowBuild);
         }
 
-        if (HasBundle(packagedPath))
-        {
-            return packagedPath;
-        }
+        if (frontendRoot is not null && HasFrontendProject(frontendRoot))
+            return await ResolveRepositoryBundleAsync(frontendRoot, cancellationToken, allowBuild);
 
         throw new CliUsageException($"InSpectra.UI bundle could not be located beside the tool. {FrontendBuildHint}");
     }
@@ -154,11 +153,66 @@ public class ViewerBundleLocator(
         throw new CliUsageException($"InSpectra.UI bundle is missing after the build attempt. {FrontendBuildHint}");
     }
 
+    private async Task<string> ResolvePackagedBundleAsync(
+        string packagedPath,
+        string? frontendRoot,
+        CancellationToken cancellationToken,
+        bool allowBuild)
+    {
+        if (frontendRoot is null || !HasFrontendProject(frontendRoot))
+        {
+            return packagedPath;
+        }
+
+        var repositoryDist = Path.Combine(frontendRoot, "dist");
+        if (!IsBundleStale(frontendRoot, packagedPath))
+        {
+            return packagedPath;
+        }
+
+        if (!HasBundle(repositoryDist))
+        {
+            return allowBuild
+                ? await ResolveRepositoryBundleOrUsePackagedAsync(packagedPath, frontendRoot, cancellationToken, allowBuild)
+                : packagedPath;
+        }
+
+        if (!IsBundleStale(frontendRoot, repositoryDist))
+        {
+            return repositoryDist;
+        }
+
+        if (!allowBuild)
+        {
+            return GetLatestWriteTimeUtc(repositoryDist) > GetLatestWriteTimeUtc(packagedPath)
+                ? repositoryDist
+                : packagedPath;
+        }
+
+        return await ResolveRepositoryBundleOrUsePackagedAsync(packagedPath, frontendRoot, cancellationToken, allowBuild);
+    }
+
     private static bool HasFrontendProject(string frontendRoot)
     {
         return Directory.Exists(frontendRoot)
             && File.Exists(Path.Combine(frontendRoot, "package.json"))
             && File.Exists(Path.Combine(frontendRoot, "package-lock.json"));
+    }
+
+    private async Task<string> ResolveRepositoryBundleOrUsePackagedAsync(
+        string packagedPath,
+        string frontendRoot,
+        CancellationToken cancellationToken,
+        bool allowBuild)
+    {
+        try
+        {
+            return await ResolveRepositoryBundleAsync(frontendRoot, cancellationToken, allowBuild);
+        }
+        catch (CliUsageException)
+        {
+            return packagedPath;
+        }
     }
 
     private static bool IsBundleStale(string frontendRoot, string bundleRoot)
