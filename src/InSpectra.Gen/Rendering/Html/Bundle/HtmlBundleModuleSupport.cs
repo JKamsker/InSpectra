@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace InSpectra.Gen.Rendering.Html;
+namespace InSpectra.Gen.Rendering.Html.Bundle;
 
 internal static class HtmlBundleModuleSupport
 {

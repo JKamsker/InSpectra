@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Viewer;
+namespace InSpectra.Gen.Rendering.Html.Bundle;
 
 public sealed class ViewerBundleLocatorOptions
 {

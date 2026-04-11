@@ -1,6 +1,6 @@
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Rendering.Pipeline;
 
-namespace InSpectra.Gen.Rendering;
+namespace InSpectra.Gen.Rendering.Contracts;
 
 public interface IDocumentRenderService
 {

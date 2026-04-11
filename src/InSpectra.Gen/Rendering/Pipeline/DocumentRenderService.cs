@@ -3,7 +3,7 @@ using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using InSpectra.Gen.UseCases.Generate.Requests;
 using InSpectra.Gen.Rendering.Contracts;
 
-namespace InSpectra.Gen.Rendering;
+namespace InSpectra.Gen.Rendering.Pipeline;
 
 public sealed class DocumentRenderService(
     OpenCliDocumentLoader documentLoader,

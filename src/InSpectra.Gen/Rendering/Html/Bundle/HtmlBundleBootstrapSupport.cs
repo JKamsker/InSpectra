@@ -1,9 +1,10 @@
 using System.Text.Json;
-using InSpectra.Gen.Rendering.Pipeline.Model;
 using InSpectra.Gen.Output.Json;
 using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Rendering.Pipeline;
+using InSpectra.Gen.Rendering.Pipeline.Model;
 
-namespace InSpectra.Gen.Rendering.Html;
+namespace InSpectra.Gen.Rendering.Html.Bundle;
 
 internal static class HtmlBundleBootstrapSupport
 {

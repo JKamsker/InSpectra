@@ -2,9 +2,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using InSpectra.Gen.Rendering.Pipeline.Model;
-using InSpectra.Gen.Rendering;
 using InSpectra.Gen.UseCases.Generate.Requests;
-using InSpectra.Gen.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Rendering;

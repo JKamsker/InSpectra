@@ -1,3 +1,3 @@
-namespace InSpectra.Gen.Rendering;
+namespace InSpectra.Gen.Rendering.Contracts;
 
 public sealed record RelativeRenderedFile(string RelativePath, string Content);

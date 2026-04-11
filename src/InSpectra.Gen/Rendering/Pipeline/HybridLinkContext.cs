@@ -1,6 +1,6 @@
 using InSpectra.Gen.Rendering.Pipeline.Model;
 
-namespace InSpectra.Gen.Rendering;
+namespace InSpectra.Gen.Rendering.Pipeline;
 
 /// <summary>
 /// Carries per-page context for the hybrid Markdown layout so link targets can be resolved

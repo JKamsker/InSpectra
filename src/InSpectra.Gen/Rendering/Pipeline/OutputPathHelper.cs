@@ -1,6 +1,6 @@
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 
-namespace InSpectra.Gen.Rendering;
+namespace InSpectra.Gen.Rendering.Pipeline;
 
 public static class OutputPathHelper
 {

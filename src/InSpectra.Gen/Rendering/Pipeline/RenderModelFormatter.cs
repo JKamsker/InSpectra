@@ -1,6 +1,6 @@
 using InSpectra.Gen.Rendering.Pipeline.Model;
 
-namespace InSpectra.Gen.Rendering;
+namespace InSpectra.Gen.Rendering.Pipeline;
 
 public sealed class RenderModelFormatter
 {

@@ -1,7 +1,7 @@
 using InSpectra.Gen.Acquisition.Contracts.Exceptions;
 using Microsoft.Extensions.Options;
 
-namespace InSpectra.Gen.Viewer;
+namespace InSpectra.Gen.Rendering.Html.Bundle;
 
 public class ViewerBundleLocator(
     ExecutableResolver executableResolver,

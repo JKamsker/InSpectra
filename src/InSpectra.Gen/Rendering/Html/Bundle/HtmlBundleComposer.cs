@@ -3,8 +3,9 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using InSpectra.Gen.Output.Json;
 using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Rendering.Pipeline;
 
-namespace InSpectra.Gen.Rendering.Html;
+namespace InSpectra.Gen.Rendering.Html.Bundle;
 
 internal static class HtmlBundleComposer
 {

@@ -1,6 +1,3 @@
-using InSpectra.Gen.Rendering.Html;
-using InSpectra.Gen.Rendering.Markdown;
-using InSpectra.Gen.Viewer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InSpectra.Gen.Rendering.Composition;
