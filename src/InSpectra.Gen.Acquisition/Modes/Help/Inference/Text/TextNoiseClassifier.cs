@@ -2,6 +2,8 @@ namespace InSpectra.Gen.Acquisition.Modes.Help.Inference.Text;
 
 using System.Text.RegularExpressions;
 
+using InSpectra.Gen.Acquisition.Contracts.TextClassification;
+
 internal static partial class TextNoiseClassifier
 {
     public static bool HasContentSections(IReadOnlyDictionary<string, List<string>> sections)
@@ -80,15 +82,7 @@ internal static partial class TextNoiseClassifier
             || TemplateInstallHeaderRegex().IsMatch(line);
 
     public static bool LooksLikeRejectedHelpInvocation(string? firstLine, string? secondLine)
-    {
-        if (LooksLikeRejectedHelpInvocation(firstLine))
-        {
-            return true;
-        }
-
-        return string.Equals(firstLine?.Trim(), "ERROR(S):", StringComparison.OrdinalIgnoreCase)
-            && LooksLikeRejectedHelpInvocation(secondLine);
-    }
+        => RejectedHelpClassifier.LooksLikeRejectedHelpInvocation(firstLine, secondLine);
 
     private static bool IsStructuredLogLine(string line)
         => StructuredLogPrefixRegex().IsMatch(line);
@@ -154,14 +148,7 @@ internal static partial class TextNoiseClassifier
         => TransientFooterRegex().IsMatch(line);
 
     private static bool LooksLikeRejectedHelpInvocation(string? line)
-    {
-        if (string.IsNullOrWhiteSpace(line))
-        {
-            return false;
-        }
-
-        return RejectedHelpInvocationRegex().IsMatch(line.Trim());
-    }
+        => RejectedHelpClassifier.LooksLikeRejectedHelpInvocation(line);
 
     private static bool LooksLikeDecorativeBannerLine(string line)
         => line.Length > 0
@@ -183,10 +170,7 @@ internal static partial class TextNoiseClassifier
     [GeneratedRegex(@"^[^\p{L}\p{N}]*\s*(?:shutting down|shutdown complete|press any key to exit|press any key|goodbye\b|exiting\b)", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex TransientFooterRegex();
 
-    [GeneratedRegex(@"^(?:--help|-h|-\?|/\?)\s+is an unknown (?:parameter|option|argument)\b|^Invalid usage\b|^Invalid argument:\b|^Unknown argument or flag for value --help\b|^Unknown operation:\s+help\b|^Need to insert a value for the option\b|^(?:unknown|unrecognized)\s+(?:option|parameter|argument)\b.*(?:--help|-h|-\?|/\?|--h)\b|^(?:unknown|unrecognized)\s+command\b.*\bhelp\b|^usage error\b.*(?:--help|-h|-\?|/\?|--h)\b|^error\(\d+\):\s+unknown command-line option\s+(?:--help|-h|-\?|/\?|--h)\b|^Verb\s+'(?:--help|-h|-\?|/\?|--h)'\s+is not recognized\.$", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
-    private static partial Regex RejectedHelpInvocationRegex();
-
-    [GeneratedRegex(@"^Package Id\s{2,}Version\b", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+[GeneratedRegex(@"^Package Id\s{2,}Version\b", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex DotnetToolListHeaderRegex();
 
     [GeneratedRegex(@"^Template Name\s{2,}Short Name\b", RegexOptions.Compiled | RegexOptions.IgnoreCase)]

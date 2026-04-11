@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.Static.Attributes.SystemCommandLine;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;

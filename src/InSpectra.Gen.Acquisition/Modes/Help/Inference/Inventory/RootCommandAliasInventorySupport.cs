@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Inference.Inventory;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 internal static class RootCommandAliasInventorySupport
 {

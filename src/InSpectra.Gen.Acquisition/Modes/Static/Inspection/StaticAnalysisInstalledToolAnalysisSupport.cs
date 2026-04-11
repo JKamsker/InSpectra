@@ -5,9 +5,8 @@ using InSpectra.Gen.Acquisition.Tooling.Paths;
 
 using InSpectra.Gen.Acquisition.OpenCli.Documents;
 
+using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Acquisition.Contracts.Results;
-
-using InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 
 using InSpectra.Gen.Acquisition.Tooling.Process;
 
@@ -23,17 +22,20 @@ internal sealed class StaticInstalledToolAnalysisSupport
     private readonly StaticAnalysisAssemblyInspectionSupport _assemblyInspectionSupport;
     private readonly StaticAnalysisOpenCliBuilder _openCliBuilder;
     private readonly StaticAnalysisCoverageClassifier _coverageClassifier;
+    private readonly IHelpCrawler _helpCrawler;
 
     public StaticInstalledToolAnalysisSupport(
         StaticAnalysisRuntime runtime,
         StaticAnalysisAssemblyInspectionSupport assemblyInspectionSupport,
         StaticAnalysisOpenCliBuilder openCliBuilder,
-        StaticAnalysisCoverageClassifier coverageClassifier)
+        StaticAnalysisCoverageClassifier coverageClassifier,
+        IHelpCrawler helpCrawler)
     {
         _runtime = runtime;
         _assemblyInspectionSupport = assemblyInspectionSupport;
         _openCliBuilder = openCliBuilder;
         _coverageClassifier = coverageClassifier;
+        _helpCrawler = helpCrawler;
     }
 
     public async Task AnalyzeAsync(
@@ -86,8 +88,7 @@ internal sealed class StaticInstalledToolAnalysisSupport
             return;
         }
 
-        var crawler = new Crawler(_runtime);
-        var crawl = await crawler.CrawlAsync(request.InstalledTool.CommandPath, request.CommandName, request.WorkingDirectory, request.InstalledTool.Environment, request.CommandTimeoutSeconds, cancellationToken);
+        var crawl = await _helpCrawler.CrawlAsync(request.InstalledTool.CommandPath, request.CommandName, request.WorkingDirectory, request.InstalledTool.Environment, request.CommandTimeoutSeconds, cancellationToken);
         crawlStopwatch.Stop();
 
         var staticCommands = inspection.Commands;

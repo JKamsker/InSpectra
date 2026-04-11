@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+namespace InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 
 internal sealed record OptionSignature(

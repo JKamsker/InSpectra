@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Inference.Text;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 using InSpectra.Gen.Acquisition.Modes.Help.Parsing;
 using InSpectra.Gen.Acquisition.Modes.Help.Parsing.OptionTable;
 

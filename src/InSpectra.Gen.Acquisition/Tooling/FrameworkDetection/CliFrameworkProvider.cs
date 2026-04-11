@@ -1,7 +1,5 @@
 namespace InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 
-using InSpectra.Gen.Acquisition.Modes.Static.Attributes;
-
 
 internal sealed record CliFrameworkProvider(
     string Name,
@@ -30,7 +28,13 @@ internal sealed record CliFrameworkProvider(
     }
 }
 
+/// <summary>
+/// Type-erased carrier for a Static-mode attribute reader. The Registry keeps the reader
+/// as <see cref="object"/> so that <c>Tooling/</c> has no compile-time dependency on
+/// <c>Modes.Static.Attributes</c>. Consumers in Static mode cast <see cref="Reader"/> back
+/// to <c>IStaticAttributeReader</c> at use sites.
+/// </summary>
 internal sealed record StaticAnalysisFrameworkAdapter(
     string FrameworkName,
     string AssemblyName,
-    IStaticAttributeReader Reader);
+    object Reader);

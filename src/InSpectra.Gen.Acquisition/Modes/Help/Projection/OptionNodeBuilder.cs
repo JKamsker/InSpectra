@@ -2,9 +2,9 @@ namespace InSpectra.Gen.Acquisition.Modes.Help.Projection;
 
 using InSpectra.Gen.Acquisition.Modes.Help.Inference.Descriptions;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 using System.Text.Json.Nodes;
 

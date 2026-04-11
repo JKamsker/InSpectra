@@ -1,8 +1,8 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Inference.Usage.Commands;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 using InSpectra.Gen.Acquisition.Modes.Help.Inference.Usage.Prototypes;
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 internal static class UsageCommandInferenceSupport
 {

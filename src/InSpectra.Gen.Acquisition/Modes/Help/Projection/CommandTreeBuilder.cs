@@ -1,8 +1,10 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Projection;
 
+using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
+
 using InSpectra.Gen.Acquisition.OpenCli.Structure;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 internal sealed class CommandTreeBuilder
 {

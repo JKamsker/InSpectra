@@ -1,7 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Modes.CliFx.Crawling;
 
 using InSpectra.Gen.Acquisition.Modes.CliFx.Metadata;
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 using System.Text.RegularExpressions;
 

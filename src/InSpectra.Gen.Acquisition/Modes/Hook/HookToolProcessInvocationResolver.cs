@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.Hook;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 using InSpectra.Gen.Acquisition.Tooling.Process;
 
 using System.Reflection.Metadata;

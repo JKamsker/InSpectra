@@ -1,8 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Signatures;
-
-using InSpectra.Gen.Acquisition.Modes.Help.Projection;
-
-using InSpectra.Gen.Acquisition.Modes.Help.Inference.Usage.Arguments;
+namespace InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 using System.Text.RegularExpressions;
 
@@ -117,12 +113,12 @@ internal static partial class OptionTokenParsingSupport
 
         if (rawPlaceholder.Contains('|', StringComparison.Ordinal) || LooksLikeOptionPlaceholder(rawPlaceholder))
         {
-            return OptionValueInferenceSupport.InferArgumentNameFromOption(primaryOption);
+            return OptionSignatureSupport.InferArgumentNameFromOption(primaryOption);
         }
 
-        return ArgumentNodeBuilder.TryParseArgumentSignature(rawPlaceholder, out var signature)
+        return ArgumentSignatureParser.TryParse(rawPlaceholder, out var signature)
             ? signature.Name
-            : OptionValueInferenceSupport.InferArgumentNameFromOption(primaryOption);
+            : OptionSignatureSupport.InferArgumentNameFromOption(primaryOption);
     }
 
     private static string StripBracketedPlaceholders(string key)

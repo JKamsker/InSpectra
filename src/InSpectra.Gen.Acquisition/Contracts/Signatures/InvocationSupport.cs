@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+namespace InSpectra.Gen.Acquisition.Contracts.Signatures;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 internal static class InvocationSupport
 {

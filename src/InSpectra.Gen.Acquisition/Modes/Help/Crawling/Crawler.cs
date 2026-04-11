@@ -1,11 +1,18 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 
+using InSpectra.Gen.Acquisition.Contracts.Crawling;
+
+using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
+
+using InSpectra.Gen.Acquisition.Contracts.CrawlResults;
+using InSpectra.Gen.Acquisition.Contracts.Providers;
+
 using InSpectra.Gen.Acquisition.Modes.Help.Projection;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 using InSpectra.Gen.Acquisition.Modes.Help.Inference.Usage.Commands;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 using InSpectra.Gen.Acquisition.Modes.Help.Parsing;
 
@@ -14,7 +21,7 @@ using InSpectra.Gen.Acquisition.Tooling.Process;
 
 using System.Text.Json.Nodes;
 
-internal sealed class Crawler
+internal sealed class Crawler : IHelpCrawler
 {
     private readonly TextParser _parser = new();
     private readonly CommandRuntime _runtime;

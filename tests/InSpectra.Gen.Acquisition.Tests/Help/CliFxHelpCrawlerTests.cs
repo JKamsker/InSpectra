@@ -1,5 +1,7 @@
 namespace InSpectra.Gen.Acquisition.Tests.Help;
 
+using InSpectra.Gen.Acquisition.Contracts.Crawling;
+
 using InSpectra.Gen.Acquisition.Modes.CliFx.Crawling;
 using InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 using InSpectra.Gen.Acquisition.Tooling.Process;

@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Documents;
+namespace InSpectra.Gen.Acquisition.Contracts.Documents;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Projection;
+using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
 
 using InSpectra.Gen.Acquisition.Tooling.Process;
 

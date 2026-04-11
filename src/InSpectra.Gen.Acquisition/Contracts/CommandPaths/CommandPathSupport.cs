@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Projection;
+namespace InSpectra.Gen.Acquisition.Contracts.CommandPaths;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 internal static class CommandPathSupport
 {

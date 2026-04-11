@@ -1,8 +1,9 @@
 namespace InSpectra.Gen.Acquisition.Modes.Static.Projection;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
-using InSpectra.Gen.Acquisition.Modes.Help.Inference.Usage.Commands;
-using InSpectra.Gen.Acquisition.Modes.Help.Projection;
+using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
+
+using InSpectra.Gen.Acquisition.Contracts.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Acquisition.OpenCli.Documents;
 using InSpectra.Gen.Acquisition.OpenCli.Structure;
 using InSpectra.Gen.Acquisition.Modes.Static.Models;
@@ -99,7 +100,7 @@ internal static class StaticAnalysisOpenCliCommandSelectionSupport
             return helpDocuments.Keys.Any(key => !string.IsNullOrWhiteSpace(key))
                 || helpDocuments.TryGetValue(string.Empty, out var helpOnlyRoot)
                     && (helpOnlyRoot.Commands.Count > 0
-                        || UsageCommandInferenceSupport.LooksLikeCommandHub(commandName, helpOnlyRoot.UsageLines));
+                        || UsageCommandHubDetectorAccessor.Current.LooksLikeCommandHub(commandName, helpOnlyRoot.UsageLines));
         }
 
         if (staticCommands.Keys.Any(key => !string.IsNullOrWhiteSpace(key)))
@@ -113,7 +114,7 @@ internal static class StaticAnalysisOpenCliCommandSelectionSupport
         }
 
         return rootHelp.Commands.Count > 0
-            || UsageCommandInferenceSupport.LooksLikeCommandHub(commandName, rootHelp.UsageLines);
+            || UsageCommandHubDetectorAccessor.Current.LooksLikeCommandHub(commandName, rootHelp.UsageLines);
     }
 
     private static bool ShouldIncludeHelpChildCommands(
@@ -123,7 +124,7 @@ internal static class StaticAnalysisOpenCliCommandSelectionSupport
         IReadOnlyDictionary<string, StaticCommandDefinition> staticCommands)
     {
         if (document.Commands.Count > 0
-            || UsageCommandInferenceSupport.LooksLikeCommandHub(commandName, document.UsageLines))
+            || UsageCommandHubDetectorAccessor.Current.LooksLikeCommandHub(commandName, document.UsageLines))
         {
             return true;
         }
@@ -144,7 +145,7 @@ internal static class StaticAnalysisOpenCliCommandSelectionSupport
         Document document,
         IReadOnlyDictionary<string, StaticCommandDefinition> staticCommands)
     {
-        if (UsageCommandInferenceSupport.LooksLikeCommandHub(commandName, document.UsageLines))
+        if (UsageCommandHubDetectorAccessor.Current.LooksLikeCommandHub(commandName, document.UsageLines))
         {
             return true;
         }

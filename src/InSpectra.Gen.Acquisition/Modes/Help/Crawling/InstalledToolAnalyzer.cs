@@ -7,7 +7,7 @@ using InSpectra.Gen.Acquisition.OpenCli.Documents;
 using InSpectra.Gen.Acquisition.Contracts.Results;
 
 using InSpectra.Gen.Acquisition.Modes.Help.Projection;
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 using InSpectra.Gen.Acquisition.Tooling.Process;
 

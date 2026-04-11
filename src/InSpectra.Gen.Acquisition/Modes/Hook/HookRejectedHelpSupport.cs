@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Modes.Hook;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Inference.Text;
+using InSpectra.Gen.Acquisition.Contracts.TextClassification;
 using InSpectra.Gen.Acquisition.Tooling.Process;
 
 internal static class HookRejectedHelpSupport
@@ -24,7 +24,7 @@ internal static class HookRejectedHelpSupport
             var secondLine = index + 1 < lines.Count
                 ? NormalizeRejectedHelpLine(lines[index + 1])
                 : null;
-            if (TextNoiseClassifier.LooksLikeRejectedHelpInvocation(firstLine, secondLine))
+            if (RejectedHelpClassifier.LooksLikeRejectedHelpInvocation(firstLine, secondLine))
             {
                 return true;
             }

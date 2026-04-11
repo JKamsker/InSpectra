@@ -1,3 +1,4 @@
+using InSpectra.Gen.Acquisition.Contracts.Providers;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Execution;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Metadata;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Projection;
@@ -28,6 +29,8 @@ public static class AcquisitionServiceCollectionExtensions
     public static IServiceCollection AddInSpectraAcquisition(this IServiceCollection services)
     {
         services.AddSingleton<CommandRuntime>();
+        services.AddSingleton<Crawler>();
+        services.AddSingleton<IHelpCrawler>(sp => sp.GetRequiredService<Crawler>());
         services.AddSingleton<OpenCliBuilder>();
         services.AddSingleton<IToolDescriptorResolver, ToolDescriptorResolver>();
         services.AddSingleton<CliFxMetadataInspector>();

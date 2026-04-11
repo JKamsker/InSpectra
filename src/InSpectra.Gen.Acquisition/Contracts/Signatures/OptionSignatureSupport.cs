@@ -1,6 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Signatures;
-
-using InSpectra.Gen.Acquisition.Modes.Help.Inference.Usage.Arguments;
+namespace InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 internal static class OptionSignatureSupport
 {

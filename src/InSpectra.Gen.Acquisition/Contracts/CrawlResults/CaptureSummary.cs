@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Crawling;
+namespace InSpectra.Gen.Acquisition.Contracts.CrawlResults;
 
 
 internal sealed record CaptureSummary(

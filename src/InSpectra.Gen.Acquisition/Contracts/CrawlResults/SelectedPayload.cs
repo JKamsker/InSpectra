@@ -1,6 +1,6 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Crawling;
+namespace InSpectra.Gen.Acquisition.Contracts.CrawlResults;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 
 internal sealed record SelectedPayload(

@@ -1,8 +1,10 @@
 namespace InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.CommandPaths;
+
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 using InSpectra.Gen.Acquisition.Modes.Help.Projection;
-using InSpectra.Gen.Acquisition.Modes.Help.Signatures;
+using InSpectra.Gen.Acquisition.Contracts.Signatures;
 
 internal static class CapturePayloadDispatcherEchoSupport
 {

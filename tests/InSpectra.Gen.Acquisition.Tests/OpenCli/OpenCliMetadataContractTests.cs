@@ -2,7 +2,7 @@ namespace InSpectra.Gen.Acquisition.Tests.OpenCli;
 
 using InSpectra.Gen.Acquisition.Modes.CliFx.Metadata;
 using InSpectra.Gen.Acquisition.Modes.CliFx.Projection;
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 using InSpectra.Gen.Acquisition.Modes.Help.Projection;
 using InSpectra.Gen.Acquisition.Contracts;
 using InSpectra.Gen.Acquisition.Tests.StaticAnalysis;

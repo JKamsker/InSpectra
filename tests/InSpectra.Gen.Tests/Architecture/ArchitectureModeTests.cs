@@ -32,7 +32,7 @@ public sealed class ArchitectureModeTests
         @"^\s*using\s+InSpectra\.Gen\.Acquisition\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
-    [Fact(Skip = "Unskip after Step 4 — requires Modes/<Mode>/ layout in Acquisition.")]
+    [Fact]
     public void No_cross_mode_dependencies()
     {
         Assert.True(Directory.Exists(ModesRoot), $"Expected Modes root at '{ModesRoot}' to exist.");

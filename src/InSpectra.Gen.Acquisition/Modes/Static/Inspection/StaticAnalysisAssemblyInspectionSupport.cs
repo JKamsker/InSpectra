@@ -2,6 +2,7 @@ namespace InSpectra.Gen.Acquisition.Modes.Static.Inspection;
 
 using InSpectra.Gen.Acquisition.Tooling.FrameworkDetection;
 
+using InSpectra.Gen.Acquisition.Modes.Static.Attributes;
 using InSpectra.Gen.Acquisition.Modes.Static.Models;
 
 
@@ -38,7 +39,8 @@ internal sealed class StaticAnalysisAssemblyInspectionSupport
 
         try
         {
-            var commands = new Dictionary<string, StaticCommandDefinition>(adapter.Reader.Read(modules), StringComparer.OrdinalIgnoreCase);
+            var reader = (IStaticAttributeReader)adapter.Reader;
+            var commands = new Dictionary<string, StaticCommandDefinition>(reader.Read(modules), StringComparer.OrdinalIgnoreCase);
             if (commands.Count == 0)
             {
                 return StaticAnalysisAssemblyInspectionResult.NoAttributes(cliFramework, modules.Count);

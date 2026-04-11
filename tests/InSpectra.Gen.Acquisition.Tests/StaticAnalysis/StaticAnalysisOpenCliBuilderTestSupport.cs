@@ -1,6 +1,6 @@
 namespace InSpectra.Gen.Acquisition.Tests.StaticAnalysis;
 
-using InSpectra.Gen.Acquisition.Modes.Help.Documents;
+using InSpectra.Gen.Acquisition.Contracts.Documents;
 
 internal static class StaticAnalysisOpenCliBuilderTestSupport
 {

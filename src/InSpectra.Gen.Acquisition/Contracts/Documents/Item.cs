@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.Acquisition.Modes.Help.Documents;
+namespace InSpectra.Gen.Acquisition.Contracts.Documents;
 
 
 internal sealed record Item(

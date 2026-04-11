@@ -1,9 +1,10 @@
 namespace InSpectra.Gen.Acquisition.Modes.CliFx.Crawling;
 
+using InSpectra.Gen.Acquisition.Contracts.Crawling;
+
 using InSpectra.Gen.Acquisition.Modes.CliFx.Metadata;
 
 using InSpectra.Gen.Acquisition.Modes.CliFx.Execution;
-using InSpectra.Gen.Acquisition.Modes.Help.Crawling;
 using InSpectra.Gen.Acquisition.Tooling.Process;
 
 
