@@ -123,15 +123,3 @@ internal sealed class OpenCliCommandTreeBuilder
     }
 }
 
-internal sealed record OpenCliCommandDescriptor(
-    string FullName,
-    string? Description);
-
-internal sealed record OpenCliCommandTreeNode(
-    string FullName,
-    string DisplayName,
-    string? Description)
-{
-    public IReadOnlyList<OpenCliCommandTreeNode> Children { get; init; } = [];
-}
-

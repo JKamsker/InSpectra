@@ -54,11 +54,3 @@ internal static class DotnetToolSettingsReader
         => string.Equals(attribute.Name.LocalName, localName, StringComparison.OrdinalIgnoreCase);
 }
 
-internal sealed record DotnetToolSettingsDocument(
-    string ToolDirectory,
-    IReadOnlyList<DotnetToolSettingsCommand> Commands);
-
-internal sealed record DotnetToolSettingsCommand(
-    string? CommandName,
-    string? EntryPointPath);
-

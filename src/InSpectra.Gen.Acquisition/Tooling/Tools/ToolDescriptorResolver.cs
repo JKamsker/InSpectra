@@ -11,19 +11,6 @@ using InSpectra.Gen.Acquisition.Tooling.Paths;
 using InSpectra.Gen.Acquisition.Tooling.NuGet;
 using InSpectra.Gen.Core;
 
-internal interface IToolDescriptorResolver
-{
-    Task<ToolDescriptorResolution> ResolveAsync(
-        string packageId,
-        string version,
-        string? commandName,
-        CancellationToken cancellationToken);
-}
-
-internal sealed record ToolDescriptorResolution(
-    ToolDescriptor Descriptor,
-    SpectrePackageInspection Inspection);
-
 internal sealed class ToolDescriptorResolver : IToolDescriptorResolver
 {
     public async Task<ToolDescriptorResolution> ResolveAsync(

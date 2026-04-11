@@ -153,12 +153,3 @@ internal static partial class DotnetRuntimeCompatibilitySupport
     [GeneratedRegex(@"Framework:\s*'(?<name>[^']+)',\s*version\s*'(?<version>[^']+)'", RegexOptions.Compiled)]
     private static partial Regex RequiredFrameworkRegex();
 }
-
-internal sealed record DotnetRuntimeIssue(
-    string Command,
-    string Mode,
-    DotnetRuntimeRequirement? Requirement);
-
-internal sealed record DotnetRuntimeRequirement(
-    string Name,
-    string Version);
