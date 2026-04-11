@@ -40,7 +40,7 @@ jobs:
           mode: dotnet
           project: src/MyCli         # path to .csproj or directory
           configuration: Release
-          format: html               # html / markdown / markdown-monolith
+          format: html               # html / markdown / markdown-monolith / markdown-hybrid
           output-dir: docs/cli
 
       - uses: actions/upload-artifact@v4

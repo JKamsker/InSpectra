@@ -112,7 +112,7 @@ The intended flow is:
 1. `inspectra generate ...` from a project, executable, or package.
 2. `inspectra render file ...` from that generated `opencli.json`.
 
-Open `./jellyfin-docs/index.html` in a browser. The bundle is relocatable because the viewer is built with `base: "./"`.
+Open `./docs/index.html` in a browser. The bundle is relocatable because the viewer is built with `base: "./"`.
 
 ## GitHub Action
 
@@ -168,7 +168,7 @@ steps:
       project: src/MyCli              # path to .csproj or directory
       configuration: Release
       no-build: 'false'               # set true if you build in a previous step
-      format: markdown                # html / markdown / markdown-monolith
+      format: markdown                # html / markdown / markdown-monolith / markdown-hybrid
       output-dir: docs/cli
 ```
 
@@ -201,6 +201,12 @@ steps:
   with:
     cli-name: mycli
     format: markdown-monolith   # single file
+
+- uses: JKamsker/InSpectra@v1
+  with:
+    cli-name: mycli
+    format: markdown-hybrid     # README.md + per-group files
+    split-depth: '2'
 ```
 
 ### Action inputs
@@ -208,7 +214,8 @@ steps:
 | Input | Default | Description |
 | --- | --- | --- |
 | `mode` | `exec` | `exec`, `file`, `dotnet`, or `package` |
-| `format` | `html` | `html`, `markdown` (tree), or `markdown-monolith` (single file) |
+| `format` | `html` | `html`, `markdown` (tree), `markdown-monolith` (single file), or `markdown-hybrid` (README + per-group files) |
+| `split-depth` | | Depth for `markdown-hybrid` output. Ignored for other formats. |
 | `cli-name` | | CLI executable name or path (exec mode) |
 | `dotnet-tool` | | NuGet package to `dotnet tool install -g` (exec mode) |
 | `dotnet-tool-version` | | Version constraint for the dotnet tool |
@@ -226,6 +233,13 @@ steps:
 | `label` | | Custom label shown in the viewer header (e.g. `v1.2.3`) |
 | `title` | | Override the CLI title shown in the viewer header and overview |
 | `command-prefix` | | Override the CLI command prefix used in generated examples and the composer |
+| `single-file` | `false` | Emit a single self-contained HTML file |
+| `compression-level` | `2` | HTML bundle compression level (`0`, `1`, or `2`) |
+| `theme` | | Initial HTML theme (`light` or `dark`) |
+| `color-theme` | | HTML accent preset (`cyan`, `indigo`, `emerald`, `amber`, `rose`, `blue`) |
+| `accent` | | Custom HTML accent color for light mode |
+| `accent-dark` | | Custom HTML accent color for dark mode (falls back to `accent`) |
+| `no-theme-picker` | `false` | Hide the HTML color theme picker in the toolbar |
 | `extra-args` | | Additional flags forwarded to the `inspectra` CLI |
 | `inspectra-version` | latest | InSpectra.Gen NuGet tool version |
 | `inspectra-cli-package` | `InSpectra.Cli` | NuGet package id auto-added to the target project in dotnet mode |
@@ -245,6 +259,10 @@ steps:
 | Output | Description |
 | --- | --- |
 | `output-dir` | Path to the rendered output directory |
+
+HTML viewer flags such as `--show-home`, `--enable-url`, `--enable-nuget-browser`,
+`--enable-package-upload`, `--no-composer`, `--no-dark`, and `--no-light` are
+still available through `extra-args` rather than dedicated action inputs.
 
 ### End-to-end example: deploy to GitHub Pages
 
@@ -328,6 +346,9 @@ jobs:
     with:
       cli-name: mycli
       dotnet-tool: MyCompany.MyCli
+      output-dir: docs/cli
+      title: My CLI
+      command-prefix: mycli
 ```
 
 The workflow accepts the same inputs as the action, plus:

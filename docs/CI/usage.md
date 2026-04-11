@@ -30,7 +30,7 @@ steps:
       mode: dotnet
       project: src/MyCli           # .csproj path or directory
       configuration: Release
-      format: html                 # html / markdown / markdown-monolith
+      format: html                 # html / markdown / markdown-monolith / markdown-hybrid
       output-dir: docs/cli
 
   - uses: actions/upload-artifact@v4
@@ -87,8 +87,10 @@ steps:
 
 ## Markdown output instead of HTML
 
-Set `format` to `markdown` (tree layout, one file per command) or
-`markdown-monolith` (single file). Works with any mode.
+Set `format` to `markdown` (tree layout, one file per command),
+`markdown-monolith` (single file), or `markdown-hybrid`
+(`README.md` plus per-group files). `split-depth` only applies to
+`markdown-hybrid`. All three work with any mode.
 
 ```yaml
 steps:
@@ -98,7 +100,8 @@ steps:
     with:
       mode: dotnet
       project: src/MyCli
-      format: markdown               # or markdown-monolith
+      format: markdown-hybrid        # or markdown / markdown-monolith
+      split-depth: '2'
       output-dir: docs/cli
 ```
 

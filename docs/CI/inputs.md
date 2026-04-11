@@ -1,17 +1,20 @@
 # Inputs Reference
 
-Every input accepted by `JKamsker/InSpectra@v1`. The same inputs are exposed
-on the reusable workflow at
-`JKamsker/InSpectra/.github/workflows/inspectra-generate.yml@v1`.
+Every input accepted by `JKamsker/InSpectra@v1`.
+`JKamsker/InSpectra/.github/workflows/inspectra-generate.yml@v1` exposes the
+same action inputs, plus a small wrapper-specific set for setup and artifact upload.
 
 ## Mode and format
 
 | Input | Default | Description |
 |---|---|---|
 | `mode` | `exec` | `exec` (generate `opencli.json` from a live CLI, then render it), `file` (render from saved `opencli.json`), `dotnet` (generate from a .NET project), or `package` (analyze a published .NET tool package) |
-| `format` | `html` | `html` (interactive SPA), `markdown` (tree layout), or `markdown-monolith` (single file) |
+| `format` | `html` | `html` (interactive SPA), `markdown` (tree layout), `markdown-monolith` (single file), or `markdown-hybrid` (README + per-group files) |
+| `split-depth` | | Depth for `markdown-hybrid` output. Depth `1` emits one file per top-level group; depth `2` also emits second-level group files. Ignored for other formats |
 | `output-dir` | `inspectra-output` | Directory where the rendered output is written |
 | `label` | | Custom label shown in the viewer header (e.g. `v1.2.3`) |
+| `title` | | Override the CLI title shown in the viewer header and overview |
+| `command-prefix` | | Override the CLI command prefix used in generated examples and the composer |
 
 ## `exec` mode
 
@@ -96,6 +99,25 @@ The action installs `.NET` itself — you don't need a separate
 | `inspectra-version` | _latest_ | Pin a specific `InSpectra.Gen` NuGet tool version |
 | `extra-args` | | Additional flags forwarded verbatim to the `inspectra` CLI |
 
+## HTML output options
+
+These inputs only affect `format: html`.
+
+| Input | Default | Description |
+|---|---|---|
+| `single-file` | `false` | Emit a single self-contained HTML file |
+| `compression-level` | `2` | HTML bundle compression level: `0` none, `1` compressed JSON, `2` self-extracting bundle |
+| `theme` | | Initial theme mode (`light` or `dark`) |
+| `color-theme` | | Color theme preset (`cyan`, `indigo`, `emerald`, `amber`, `rose`, `blue`) |
+| `accent` | | Custom accent color for light mode (hex) |
+| `accent-dark` | | Custom accent color for dark mode (hex, falls back to `accent`) |
+| `no-theme-picker` | `false` | Hide the color theme picker from the viewer toolbar |
+
+Other HTML renderer flags such as `--show-home`, `--enable-url`,
+`--enable-nuget-browser`, `--enable-package-upload`, `--no-composer`,
+`--no-dark`, and `--no-light` are still supported by the CLI, but they are
+passed through the action via `extra-args` rather than dedicated inputs.
+
 ## Outputs
 
 | Output | Description |
@@ -105,7 +127,7 @@ The action installs `.NET` itself — you don't need a separate
 ## Reusable workflow extras
 
 When using `JKamsker/InSpectra/.github/workflows/inspectra-generate.yml@v1`,
-two additional inputs are available:
+these wrapper-specific inputs are available in addition to the full action surface:
 
 | Input | Default | Description |
 |---|---|---|

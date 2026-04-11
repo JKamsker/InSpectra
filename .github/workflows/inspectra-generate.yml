@@ -150,6 +150,14 @@ on:
         type: string
         description: 'Custom label shown in the viewer header (e.g. "v1.2.3")'
 
+      title:
+        type: string
+        description: 'Override the CLI title shown in the viewer header and overview'
+
+      command-prefix:
+        type: string
+        description: 'Override the CLI command prefix used in generated examples and the composer'
+
       single-file:
         type: string
         default: 'false'
@@ -186,6 +194,11 @@ on:
         description: 'Additional flags forwarded to the inspectra CLI'
 
       # ── output ───────────────────────────────────────────────────
+      output-dir:
+        type: string
+        default: 'inspectra-output'
+        description: 'Directory where the rendered output is written'
+
       artifact-name:
         type: string
         default: 'inspectra-docs'
@@ -236,6 +249,8 @@ jobs:
           package-id: ${{ inputs.package-id }}
           package-version: ${{ inputs.package-version }}
           label: ${{ inputs.label }}
+          title: ${{ inputs.title }}
+          command-prefix: ${{ inputs.command-prefix }}
           opencli-args: ${{ inputs.opencli-args }}
           xmldoc-args: ${{ inputs.xmldoc-args }}
           timeout: ${{ inputs.timeout }}
@@ -250,7 +265,7 @@ jobs:
           launch-profile: ${{ inputs.launch-profile }}
           no-build: ${{ inputs.no-build }}
           no-restore: ${{ inputs.no-restore }}
-          output-dir: _inspectra-site
+          output-dir: ${{ inputs.output-dir }}
           single-file: ${{ inputs.single-file }}
           compression-level: ${{ inputs.compression-level }}
           theme: ${{ inputs.theme }}
@@ -271,4 +286,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
-          path: _inspectra-site
+          path: ${{ inputs.output-dir }}
