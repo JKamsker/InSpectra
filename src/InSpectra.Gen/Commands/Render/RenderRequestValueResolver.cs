@@ -1,7 +1,7 @@
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Rendering.Contracts;
 
-namespace InSpectra.Gen.UseCases.Render;
+namespace InSpectra.Gen.Commands.Render;
 
 internal static class RenderRequestValueResolver
 {

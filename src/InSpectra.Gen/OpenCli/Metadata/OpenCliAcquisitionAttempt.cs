@@ -1,4 +1,4 @@
-namespace InSpectra.Gen.UseCases.Generate.Requests;
+namespace InSpectra.Gen.OpenCli.Metadata;
 
 public sealed record OpenCliAcquisitionAttempt(
     string Mode,

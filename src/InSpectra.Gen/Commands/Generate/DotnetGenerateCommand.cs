@@ -1,4 +1,4 @@
-using InSpectra.Gen.UseCases.Render;
+using InSpectra.Gen.Commands.Render;
 using InSpectra.Gen.UseCases.Generate.Requests;
 using InSpectra.Gen.Output;
 using Spectre.Console.Cli;

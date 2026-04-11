@@ -1,6 +1,7 @@
 global using InSpectra.Gen.Execution.Process;
 global using InSpectra.Gen.Execution.Workspace;
 global using InSpectra.Gen.OpenCli.Enrichment;
+global using InSpectra.Gen.OpenCli.Metadata;
 global using InSpectra.Gen.OpenCli.Model;
 global using InSpectra.Gen.OpenCli.Schema;
 global using InSpectra.Gen.OpenCli.Serialization;

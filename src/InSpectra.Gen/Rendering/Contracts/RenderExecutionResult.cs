@@ -1,5 +1,3 @@
-using InSpectra.Gen.UseCases.Generate.Requests;
-
 namespace InSpectra.Gen.Rendering.Contracts;
 
 public sealed class RenderExecutionResult

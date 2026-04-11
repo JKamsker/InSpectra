@@ -26,7 +26,6 @@ public static class OpenCliServiceCollectionExtensions
         services.AddSingleton<OpenCliDocumentCloner>();
         services.AddSingleton<OpenCliDocumentSerializer>();
         services.AddSingleton<OpenCliXmlEnricher>();
-        services.AddSingleton<OpenCliNormalizer>();
         services.AddSingleton<OpenCliNativeAcquisitionSupport>();
         services.AddSingleton<IOpenCliAcquisitionService, OpenCliAcquisitionService>();
         services.AddSingleton<IOpenCliGenerationService, OpenCliGenerationService>();

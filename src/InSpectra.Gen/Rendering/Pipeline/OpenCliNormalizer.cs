@@ -1,6 +1,6 @@
 using InSpectra.Gen.Rendering.Pipeline.Model;
 
-namespace InSpectra.Gen.OpenCli.Enrichment;
+namespace InSpectra.Gen.Rendering.Pipeline;
 
 public sealed class OpenCliNormalizer
 {

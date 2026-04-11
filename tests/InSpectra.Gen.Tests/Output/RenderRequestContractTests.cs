@@ -1,7 +1,6 @@
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Commands.Generate;
 using InSpectra.Gen.Commands.Render;
-using InSpectra.Gen.UseCases.Render;
 using InSpectra.Gen.UseCases.Generate.Requests;
 using InSpectra.Gen.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;

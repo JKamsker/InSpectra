@@ -2,7 +2,7 @@ using InSpectra.Gen.Core;
 using InSpectra.Gen.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
 
-namespace InSpectra.Gen.UseCases.Render;
+namespace InSpectra.Gen.Commands.Render;
 
 internal static class RenderRequestHtmlSupport
 {

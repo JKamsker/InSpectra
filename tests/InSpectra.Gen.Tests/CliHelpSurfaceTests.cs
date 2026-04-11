@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using InSpectra.Gen.UseCases.Render;
+using InSpectra.Gen.Commands.Render;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests;

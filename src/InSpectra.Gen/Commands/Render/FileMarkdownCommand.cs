@@ -1,4 +1,3 @@
-using InSpectra.Gen.UseCases.Render;
 using InSpectra.Gen.Output;
 using InSpectra.Gen.Rendering.Contracts;
 using Spectre.Console.Cli;
