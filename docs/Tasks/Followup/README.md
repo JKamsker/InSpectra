@@ -8,41 +8,43 @@ This folder replaces the old monolithic
 - Working branch: `feat/merge-tool`
 - Current follow-up docs live on the branch tip; verify `HEAD` before
   resuming work.
-- Latest fully validated pushed tip: `f1e23dd`
+- Latest fully validated pushed tip: `2a941b9`
 - Seven outer iterations shipped phases `g1`–`g39` on `feat/merge-tool`, and
   the queue-driven thin-shell phase `g40`, the installed-tool
   process-safety phase `g41`, the packaged-tool verification phase `g42`, and
   the hosted follow-up fix `g43`, the Playwright hosted-CI phase `g44`, the
   website truthfulness phase `g45`, the frontend file-limit phase `g46`, the
-  static-package-route phase `g47`, and the hosted test-support follow-up
-  phase `g48`, the backend failure-diagnostics phase `g49`, and the hosted
-  OpenCli test-support follow-up phase `g50` are now pushed and hosted
-  validated.
-- The pushed tip `f1e23dd` is hosted validated:
+  static-package-route phase `g47`, the hosted test-support follow-up
+  phase `g48`, the backend failure-diagnostics phase `g49`, the hosted
+  OpenCli test-support follow-up phase `g50`, and the installed-tool
+  multi-TFM determinism phase `g51` are now pushed and hosted validated.
+- The pushed tip `2a941b9` is hosted validated:
   - `61` frontend unit tests
   - `12` Playwright E2E tests
-  - `354 / 0 / 0` backend unit tests
-  - `17` architecture policy tests
-  - green `pull_request` run `24304837684`
+  - green `pull_request` run `24305752872`
+  - local full backend rerun on the same tip:
+    `199` engine tests and `171` app-shell tests, including `17`
+    architecture policy tests
 - The latest green `workflow_dispatch` validation is still on pushed tip
   `a3390bb`:
   - green `workflow_dispatch` run `24296167355`, including `live-tests`
-- Outer iteration 13 dotnet/backend wave 1 shipped `g49` / `g50` on
-  `f1e23dd`; the next required step is the next contained backend phase from
-  the current wave, not a fresh swarm.
+- Outer iteration 13 dotnet/backend wave 1 shipped `g49` / `g50` / `g51` on
+  `2a941b9`; the next required step is a fresh dotnet/backend investigation
+  swarm from the current tree.
 - The original zero-BLOCKER/HIGH/MEDIUM stop condition was not reached.
-  `g49` / `g50` closed the ProcessRunner failure-diagnostics HIGH and the
-  native auto-mode failure-detail loss, but the viewer-bundle fallback HIGH
-  and the remaining backend MEDIUM clusters still remain. The next phase
-  should stay focused on the dotnet projects; installed-tool multi-TFM
-  selection determinism is the narrowest contained remaining slice.
+  `g49` / `g50` / `g51` closed the ProcessRunner failure-diagnostics HIGH,
+  the native auto-mode failure-detail loss, and the installed-tool
+  multi-TFM determinism MEDIUM. The viewer-bundle fallback HIGH and the
+  remaining backend MEDIUM clusters still remain, so the next fresh swarm
+  should stay focused on the dotnet projects.
 - Active todo-next queue:
   - no non-completed queued items remain
-  - latest hosted-validated phases: `g49` / `g50`
-    (`48d66c7`, `f1e23dd`) with failed `pull_request` run `24304747281`
-    followed by green `pull_request` run `24304837684`
-  - next work item continues outer iteration 13 with the installed-tool
-    multi-TFM selection phase, still focused on the dotnet projects
+  - latest hosted-validated phases: `g49` / `g50` / `g51`
+    (`48d66c7`, `f1e23dd`, `2a941b9`) with failed `pull_request` run
+    `24304747281` followed by green `pull_request` runs `24304837684` and
+    `24305752872`
+  - next work item is a fresh dotnet/backend investigation swarm from the
+    current tree
   - `TN-2026-04-12-04` completed on `g44` (`99a2c5a`) with green
     `pull_request` run `24301203450`:
     [TodoNext/2026-04-12-playwright-ci-and-e2e-hygiene.md](TodoNext/2026-04-12-playwright-ci-and-e2e-hygiene.md)
@@ -58,7 +60,7 @@ This folder replaces the old monolithic
 ## Current Handoff State
 
 - Source of truth for current open work:
-  [Logbook](Logbook.md#current-open-items-after-g50-hosted-validation-2026-04-12)
+  [Logbook](Logbook.md#current-open-items-after-g51-hosted-validation-2026-04-12)
 - Source of truth for how to resume the loop:
   [Runbook](Runbook.md)
 - Source of truth for mandatory queued work before the next swarm:
