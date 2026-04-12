@@ -229,6 +229,7 @@ export function WebsiteApp() {
         version={route.kind === "browse" ? route.version : undefined}
         onLoadPackage={handleLoadPackage}
         onBack={() => { window.location.hash = "#/"; }}
+        onBackToBrowse={() => { window.location.hash = "#/"; }}
       />
     </>
   );

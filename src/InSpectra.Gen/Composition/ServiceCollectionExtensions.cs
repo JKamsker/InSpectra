@@ -1,0 +1,14 @@
+using InSpectra.Gen.Engine.Composition;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace InSpectra.Gen.Composition;
+
+internal static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddInSpectraGen(this IServiceCollection services)
+    {
+        services.AddInSpectraEngine();
+
+        return services;
+    }
+}

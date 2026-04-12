@@ -3,7 +3,10 @@
     "allow": [
       "mcp__Claude_Preview__preview_start",
       "Bash(where npm.cmd)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git commit:*)",
+      "Bash(rm .git/COMMIT_MSG_*.txt)",
+      "Bash(git push:*)"
     ]
   }
 }

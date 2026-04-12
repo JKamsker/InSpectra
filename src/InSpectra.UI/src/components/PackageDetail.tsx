@@ -11,6 +11,8 @@ interface PackageDetailProps {
   pkg: DiscoveryPackageDetail;
   summary?: DiscoveryPackageSummary;
   selectedVersion?: string;
+  loadError?: string | null;
+  onBack: () => void;
   onLoadPackage: (
     opencliUrl: string,
     xmldocUrl: string | undefined,
@@ -18,10 +20,10 @@ interface PackageDetailProps {
     packageId: string,
     version: string | undefined,
     command: string | undefined,
-  ) => void;
+  ) => Promise<void>;
 }
 
-export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: PackageDetailProps) {
+export function PackageDetail({ pkg, summary, selectedVersion, loadError, onBack, onLoadPackage }: PackageDetailProps) {
   const [loadingVersion, setLoadingVersion] = useState<string | null>(null);
   const activeVersion = selectedVersion || pkg.latestVersion;
   const versionInfo = pkg.versions.find((v) => v.version === activeVersion) || pkg.versions[0];
@@ -39,7 +41,8 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
     const label = `${pkg.packageId} v${resolvedVersion}`;
     const command = pkg.versions.find((candidate) => candidate.version === resolvedVersion)?.command ?? versionInfo.command;
     setLoadingVersion(resolvedVersion);
-    onLoadPackage(urls.opencliUrl, urls.xmldocUrl, label, pkg.packageId, isLatest ? undefined : resolvedVersion, command);
+    void onLoadPackage(urls.opencliUrl, urls.xmldocUrl, label, pkg.packageId, isLatest ? undefined : resolvedVersion, command)
+      .finally(() => setLoadingVersion(null));
   }
 
   return (
@@ -59,11 +62,14 @@ export function PackageDetail({ pkg, summary, selectedVersion, onLoadPackage }: 
               <h1>{pkg.packageId}</h1>
             </div>
           </div>
-          <button type="button" className="secondary-button" onClick={() => history.back()}>
+          <button type="button" className="secondary-button" onClick={onBack}>
             <ArrowLeft aria-hidden="true" size={14} />
             All packages
           </button>
         </div>
+        {loadError && (
+          <p className="ds-inline-alert" role="alert">{loadError}</p>
+        )}
 
         <div className="browse-detail-meta">
           {versionInfo.command && (

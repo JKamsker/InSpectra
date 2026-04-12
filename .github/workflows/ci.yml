@@ -6,9 +6,11 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'  # nightly at 03:00 UTC
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-test:
@@ -29,6 +31,10 @@ jobs:
         working-directory: src/InSpectra.UI
         run: npm ci
 
+      - name: Install Playwright browser
+        working-directory: src/InSpectra.UI
+        run: npx playwright install --with-deps chromium
+
       - name: Test frontend
         working-directory: src/InSpectra.UI
         run: npm test
@@ -48,8 +54,24 @@ jobs:
       - name: Build
         run: dotnet build InSpectra.Gen.sln --configuration Release --no-restore
 
+      - name: Test rendered HTML in Chromium
+        working-directory: src/InSpectra.UI
+        env:
+          INSPECTRA_E2E_DOTNET_CONFIGURATION: Release
+          INSPECTRA_E2E_DOTNET_NO_BUILD: "1"
+        run: npm run test:e2e
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            src/InSpectra.UI/playwright-report/
+            src/InSpectra.UI/test-results/
+
       - name: Test
-        run: dotnet test InSpectra.Gen.sln --configuration Release --no-build
+        run: dotnet test InSpectra.Gen.sln --configuration Release --no-build --filter "Category!=WindowsOnly&Category!=Live"
 
       - name: Pack tool
         run: dotnet pack src/InSpectra.Gen/InSpectra.Gen.csproj --configuration Release --no-build -p:Version=0.0.${{ github.run_number }}
@@ -63,6 +85,8 @@ jobs:
           set -euo pipefail
           test -f artifacts/publish/InSpectra.UI/dist/index.html
           test -f artifacts/publish/InSpectra.UI/dist/static.html
+          test -f artifacts/publish/hooks/InSpectra.Gen.StartupHook.dll
+          test -f artifacts/publish/hooks/0Harmony.dll
           compgen -G 'artifacts/publish/InSpectra.UI/dist/assets/*.css' > /dev/null
           compgen -G 'artifacts/publish/InSpectra.UI/dist/assets/*.js' > /dev/null
 
@@ -92,17 +116,33 @@ jobs:
           test -f "$out2/index.html"
           [ "$(find "$out2" -type f | wc -l)" -eq 1 ]
 
-      - name: Smoke render dotnet mode
+      - name: Smoke pure dotnet generate plus render flow
         shell: bash
         run: |
           set -euo pipefail
           tmp_dir="$(mktemp -d)"
+          opencli="$tmp_dir/opencli.json"
           out="$tmp_dir/dotnet"
           dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
-            render dotnet html src/InSpectra.Gen \
+            generate dotnet src/InSpectra.Gen \
             --configuration Release --no-build --with-xmldoc \
+            --out "$opencli"
+          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
+            render file html "$opencli" \
             --out-dir "$out" --overwrite
           test -f "$out/index.html"
+
+      - name: Smoke generate dotnet mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp_dir="$(mktemp -d)"
+          out="$tmp_dir/opencli.json"
+          dotnet run --project src/InSpectra.Gen --configuration Release --no-build -- \
+            generate dotnet src/InSpectra.Gen \
+            --configuration Release --no-build \
+            --out "$out"
+          test -f "$out"
 
       - name: Validate nupkg
         shell: bash
@@ -110,9 +150,30 @@ jobs:
           set -euo pipefail
           nupkg=$(find src/InSpectra.Gen/bin/Release -name '*.nupkg' | head -1)
           test -n "$nupkg"
+          version="0.0.${{ github.run_number }}"
+          tool_dir="$(mktemp -d)"
+          package_source_dir="$(cd "$(dirname "$nupkg")" && pwd -P)"
+          nuget_config="$(mktemp)"
           echo "Found package: $nupkg"
-          dotnet tool install --global --add-source "$(dirname "$nupkg")" InSpectra.Gen --version "0.0.${{ github.run_number }}"
-          inspectra --version
+          cat > "$nuget_config" <<EOF
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="local-build" value="$package_source_dir" />
+            </packageSources>
+          </configuration>
+          EOF
+          dotnet tool install --tool-path "$tool_dir" --configfile "$nuget_config" InSpectra.Gen --version "$version"
+          "$tool_dir/inspectra" --version
+          install_store_root="$tool_dir/.store/inspectra.gen/$version"
+          hook_dll_path="$(find "$install_store_root" -path '*/tools/*/any/hooks/InSpectra.Gen.StartupHook.dll' | head -1)"
+          test -n "$hook_dll_path"
+          installed_tool_dir="$(dirname "$(dirname "$hook_dll_path")")"
+          test -n "$installed_tool_dir"
+          test -f "$installed_tool_dir/inspectra.dll"
+          test -f "$installed_tool_dir/hooks/InSpectra.Gen.StartupHook.dll"
+          test -f "$installed_tool_dir/hooks/0Harmony.dll"
 
       - name: Upload build
         uses: actions/upload-artifact@v4
@@ -127,6 +188,69 @@ jobs:
         with:
           name: nupkg
           path: src/InSpectra.Gen/bin/Release/*.nupkg
+
+  windows-backend-tests:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run Windows-only backend tests
+        run: dotnet test tests/InSpectra.Gen.Tests/InSpectra.Gen.Tests.csproj --configuration Release --filter "Category=WindowsOnly"
+
+  live-tests:
+    # Runs the ~35 end-to-end regression tests against real NuGet packages.
+    # Gated behind INSPECTRA_GEN_LIVE_TESTS=1 so normal PRs stay fast.
+    # This job installs real CLI tools from NuGet and validates the
+    # acquisition pipeline produces stable OpenCLI output.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    needs: build-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore InSpectra.Gen.sln
+
+      - name: Build
+        run: dotnet build InSpectra.Gen.sln --configuration Release --no-restore
+
+      - name: Run live regression tests
+        env:
+          INSPECTRA_GEN_LIVE_TESTS: "1"
+        run: |
+          dotnet test InSpectra.Gen.sln \
+            --configuration Release \
+            --no-build \
+            --filter "Category=Live" \
+            --logger "console;verbosity=detailed" \
+            --logger "trx;LogFileName=live-tests.trx"
+
+      - name: Upload live test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-test-logs
+          path: |
+            **/TestResults/**
 
   package-pages-preview:
     needs: build-test
@@ -199,6 +323,8 @@ jobs:
     needs: build-test
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -266,6 +392,8 @@ jobs:
     needs: build-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout main

@@ -1,4 +1,4 @@
-import { Home, Menu, PanelRight, PanelRightClose, Search, Upload, X } from "lucide-react";
+import { Home, Menu, Package, PanelRight, PanelRightClose, Search, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CommandPalette } from "./CommandPalette";
 import { CommandPanel } from "./CommandPanel";
@@ -10,18 +10,20 @@ import { useViewerInteraction } from "../hooks/useViewerInteraction";
 import { findCommandByPath, NormalizedCliDocument } from "../data/normalize";
 import { buildBrowseHash, buildCommandHash, buildPackageHash } from "../data/navigation";
 import { FeatureFlags, ViewerOptions } from "../boot/contracts";
+import { PackageContext, ViewerToolbarRoutes } from "../staticViewerSupport";
 
 interface CliViewerProps {
   document: NormalizedCliDocument;
   viewerOptions: ViewerOptions;
   featureFlags: FeatureFlags;
-  packageContext: { packageId: string; version?: string; command?: string } | null;
+  packageContext: PackageContext | null;
   sourceLabel: string;
   warnings: string[];
   error: string | null;
   commandPath: string | undefined;
   onNavigate: (commandPath?: string) => void;
   showThemeToggle?: boolean;
+  toolbarRoutes?: ViewerToolbarRoutes;
 }
 
 export function CliViewer({
@@ -35,6 +37,7 @@ export function CliViewer({
   commandPath,
   onNavigate,
   showThemeToggle = true,
+  toolbarRoutes,
 }: CliViewerProps) {
   const {
     searchInputRef,
@@ -68,6 +71,10 @@ export function CliViewer({
     document.rootArguments.length === 0 &&
     document.rootOptions.length === 0;
   const cliPrefix = packageContext?.command || viewerOptions.commandPrefix || toCliPrefix(document.source.info.title) || "cli";
+  const routes = toolbarRoutes ?? {
+    homeHref: "#/",
+    importHref: "#/import",
+  };
 
   const gridRef = useRef<HTMLDivElement>(null);
   const [composerFloating, setComposerFloating] = useState(false);
@@ -175,15 +182,26 @@ export function CliViewer({
 
         <div className="toolbar">
           <div className="toolbar-group toolbar-group-secondary">
-            <a href="#/" className="toolbar-button" title="Home">
-              <Home aria-hidden="true" />
-              <span>Home</span>
-            </a>
+            {routes.homeHref && (
+              <a href={routes.homeHref} className="toolbar-button" title="Home">
+                <Home aria-hidden="true" />
+                <span>Home</span>
+              </a>
+            )}
 
-            <a href="#/import" className="toolbar-button" title="Import OpenCLI files">
-              <Upload aria-hidden="true" />
-              <span>Import</span>
-            </a>
+            {routes.browseHref && (
+              <a href={routes.browseHref} className="toolbar-button" title="Browse packages">
+                <Package aria-hidden="true" />
+                <span>Browse</span>
+              </a>
+            )}
+
+            {routes.importHref && (
+              <a href={routes.importHref} className="toolbar-button" title="Import OpenCLI files">
+                <Upload aria-hidden="true" />
+                <span>Import</span>
+              </a>
+            )}
 
             {showThemeToggle && featureFlags.darkTheme && featureFlags.lightTheme && (
               <ThemeToggle colorThemePicker={featureFlags.colorThemePicker} />

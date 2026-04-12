@@ -1,0 +1,21 @@
+{
+  "info": {
+    "title": "=\u003E Welcome to sqlite .net core global tool version",
+    "version": "1.2.2",
+    "description": "SQLite .NET Core global tool project that provides a simple command-line program that allows the user to manually enter and execute SQL statements with or without showing query results against an SQLite database."
+  },
+  "options": [
+    {
+      "name": "-q",
+      "description": "\u0022Query to execute\u0022"
+    },
+    {
+      "name": "-r",
+      "description": "\u0022Query to execute with result\u0022"
+    },
+    {
+      "name": "-s",
+      "description": "\u0022the table that you want to show, its data\u0022"
+    }
+  ]
+}

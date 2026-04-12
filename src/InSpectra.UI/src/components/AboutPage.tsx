@@ -7,11 +7,10 @@ const lc = isWindows ? "`" : "\\";
 
 const snippets = {
   install: "dotnet tool install -g InSpectra.Gen",
-  fileHtml: `inspectra render file html ${lc}\n  mycli.json --xmldoc mycli.xml ${lc}\n  --out-dir ./docs`,
-  fileMd: `inspectra render file markdown ${lc}\n  mycli.json --out docs.md`,
-  execHtml: `inspectra render exec html ${lc}\n  jf --with-xmldoc ${lc}\n  --out-dir ./jellyfin-docs`,
-  execMd: `inspectra render exec markdown ${lc}\n  mytool --opencli-arg "cli opencli" ${lc}\n  --out docs.md`,
-  dotnetHtml: `inspectra render dotnet html ${lc}\n  src/MyCli --configuration Release ${lc}\n  --no-build --with-xmldoc --out-dir ./docs`,
+  generateExec: `inspectra generate exec ${lc}\n  jf --with-xmldoc ${lc}\n  --out opencli.json`,
+  generateDotnet: `inspectra generate dotnet ${lc}\n  src/MyCli --configuration Release ${lc}\n  --with-xmldoc --out opencli.json`,
+  fileHtml: `inspectra render file html ${lc}\n  opencli.json ${lc}\n  --out-dir ./docs`,
+  fileMd: `inspectra render file markdown ${lc}\n  opencli.json --out docs.md`,
 };
 
 export function AboutPage() {
@@ -52,7 +51,7 @@ export function AboutPage() {
         </h1>
         <p className="qs-sub">
           Generate polished, interactive documentation from your CLI's OpenCLI
-          spec — Markdown or HTML, one command.
+          spec — export once, then render to Markdown or HTML.
         </p>
       </section>
 
@@ -83,7 +82,7 @@ export function AboutPage() {
       {/* Quick Start */}
       <section className="qs-steps-section">
         <div className="qs-section-label">Quick Start</div>
-        <h2 className="qs-section-title">Three steps to docs</h2>
+        <h2 className="qs-section-title">Generate, render, open</h2>
 
         <div className="qs-timeline">
           {/* Step 1 */}
@@ -93,27 +92,27 @@ export function AboutPage() {
               <div className="qs-step-line" />
             </div>
             <div className="qs-step-body">
-              <h3>Render from a file</h3>
+              <h3>Generate OpenCLI JSON</h3>
               <p>
-                Pass your <code>opencli.json</code> and optional{" "}
-                <code>xmldoc.xml</code>. Choose Markdown or HTML output.
+                If you already have <code>opencli.json</code>, skip to step 2.
+                Otherwise export it from a live CLI or a .NET project.
               </p>
 
               <div className="qs-cmd">
-                <CmdCopy id="fileHtml" text={snippets.fileHtml} />
+                <CmdCopy id="generateExec" text={snippets.generateExec} />
                 <pre className="qs-code">
-<span className="comment"># Generate an interactive HTML app bundle</span>{"\n"}
-<span className="c">inspectra</span> <span className="a">render file html</span> <span className="lc">{lc}</span>{"\n"}
-{"  "}mycli.json <span className="f">--xmldoc</span> mycli.xml <span className="lc">{lc}</span>{"\n"}
-{"  "}<span className="f">--out-dir</span> ./docs</pre>
+<span className="comment"># Export from a live CLI</span>{"\n"}
+<span className="c">inspectra</span> <span className="a">generate exec</span> <span>jf</span> <span className="lc">{lc}</span>{"\n"}
+{"  "}<span className="f">--with-xmldoc</span> <span className="f">--out</span> opencli.json</pre>
               </div>
 
               <div className="qs-cmd">
-                <CmdCopy id="fileMd" text={snippets.fileMd} />
+                <CmdCopy id="generateDotnet" text={snippets.generateDotnet} />
                 <pre className="qs-code">
-<span className="comment"># Or generate Markdown</span>{"\n"}
-<span className="c">inspectra</span> <span className="a">render file markdown</span> <span className="lc">{lc}</span>{"\n"}
-{"  "}mycli.json <span className="f">--out</span> docs.md</pre>
+<span className="comment"># Or export from a .NET project</span>{"\n"}
+<span className="c">inspectra</span> <span className="a">generate dotnet</span> <span className="lc">{lc}</span>{"\n"}
+{"  "}src/MyCli <span className="f">--configuration</span> Release <span className="lc">{lc}</span>{"\n"}
+{"  "}<span className="f">--with-xmldoc</span> <span className="f">--out</span> opencli.json</pre>
               </div>
             </div>
           </div>
@@ -125,38 +124,28 @@ export function AboutPage() {
               <div className="qs-step-line" />
             </div>
             <div className="qs-step-body">
-              <h3>Or render from a live CLI &mdash; or from a .NET project on disk</h3>
+              <h3>Render the saved export</h3>
               <p>
-                Use <code>exec</code> mode to invoke a pre-built CLI directly, or{" "}
-                <code>dotnet</code> mode to point at a <code>.csproj</code> and let
-                InSpectra run <code>dotnet run -- cli opencli</code> for you.
+                Pass your generated <code>opencli.json</code> and optional{" "}
+                <code>xmldoc.xml</code> if you exported it separately. Choose
+                Markdown or HTML output.
               </p>
 
               <div className="qs-cmd">
-                <CmdCopy id="execHtml" text={snippets.execHtml} />
+                <CmdCopy id="fileHtml" text={snippets.fileHtml} />
                 <pre className="qs-code">
-<span className="comment"># Render directly from a running CLI</span>{"\n"}
-<span className="c">inspectra</span> <span className="a">render exec html</span> <span className="lc">{lc}</span>{"\n"}
-{"  "}jf <span className="f">--with-xmldoc</span> <span className="lc">{lc}</span>{"\n"}
-{"  "}<span className="f">--out-dir</span> ./jellyfin-docs</pre>
+<span className="comment"># Generate an interactive HTML app bundle</span>{"\n"}
+<span className="c">inspectra</span> <span className="a">render file html</span> <span className="lc">{lc}</span>{"\n"}
+{"  "}opencli.json <span className="lc">{lc}</span>{"\n"}
+{"  "}<span className="f">--out-dir</span> ./docs</pre>
               </div>
 
               <div className="qs-cmd">
-                <CmdCopy id="dotnetHtml" text={snippets.dotnetHtml} />
+                <CmdCopy id="fileMd" text={snippets.fileMd} />
                 <pre className="qs-code">
-<span className="comment"># Render from a .NET project source</span>{"\n"}
-<span className="c">inspectra</span> <span className="a">render dotnet html</span> <span className="lc">{lc}</span>{"\n"}
-{"  "}src/MyCli <span className="f">--configuration</span> Release <span className="lc">{lc}</span>{"\n"}
-{"  "}<span className="f">--no-build</span> <span className="f">--with-xmldoc</span> <span className="f">--out-dir</span> ./docs</pre>
-              </div>
-
-              <div className="qs-cmd">
-                <CmdCopy id="execMd" text={snippets.execMd} />
-                <pre className="qs-code">
-<span className="comment"># Custom OpenCLI arguments</span>{"\n"}
-<span className="c">inspectra</span> <span className="a">render exec markdown</span> <span className="lc">{lc}</span>{"\n"}
-{"  "}mytool <span className="f">--opencli-arg</span> "cli opencli" <span className="lc">{lc}</span>{"\n"}
-{"  "}<span className="f">--out</span> docs.md</pre>
+<span className="comment"># Or generate Markdown</span>{"\n"}
+<span className="c">inspectra</span> <span className="a">render file markdown</span> <span className="lc">{lc}</span>{"\n"}
+{"  "}opencli.json <span className="f">--out</span> docs.md</pre>
               </div>
             </div>
           </div>
@@ -182,12 +171,12 @@ export function AboutPage() {
                   <span />
                 </div>
                 <div className="qs-terminal">
-                  <div className="line"><span className="p">$</span> <span className="c">inspectra</span> <span className="a">render file html</span> <span>jellyfin.json</span> <span className="f">--xmldoc</span> <span>jellyfin.xml</span></div>
+                  <div className="line"><span className="p">$</span> <span className="c">inspectra</span> <span className="a">render file html</span> <span>opencli.json</span> <span className="f">--out-dir</span> <span>./docs</span></div>
                   <div className="line"><span className="dim">&nbsp;&nbsp;Validating OpenCLI schema...</span> <span className="ok">OK</span></div>
                   <div className="line"><span className="dim">&nbsp;&nbsp;Normalizing 47 commands, 128 options...</span> <span className="ok">OK</span></div>
-                  <div className="line"><span className="dim">&nbsp;&nbsp;Enriching from XML metadata...</span> <span className="ok">OK</span></div>
+                  <div className="line"><span className="dim">&nbsp;&nbsp;Using enriched descriptions from opencli.json...</span> <span className="ok">OK</span></div>
                   <div className="line"><span className="dim">&nbsp;&nbsp;Copying HTML app bundle...</span> <span className="ok">OK</span></div>
-                  <div className="line"><span className="ok">&nbsp;&nbsp;&#10003; Written index.html and assets to jellyfin-docs/</span> <span className="dim">(relocatable static bundle)</span></div>
+                  <div className="line"><span className="ok">&nbsp;&nbsp;&#10003; Written index.html and assets to ./docs/</span> <span className="dim">(relocatable static bundle)</span></div>
                 </div>
               </div>
             </div>

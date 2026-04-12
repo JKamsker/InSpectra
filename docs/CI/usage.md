@@ -17,8 +17,8 @@ Pick the one that matches your situation, copy it into a file under
 ## From source (`dotnet` mode)
 
 The action checks out your repo, parses your `.csproj` to install the right
-.NET SDK, adds `InSpectra.Cli` for you, then runs
-`dotnet run --project <PROJECT> -- cli opencli`.
+.NET SDK, adds `InSpectra.Cli` for you, generates an enriched `opencli.json`,
+then renders from that saved spec.
 
 ```yaml
 # .github/workflows/docs.yml — render straight from a .csproj
@@ -30,7 +30,7 @@ steps:
       mode: dotnet
       project: src/MyCli           # .csproj path or directory
       configuration: Release
-      format: html                 # html / markdown / markdown-monolith
+      format: html                 # html / markdown / markdown-monolith / markdown-hybrid
       output-dir: docs/cli
 
   - uses: actions/upload-artifact@v4
@@ -47,6 +47,9 @@ steps:
   so the action doesn't rebuild for each `dotnet run` invocation.
 - If your project already references a specific `InSpectra.Cli` version, the
   action skips the auto-add. To opt out entirely, set `skip-inspectra-cli: 'true'`.
+- The auto-added `InSpectra.Cli` reference stays in the checked-out workspace
+  for the rest of the job, so keep later commit or diff steps scoped to the
+  docs output unless you want that project-file change included.
 
 ## From a published .NET tool (`exec` mode)
 
@@ -87,8 +90,11 @@ steps:
 
 ## Markdown output instead of HTML
 
-Set `format` to `markdown` (tree layout, one file per command) or
-`markdown-monolith` (single file). Works with any mode.
+Set `format` to `markdown` (tree layout, one file per command),
+`markdown-monolith` (single file), or `markdown-hybrid`
+(`README.md` plus group files when groups exist; leaf-only CLIs may emit
+`README.md` only). `split-depth` only applies to
+`markdown-hybrid`. All three work with any mode.
 
 ```yaml
 steps:
@@ -98,15 +104,16 @@ steps:
     with:
       mode: dotnet
       project: src/MyCli
-      format: markdown               # or markdown-monolith
+      format: markdown-hybrid        # or markdown / markdown-monolith
+      split-depth: '2'
       output-dir: docs/cli
 ```
 
 ## Build then render (legacy `exec` against a built binary)
 
-Pre-`dotnet` mode pattern. Still useful when you need a custom build step
-(e.g. publishing self-contained, signing, vendoring native deps) before the
-binary can run.
+Still useful when you need a custom build step (e.g. publishing self-contained,
+signing, vendoring native deps) before the binary can run. The action still
+acquires `opencli.json` first and then renders from that generated file.
 
 ```yaml
 steps:

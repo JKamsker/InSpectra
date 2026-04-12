@@ -7,10 +7,11 @@ branding:
 inputs:
   mode:
     description: >
-      Render mode.
-        exec    - invoke a live CLI (requires cli-name)
+      Source mode.
+        exec    - acquire opencli.json from a live CLI, then render it (requires cli-name)
         file    - render from a saved opencli.json (requires opencli-json)
-        dotnet  - run a .NET project from source (requires project)
+        dotnet  - acquire opencli.json from a .NET project, then render it (requires project)
+        package - acquire opencli.json from a .NET tool package, then render it (requires package-id and package-version)
     required: false
     default: 'exec'
 
@@ -20,19 +21,29 @@ inputs:
         html               - interactive SPA bundle
         markdown            - tree layout (one file per command)
         markdown-monolith   - single Markdown file
-        markdown-hybrid     - README.md + one file per command group (see split-depth)
+        markdown-hybrid     - README.md + group files as needed (leaf-only CLIs may emit README.md only; see split-depth)
     required: false
     default: 'html'
 
   split-depth:
     description: >
-      Depth for markdown-hybrid output (default 1). Depth 1 emits one file per top-level group;
-      depth 2 also emits a file per second-level group; and so on. Ignored for other formats.
+      Depth for markdown-hybrid output (default 1). Depth 1 emits one file per top-level group when groups exist;
+      depth 2 also emits a file per second-level group; and so on. Leaf-only CLIs may legitimately emit README.md only.
+      Ignored for other formats.
     required: false
 
   # ── exec mode ──────────────────────────────────────────────────────
   cli-name:
     description: 'CLI executable name or path (exec mode)'
+    required: false
+
+  # ── package mode ───────────────────────────────────────────────────
+  package-id:
+    description: 'NuGet package id for mode: package'
+    required: false
+
+  package-version:
+    description: 'NuGet package version for mode: package'
     required: false
 
   dotnet-tool:
@@ -44,15 +55,15 @@ inputs:
     required: false
 
   opencli-args:
-    description: 'Override the OpenCLI export arguments (exec mode, default: cli opencli)'
+    description: 'Override the OpenCLI export arguments for generate-based modes (exec, dotnet, package; default: cli opencli)'
     required: false
 
   xmldoc-args:
-    description: 'Override the xmldoc export arguments (exec mode, default: cli xmldoc)'
+    description: 'Override the xmldoc export arguments for generate-based modes (exec, dotnet, package; default: cli xmldoc)'
     required: false
 
   timeout:
-    description: 'Timeout in seconds for each export command (exec mode)'
+    description: 'Timeout in seconds for each generate-mode export command (exec, dotnet, package)'
     required: false
 
   # ── file mode ──────────────────────────────────────────────────────
@@ -109,8 +120,20 @@ inputs:
     description: 'Override the CLI command prefix used in generated examples and the composer'
     required: false
 
+  opencli-mode:
+    description: 'OpenCLI acquisition mode: native, auto, help, clifx, static, or hook'
+    required: false
+
+  command:
+    description: 'Override the root command name used for generated OpenCLI documents'
+    required: false
+
+  cli-framework:
+    description: 'Hint or override the detected CLI framework for non-native analysis'
+    required: false
+
   single-file:
-    description: 'Emit a single self-contained HTML file (works from file://)'
+    description: 'Force a single self-contained HTML file (works from file://). HTML is also self-contained by default at compression-level 2.'
     required: false
     default: 'false'
 
@@ -119,7 +142,7 @@ inputs:
       Compression level for HTML output.
         0  - none (raw JSON, largest)
         1  - compress embedded JSON
-        2  - self-extracting bundle (smallest, default)
+        2  - self-extracting single-file bundle (smallest, default)
     required: false
     default: '2'
 
@@ -190,6 +213,8 @@ runs:
       env:
         MODE: ${{ inputs.mode }}
         CLI_NAME: ${{ inputs.cli-name }}
+        PACKAGE_ID: ${{ inputs.package-id }}
+        PACKAGE_VERSION: ${{ inputs.package-version }}
         DOTNET_TOOL: ${{ inputs.dotnet-tool }}
         OPENCLI_JSON: ${{ inputs.opencli-json }}
         PROJECT: ${{ inputs.project }}
@@ -209,6 +234,14 @@ runs:
         fi
         if [ "$MODE" = "file" ] && [ -n "$DOTNET_TOOL" ]; then
           echo "::error::dotnet-tool is not used in file mode"
+          exit 1
+        fi
+        if [ "$MODE" = "package" ] && [ -z "$PACKAGE_ID" -o -z "$PACKAGE_VERSION" ]; then
+          echo "::error::package mode requires package-id and package-version"
+          exit 1
+        fi
+        if [ "$MODE" = "package" ] && [ -n "$DOTNET_TOOL" ]; then
+          echo "::error::dotnet-tool is not used in package mode"
           exit 1
         fi
         if [ "$MODE" = "dotnet" ] && [ -z "$PROJECT" ]; then
@@ -308,7 +341,7 @@ runs:
         inspectra --version
 
     - name: Auto-add InSpectra.Cli to target project
-      if: inputs.mode == 'dotnet' && inputs.skip-inspectra-cli != 'true'
+      if: inputs.mode == 'dotnet' && inputs.skip-inspectra-cli != 'true' && (inputs.opencli-mode == '' || inputs.opencli-mode == 'native')
       shell: bash
       env:
         PROJECT: ${{ inputs.project }}
@@ -357,7 +390,7 @@ runs:
         fi
         "${args[@]}"
 
-    - name: Render
+    - name: Generate and render
       shell: bash
       env:
         MODE: ${{ inputs.mode }}
@@ -369,6 +402,11 @@ runs:
         OPENCLI_ARGS: ${{ inputs.opencli-args }}
         XMLDOC_ARGS: ${{ inputs.xmldoc-args }}
         TIMEOUT: ${{ inputs.timeout }}
+        OPENCLI_MODE: ${{ inputs.opencli-mode }}
+        COMMAND_NAME: ${{ inputs.command }}
+        CLI_FRAMEWORK: ${{ inputs.cli-framework }}
+        PACKAGE_ID: ${{ inputs.package-id }}
+        PACKAGE_VERSION: ${{ inputs.package-version }}
         LABEL: ${{ inputs.label }}
         TITLE: ${{ inputs.title }}
         COMMAND_PREFIX: ${{ inputs.command-prefix }}
@@ -389,6 +427,11 @@ runs:
         NO_RESTORE: ${{ inputs.no-restore }}
       run: |
         set -euo pipefail
+        tmp_dir="$(mktemp -d)"
+        cleanup() {
+          rm -rf "$tmp_dir"
+        }
+        trap cleanup EXIT
 
         # ── determine subcommand + format flags ──
         case "$FORMAT" in
@@ -422,44 +465,63 @@ runs:
           echo "::warning::split-depth is ignored for format '$FORMAT'; it only applies to markdown-hybrid."
         fi
 
-        # ── build command based on mode ──
+        generated_opencli="$tmp_dir/opencli.json"
+        render_input="$OPENCLI_JSON"
+        render_xmldoc="$XMLDOC"
+
+        # ── acquire OpenCLI when the source is not already a file ──
         if [ "$MODE" = "exec" ]; then
-          args=(render exec "$subcmd" "$CLI_NAME" --overwrite)
+          generate_args=(generate exec "$CLI_NAME" --out "$generated_opencli")
 
           # auto-detect xmldoc support
           xmldoc_probe=( ${XMLDOC_ARGS:-cli xmldoc} )
           if "$CLI_NAME" "${xmldoc_probe[@]}" > /dev/null 2>&1; then
-            echo "xmldoc supported — enriching output"
-            args+=(--with-xmldoc)
+            echo "xmldoc supported — enriching generated OpenCLI"
+            generate_args+=(--with-xmldoc)
             if [ -n "$XMLDOC_ARGS" ]; then
-              for a in $XMLDOC_ARGS; do args+=(--xmldoc-arg "$a"); done
+              for a in $XMLDOC_ARGS; do generate_args+=(--xmldoc-arg "$a"); done
             fi
           else
-            echo "xmldoc not available — rendering without enrichment"
+            echo "xmldoc not available — generating without enrichment"
           fi
 
           if [ -n "$OPENCLI_ARGS" ]; then
-            for a in $OPENCLI_ARGS; do args+=(--opencli-arg "$a"); done
+            for a in $OPENCLI_ARGS; do generate_args+=(--opencli-arg "$a"); done
           fi
 
           if [ -n "$TIMEOUT" ]; then
-            args+=(--timeout "$TIMEOUT")
+            generate_args+=(--timeout "$TIMEOUT")
           fi
 
         elif [ "$MODE" = "file" ]; then
-          args=(render file "$subcmd" "$OPENCLI_JSON" --overwrite)
-          if [ -n "$XMLDOC" ]; then
-            args+=(--xmldoc "$XMLDOC")
+          :
+
+        elif [ "$MODE" = "package" ]; then
+          generate_args=(generate package "$PACKAGE_ID" --version "$PACKAGE_VERSION" --out "$generated_opencli")
+
+          if [ -n "$OPENCLI_ARGS" ]; then
+            for a in $OPENCLI_ARGS; do generate_args+=(--opencli-arg "$a"); done
+          fi
+
+          # Package mode uses the documented default xmldoc command (`cli xmldoc`)
+          # unless the caller overrides it via xmldoc-args.
+          generate_args+=(--with-xmldoc)
+          if [ -n "$XMLDOC_ARGS" ]; then
+            for a in $XMLDOC_ARGS; do generate_args+=(--xmldoc-arg "$a"); done
+          fi
+
+          if [ -n "$TIMEOUT" ]; then
+            generate_args+=(--timeout "$TIMEOUT")
           fi
 
         elif [ "$MODE" = "dotnet" ]; then
-          args=(render dotnet "$subcmd" "$PROJECT" --overwrite)
+          generate_args=(generate dotnet "$PROJECT" --out "$generated_opencli")
 
-          [ -n "$CONFIGURATION" ]   && args+=(--configuration "$CONFIGURATION")
-          [ -n "$FRAMEWORK" ]       && args+=(--framework "$FRAMEWORK")
-          [ -n "$LAUNCH_PROFILE" ]  && args+=(--launch-profile "$LAUNCH_PROFILE")
-          [ "$NO_BUILD" = "true" ]  && args+=(--no-build)
-          [ "$NO_RESTORE" = "true" ] && args+=(--no-restore)
+          [ -n "$CONFIGURATION" ]   && generate_args+=(--configuration "$CONFIGURATION")
+          [ -n "$FRAMEWORK" ]       && generate_args+=(--framework "$FRAMEWORK")
+          [ -n "$LAUNCH_PROFILE" ]  && generate_args+=(--launch-profile "$LAUNCH_PROFILE")
+          [ "$NO_BUILD" = "true" ]  && generate_args+=(--no-build)
+          [ "$NO_RESTORE" = "true" ] && generate_args+=(--no-restore)
 
           # auto-detect xmldoc support by probing the project once
           # (subsequent dotnet run invocations reuse the same build output)
@@ -471,21 +533,21 @@ runs:
           probe_args+=(--)
           xmldoc_probe=( ${XMLDOC_ARGS:-cli xmldoc} )
           if dotnet "${probe_args[@]}" "${xmldoc_probe[@]}" > /dev/null 2>&1; then
-            echo "xmldoc supported — enriching output"
-            args+=(--with-xmldoc)
+            echo "xmldoc supported — enriching generated OpenCLI"
+            generate_args+=(--with-xmldoc)
             if [ -n "$XMLDOC_ARGS" ]; then
-              for a in $XMLDOC_ARGS; do args+=(--xmldoc-arg "$a"); done
+              for a in $XMLDOC_ARGS; do generate_args+=(--xmldoc-arg "$a"); done
             fi
           else
-            echo "xmldoc not available — rendering without enrichment"
+            echo "xmldoc not available — generating without enrichment"
           fi
 
           if [ -n "$OPENCLI_ARGS" ]; then
-            for a in $OPENCLI_ARGS; do args+=(--opencli-arg "$a"); done
+            for a in $OPENCLI_ARGS; do generate_args+=(--opencli-arg "$a"); done
           fi
 
           if [ -n "$TIMEOUT" ]; then
-            args+=(--timeout "$TIMEOUT")
+            generate_args+=(--timeout "$TIMEOUT")
           fi
 
         else
@@ -493,50 +555,76 @@ runs:
           exit 1
         fi
 
-        args+=("${format_args[@]}")
+        if [ "$MODE" != "file" ]; then
+          if [ -n "$OPENCLI_MODE" ]; then
+            generate_args+=(--opencli-mode "$OPENCLI_MODE")
+          fi
+
+          if [ -n "$COMMAND_NAME" ]; then
+            generate_args+=(--command "$COMMAND_NAME")
+          fi
+
+          if [ -n "$CLI_FRAMEWORK" ]; then
+            generate_args+=(--cli-framework "$CLI_FRAMEWORK")
+          fi
+
+          echo "::group::inspectra ${generate_args[*]}"
+          inspectra "${generate_args[@]}"
+          echo "::endgroup::"
+
+          render_input="$generated_opencli"
+          render_xmldoc=""
+        fi
+
+        render_args=(render file "$subcmd" "$render_input" --overwrite)
+        if [ -n "$render_xmldoc" ]; then
+          render_args+=(--xmldoc "$render_xmldoc")
+        fi
+
+        render_args+=("${format_args[@]}")
 
         if [ -n "$LABEL" ]; then
-          args+=(--label "$LABEL")
+          render_args+=(--label "$LABEL")
         fi
 
         if [ -n "$TITLE" ]; then
-          args+=(--title "$TITLE")
+          render_args+=(--title "$TITLE")
         fi
 
         if [ -n "$COMMAND_PREFIX" ]; then
-          args+=(--command-prefix "$COMMAND_PREFIX")
+          render_args+=(--command-prefix "$COMMAND_PREFIX")
         fi
 
         # ── HTML-specific options ──
         if [ "$subcmd" = "html" ]; then
           if [ "$SINGLE_FILE" = "true" ]; then
-            args+=(--single-file)
+            render_args+=(--single-file)
           fi
-          args+=(--compression-level "$COMPRESSION_LEVEL")
+          render_args+=(--compression-level "$COMPRESSION_LEVEL")
           if [ -n "${THEME:-}" ]; then
-            args+=(--theme "$THEME")
+            render_args+=(--theme "$THEME")
           fi
           if [ -n "${COLOR_THEME:-}" ]; then
-            args+=(--color-theme "$COLOR_THEME")
+            render_args+=(--color-theme "$COLOR_THEME")
           fi
           if [ -n "${ACCENT:-}" ]; then
-            args+=(--accent "$ACCENT")
+            render_args+=(--accent "$ACCENT")
           fi
           if [ -n "${ACCENT_DARK:-}" ]; then
-            args+=(--accent-dark "$ACCENT_DARK")
+            render_args+=(--accent-dark "$ACCENT_DARK")
           fi
           if [ "$NO_THEME_PICKER" = "true" ]; then
-            args+=(--no-theme-picker)
+            render_args+=(--no-theme-picker)
           fi
         fi
 
         if [ -n "${EXTRA_ARGS:-}" ]; then
           # shellcheck disable=SC2206
-          args+=($EXTRA_ARGS)
+          render_args+=($EXTRA_ARGS)
         fi
 
-        echo "::group::inspectra ${args[*]}"
-        inspectra "${args[@]}"
+        echo "::group::inspectra ${render_args[*]}"
+        inspectra "${render_args[@]}"
         echo "::endgroup::"
 
     - name: Verify output
@@ -559,13 +647,10 @@ runs:
             test -f "$OUTPUT_DIR/README.md"
             ;;
           markdown-hybrid)
+            test -d "$OUTPUT_DIR"
             test -f "$OUTPUT_DIR/README.md"
-            # Hybrid always emits the README plus at least one group file.
-            group_count=$(find "$OUTPUT_DIR" -mindepth 2 -name 'index.md' | wc -l)
-            if [ "$group_count" -eq 0 ]; then
-              echo "::error::markdown-hybrid output is missing per-group index.md files"
-              exit 1
-            fi
+            # Hybrid may legitimately emit only README.md for leaf-only CLIs.
+            # Grouped CLIs will add per-group Markdown files under the output directory.
             ;;
         esac
         echo "InSpectra output verified ($FORMAT) at $OUTPUT_DIR"

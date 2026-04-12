@@ -27,6 +27,7 @@ export function InSpectraApp() {
         version={route.version}
         onLoadPackage={handleLoadPackage}
         onBack={() => { window.location.hash = "#/"; }}
+        onBackToBrowse={() => { window.location.hash = "#/browse"; }}
       />
     );
   }

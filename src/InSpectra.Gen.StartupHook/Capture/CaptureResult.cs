@@ -1,0 +1,30 @@
+using System.Text.Json.Serialization;
+
+namespace InSpectra.Gen.StartupHook.Capture;
+
+internal sealed class CaptureResult
+{
+    [JsonPropertyName("captureVersion")]
+    public int CaptureVersion { get; set; } = 1;
+
+    [JsonPropertyName("status")]
+    public string Status { get; set; } = "ok";
+
+    [JsonPropertyName("error")]
+    public string? Error { get; set; }
+
+    [JsonPropertyName("cliFramework")]
+    public string? CliFramework { get; set; }
+
+    [JsonPropertyName("frameworkVersion")]
+    public string? FrameworkVersion { get; set; }
+
+    [JsonPropertyName("systemCommandLineVersion")]
+    public string? SystemCommandLineVersion { get; set; }
+
+    [JsonPropertyName("patchTarget")]
+    public string? PatchTarget { get; set; }
+
+    [JsonPropertyName("root")]
+    public CapturedCommand? Root { get; set; }
+}

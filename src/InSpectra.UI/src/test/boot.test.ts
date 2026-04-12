@@ -7,7 +7,7 @@ describe("boot resolution", () => {
     document.body.innerHTML = "";
   });
 
-  it("prefers injected bootstrap over URL params", async () => {
+  it("prefers injected bootstrap when URL loading is disabled", async () => {
     document.body.innerHTML = `
       <script id="inspectra-bootstrap" type="application/json">${JSON.stringify({
         mode: "inline",
@@ -29,6 +29,51 @@ describe("boot resolution", () => {
     expect(result.options.includeHidden).toBe(true);
   });
 
+  it("lets query params override inline bootstrap when URL loading is enabled", async () => {
+    document.body.innerHTML = `
+      <script id="inspectra-bootstrap" type="application/json">${JSON.stringify({
+        mode: "inline",
+        openCli: testDocument,
+        options: { includeHidden: true, includeMetadata: true },
+        features: {
+          showHome: false,
+          composer: false,
+          darkTheme: false,
+          lightTheme: true,
+          urlLoading: true,
+          nugetBrowser: false,
+          packageUpload: false,
+          colorThemePicker: false,
+        },
+      })}</script>
+    `;
+
+    const result = await resolveStartupRequest({
+      documentRef: document,
+      search: "?opencli=./opencli.json",
+      href: "https://example.test/viewer/index.html",
+    });
+
+    expect(result.kind).toBe("links");
+    if (result.kind !== "links") {
+      throw new Error("Expected links mode.");
+    }
+
+    expect(result.source).toBe("query");
+    expect(result.links.openCliUrl).toBe("https://example.test/viewer/opencli.json");
+    expect(result.options.includeHidden).toBe(true);
+    expect(result.features).toEqual({
+      showHome: false,
+      composer: false,
+      darkTheme: false,
+      lightTheme: true,
+      urlLoading: true,
+      nugetBrowser: false,
+      packageUpload: false,
+      colorThemePicker: false,
+    });
+  });
+
   it("uses query params when no bootstrap is injected", async () => {
     const result = await resolveStartupRequest({
       documentRef: document,
@@ -44,7 +89,7 @@ describe("boot resolution", () => {
     expect(result.links.openCliUrl).toBe("https://example.test/viewer/opencli.json");
   });
 
-  it("prefers injected links bootstrap over URL params", async () => {
+  it("prefers injected links bootstrap over URL params when URL loading is disabled", async () => {
     document.body.innerHTML = `
       <script id="inspectra-bootstrap" type="application/json">${JSON.stringify({
         mode: "links",
@@ -67,6 +112,51 @@ describe("boot resolution", () => {
     expect(result.source).toBe("bootstrap");
     expect(result.links.openCliUrl).toBe("https://example.test/viewer/bundle-data/opencli.json");
     expect(result.options.includeMetadata).toBe(true);
+  });
+
+  it("lets query params override injected links bootstrap when URL loading is enabled", async () => {
+    document.body.innerHTML = `
+      <script id="inspectra-bootstrap" type="application/json">${JSON.stringify({
+        mode: "links",
+        directoryUrl: "./bundle-data/",
+        options: { includeMetadata: true },
+        features: {
+          showHome: false,
+          composer: false,
+          darkTheme: false,
+          lightTheme: true,
+          urlLoading: true,
+          nugetBrowser: false,
+          packageUpload: false,
+          colorThemePicker: false,
+        },
+      })}</script>
+    `;
+
+    const result = await resolveStartupRequest({
+      documentRef: document,
+      search: "?dir=./alt-data/",
+      href: "https://example.test/viewer/index.html",
+    });
+
+    expect(result.kind).toBe("links");
+    if (result.kind !== "links") {
+      throw new Error("Expected links mode.");
+    }
+
+    expect(result.source).toBe("query");
+    expect(result.links.openCliUrl).toBe("https://example.test/viewer/alt-data/opencli.json");
+    expect(result.options.includeMetadata).toBe(true);
+    expect(result.features).toEqual({
+      showHome: false,
+      composer: false,
+      darkTheme: false,
+      lightTheme: true,
+      urlLoading: true,
+      nugetBrowser: false,
+      packageUpload: false,
+      colorThemePicker: false,
+    });
   });
 
   it("falls back to empty mode without bootstrap or query params", async () => {
@@ -104,5 +194,14 @@ describe("query param parsing", () => {
     expect(result?.openCliUrl).toBe("https://example.test/raw/opencli.json");
     expect(result?.xmlDocUrl).toBe("https://example.test/raw/xmldoc.xml");
     expect(result?.xmlDocIsOptional).toBe(false);
+  });
+
+  it("ignores standalone xmldoc without opencli or dir", () => {
+    const result = resolveViewerLinksFromSearch(
+      "?xmldoc=./raw/xmldoc.xml",
+      "https://example.test/viewer/index.html",
+    );
+
+    expect(result).toBeNull();
   });
 });

@@ -2,1102 +2,35 @@
   "opencli": "0.1-draft",
   "info": {
     "title": "inspectra",
-    "version": "0.1.0"
+    "version": "0.0.0"
   },
+  "arguments": [],
+  "options": [],
   "commands": [
     {
-      "name": "render",
+      "name": "generate",
+      "aliases": [],
+      "options": [],
+      "arguments": [],
       "commands": [
         {
-          "name": "exec",
-          "commands": [
-            {
-              "name": "html",
-              "options": [
-                {
-                  "name": "--cwd",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "PATH",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Working directory to use when invoking the  source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--dry-run",
-                  "required": false,
-                  "description": "Preview the resolved render plan without  writing files.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--enable-nuget-browser",
-                  "required": false,
-                  "description": "Enable the NuGet package browser on the viewer home screen.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--enable-package-upload",
-                  "required": false,
-                  "description": "Enable local package upload on the viewer home screen.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--enable-url",
-                  "required": false,
-                  "description": "Allow the viewer to load OpenCLI inputs from  URL query parameters.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-hidden",
-                  "required": false,
-                  "description": "Include commands and options marked hidden by  the source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-metadata",
-                  "required": false,
-                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--json",
-                  "required": false,
-                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-color",
-                  "required": false,
-                  "description": "Disable ANSI color sequences in human-readable console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-composer",
-                  "required": false,
-                  "description": "Hide the interactive command composer from the generated HTML app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-dark",
-                  "required": false,
-                  "description": "Disable dark mode in the generated HTML app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-light",
-                  "required": false,
-                  "description": "Disable light mode in the generated HTML  app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--opencli-arg",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "ARG",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String[]"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the arguments used to invoke the  source CLI\u0027s OpenCLI export command.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--out-dir",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "DIR",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Directory where the HTML app bundle should be  written.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--output",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "MODE",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the output mode. Supported values are human and json.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--overwrite",
-                  "required": false,
-                  "description": "Allow existing output files or directories to  be replaced.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--quiet",
-                  "required": false,
-                  "aliases": [
-                    "-q"
-                  ],
-                  "description": "Suppress non-essential console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--show-home",
-                  "required": false,
-                  "description": "Show the viewer home screen button in the  generated HTML app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--source-arg",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "ARG",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String[]"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Additional arguments passed directly to the  source executable before the export command.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--timeout",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "SECONDS",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.Nullable\u003CSystem.Int32\u003E"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Timeout in seconds for each export command  executed against the source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--verbose",
-                  "required": false,
-                  "description": "Increase diagnostic detail in the rendered  summary output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--with-xmldoc",
-                  "required": false,
-                  "description": "Also invoke the source CLI\u0027s cli xmldoc  command for XML enrichment.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--xmldoc-arg",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "ARG",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String[]"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the arguments used to invoke the  source CLI\u0027s XML documentation export command.",
-                  "recursive": false,
-                  "hidden": false
-                }
-              ],
-              "arguments": [
-                {
-                  "name": "SOURCE",
-                  "required": true,
-                  "arity": {
-                    "minimum": 1,
-                    "maximum": 1
-                  },
-                  "description": "CLI executable or script to invoke for cli  opencli exports.",
-                  "hidden": false,
-                  "metadata": [
-                    {
-                      "name": "ClrType",
-                      "value": "System.String"
-                    }
-                  ]
-                }
-              ],
-              "description": "Render an HTML app bundle from a live CLI process  and optional \u0060cli xmldoc\u0060 enrichment.",
-              "hidden": false,
-              "examples": []
-            },
-            {
-              "name": "markdown",
-              "options": [
-                {
-                  "name": "--cwd",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "PATH",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Working directory to use when invoking the  source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--dry-run",
-                  "required": false,
-                  "description": "Preview the resolved render plan without  writing files.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-hidden",
-                  "required": false,
-                  "description": "Include commands and options marked hidden by  the source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-metadata",
-                  "required": false,
-                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--json",
-                  "required": false,
-                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--layout",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "LAYOUT",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Markdown layout mode. Supported values are  single and tree.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-color",
-                  "required": false,
-                  "description": "Disable ANSI color sequences in human-readable console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--opencli-arg",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "ARG",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String[]"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the arguments used to invoke the  source CLI\u0027s OpenCLI export command.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--out",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "FILE",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Single Markdown file to write when using the  single layout.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--out-dir",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "DIR",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Output directory to write when using the tree  layout.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--output",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "MODE",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the output mode. Supported values are human and json.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--overwrite",
-                  "required": false,
-                  "description": "Allow existing output files or directories to  be replaced.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--quiet",
-                  "required": false,
-                  "aliases": [
-                    "-q"
-                  ],
-                  "description": "Suppress non-essential console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--source-arg",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "ARG",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String[]"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Additional arguments passed directly to the  source executable before the export command.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--timeout",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "SECONDS",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.Nullable\u003CSystem.Int32\u003E"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Timeout in seconds for each export command  executed against the source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--verbose",
-                  "required": false,
-                  "description": "Increase diagnostic detail in the rendered  summary output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--with-xmldoc",
-                  "required": false,
-                  "description": "Also invoke the source CLI\u0027s cli xmldoc  command for XML enrichment.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--xmldoc-arg",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "ARG",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String[]"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the arguments used to invoke the  source CLI\u0027s XML documentation export command.",
-                  "recursive": false,
-                  "hidden": false
-                }
-              ],
-              "arguments": [
-                {
-                  "name": "SOURCE",
-                  "required": true,
-                  "arity": {
-                    "minimum": 1,
-                    "maximum": 1
-                  },
-                  "description": "CLI executable or script to invoke for cli  opencli exports.",
-                  "hidden": false,
-                  "metadata": [
-                    {
-                      "name": "ClrType",
-                      "value": "System.String"
-                    }
-                  ]
-                }
-              ],
-              "description": "Render Markdown from a live CLI process and  optional \u0060cli xmldoc\u0060 enrichment.",
-              "hidden": false,
-              "examples": []
-            }
-          ],
-          "description": "Render docs by executing a CLI that exposes \u0060cli  opencli\u0060.",
-          "hidden": false,
-          "examples": []
-        },
-        {
-          "name": "file",
-          "commands": [
-            {
-              "name": "html",
-              "options": [
-                {
-                  "name": "--dry-run",
-                  "required": false,
-                  "description": "Preview the resolved render plan without  writing files.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--enable-nuget-browser",
-                  "required": false,
-                  "description": "Enable the NuGet package browser on the viewer home screen.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--enable-package-upload",
-                  "required": false,
-                  "description": "Enable local package upload on the viewer home screen.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--enable-url",
-                  "required": false,
-                  "description": "Allow the viewer to load OpenCLI inputs from  URL query parameters.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-hidden",
-                  "required": false,
-                  "description": "Include commands and options marked hidden by  the source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-metadata",
-                  "required": false,
-                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--json",
-                  "required": false,
-                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-color",
-                  "required": false,
-                  "description": "Disable ANSI color sequences in human-readable console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-composer",
-                  "required": false,
-                  "description": "Hide the interactive command composer from the generated HTML app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-dark",
-                  "required": false,
-                  "description": "Disable dark mode in the generated HTML app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-light",
-                  "required": false,
-                  "description": "Disable light mode in the generated HTML  app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--out-dir",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "DIR",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Directory where the HTML app bundle should be  written.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--output",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "MODE",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the output mode. Supported values are human and json.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--overwrite",
-                  "required": false,
-                  "description": "Allow existing output files or directories to  be replaced.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--quiet",
-                  "required": false,
-                  "aliases": [
-                    "-q"
-                  ],
-                  "description": "Suppress non-essential console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--show-home",
-                  "required": false,
-                  "description": "Show the viewer home screen button in the  generated HTML app.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--verbose",
-                  "required": false,
-                  "description": "Increase diagnostic detail in the rendered  summary output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--xmldoc",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "PATH",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Optional XML documentation file used to enrich missing descriptions.",
-                  "recursive": false,
-                  "hidden": false
-                }
-              ],
-              "arguments": [
-                {
-                  "name": "OPENCLI_JSON",
-                  "required": true,
-                  "arity": {
-                    "minimum": 1,
-                    "maximum": 1
-                  },
-                  "description": "Path to the OpenCLI JSON export file to  render.",
-                  "hidden": false,
-                  "metadata": [
-                    {
-                      "name": "ClrType",
-                      "value": "System.String"
-                    }
-                  ]
-                }
-              ],
-              "description": "Render an HTML app bundle from an OpenCLI JSON  file and optional XML enrichment file.",
-              "hidden": false,
-              "examples": []
-            },
-            {
-              "name": "markdown",
-              "options": [
-                {
-                  "name": "--dry-run",
-                  "required": false,
-                  "description": "Preview the resolved render plan without  writing files.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-hidden",
-                  "required": false,
-                  "description": "Include commands and options marked hidden by  the source CLI.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--include-metadata",
-                  "required": false,
-                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--json",
-                  "required": false,
-                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--layout",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "LAYOUT",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Markdown layout mode. Supported values are  single and tree.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--no-color",
-                  "required": false,
-                  "description": "Disable ANSI color sequences in human-readable console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--out",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "FILE",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Single Markdown file to write when using the  single layout.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--out-dir",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "DIR",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Output directory to write when using the tree  layout.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--output",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "MODE",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Override the output mode. Supported values are human and json.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--overwrite",
-                  "required": false,
-                  "description": "Allow existing output files or directories to  be replaced.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--quiet",
-                  "required": false,
-                  "aliases": [
-                    "-q"
-                  ],
-                  "description": "Suppress non-essential console output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--verbose",
-                  "required": false,
-                  "description": "Increase diagnostic detail in the rendered  summary output.",
-                  "recursive": false,
-                  "hidden": false
-                },
-                {
-                  "name": "--xmldoc",
-                  "required": false,
-                  "arguments": [
-                    {
-                      "name": "PATH",
-                      "required": true,
-                      "arity": {
-                        "minimum": 1,
-                        "maximum": 1
-                      },
-                      "metadata": [
-                        {
-                          "name": "ClrType",
-                          "value": "System.String"
-                        }
-                      ]
-                    }
-                  ],
-                  "description": "Optional XML documentation file used to enrich missing descriptions.",
-                  "recursive": false,
-                  "hidden": false
-                }
-              ],
-              "arguments": [
-                {
-                  "name": "OPENCLI_JSON",
-                  "required": true,
-                  "arity": {
-                    "minimum": 1,
-                    "maximum": 1
-                  },
-                  "description": "Path to the OpenCLI JSON export file to  render.",
-                  "hidden": false,
-                  "metadata": [
-                    {
-                      "name": "ClrType",
-                      "value": "System.String"
-                    }
-                  ]
-                }
-              ],
-              "description": "Render Markdown from an OpenCLI JSON file and  optional XML enrichment file.",
-              "hidden": false,
-              "examples": []
-            }
-          ],
-          "description": "Render docs from saved OpenCLI export files.",
-          "hidden": false,
-          "examples": []
-        },
-        {
-          "name": "self",
+          "name": "dotnet",
+          "aliases": [],
           "options": [
             {
-              "name": "--enable-nuget-browser",
+              "name": "--cli-framework",
               "required": false,
-              "description": "Enable the NuGet package browser on the  self-documentation viewer home screen.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--enable-package-upload",
-              "required": false,
-              "description": "Enable local package upload on the  self-documentation viewer home screen.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--enable-url",
-              "required": false,
-              "description": "Allow the viewer to load alternate OpenCLI inputs  from URL query parameters.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--include-hidden",
-              "required": false,
-              "description": "Include hidden commands and options from  InSpectra\u0027s own CLI surface.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--include-metadata",
-              "required": false,
-              "description": "Include metadata sections in the generated  Markdown tree and HTML bundle.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--no-composer",
-              "required": false,
-              "description": "Hide the interactive command composer from the  generated self-documentation app.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--no-dark",
-              "required": false,
-              "description": "Disable dark mode in the generated  self-documentation app.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--no-light",
-              "required": false,
-              "description": "Disable light mode in the generated  self-documentation app.",
-              "recursive": false,
-              "hidden": false
-            },
-            {
-              "name": "--out-dir",
-              "required": false,
+              "aliases": [],
               "arguments": [
                 {
-                  "name": "DIR",
+                  "name": "NAME",
                   "required": true,
                   "arity": {
                     "minimum": 1,
                     "maximum": 1
                   },
+                  "acceptedValues": [],
+                  "hidden": false,
                   "metadata": [
                     {
                       "name": "ClrType",
@@ -1106,47 +39,2008 @@
                   ]
                 }
               ],
-              "description": "Directory where the self-documentation bundle  should be written.",
+              "description": "Hint or override the detected CLI framework for  non-native analysis.",
               "recursive": false,
-              "hidden": false
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--command",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "NAME",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the root command name used for generated  OpenCLI documents.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--configuration",
+              "required": false,
+              "aliases": [
+                "-c"
+              ],
+              "arguments": [
+                {
+                  "name": "CONFIG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Build configuration passed to dotnet run/build  (e.g. Release).",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--crawl-out",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "PATH",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Write crawl.json when the selected acquisition  mode produces crawl data.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--cwd",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "PATH",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Working directory used when invoking dotnet.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--framework",
+              "required": false,
+              "aliases": [
+                "-f"
+              ],
+              "arguments": [
+                {
+                  "name": "TFM",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Target framework moniker passed to dotnet  run/build (e.g. net10.0).",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--json",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Emit the stable machine-readable JSON envelope  instead of human output.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--launch-profile",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "NAME",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Launch profile to use for dotnet run native  mode.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--no-build",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Skip the implicit build step for dotnet  run/build.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--no-restore",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Skip the implicit restore step for dotnet  run/build.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--opencli-arg",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "ARG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String[]"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the arguments used to invoke the  project's OpenCLI export command.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--opencli-mode",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "MODE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "OpenCLI acquisition mode: native, auto, help,  clifx, static, or hook.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--out",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "FILE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Write the generated OpenCLI JSON to this file  instead of stdout.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
             },
             {
               "name": "--overwrite",
               "required": false,
-              "description": "Allow existing self-documentation output to be  replaced.",
+              "aliases": [],
+              "arguments": [],
+              "description": "Allow an existing OpenCLI output file to be replaced.",
               "recursive": false,
-              "hidden": false
+              "hidden": false,
+              "metadata": []
             },
             {
-              "name": "--show-home",
+              "name": "--output",
               "required": false,
-              "description": "Show the viewer home screen button in the  generated self-documentation app.",
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "MODE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the output mode. Supported values are  human and json.",
               "recursive": false,
-              "hidden": false
+              "hidden": false,
+              "metadata": []
             },
             {
-              "name": "--skip-html",
+              "name": "--timeout",
               "required": false,
-              "description": "Skip generating the HTML app bundle under html/.",
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "SECONDS",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.Nullable<System.Int32>"
+                    }
+                  ]
+                }
+              ],
+              "description": "Timeout in seconds for dotnet execution.",
               "recursive": false,
-              "hidden": false
+              "hidden": false,
+              "metadata": []
             },
             {
-              "name": "--skip-markdown",
+              "name": "--verbose",
               "required": false,
-              "description": "Skip generating the Markdown tree output under  tree/.",
+              "aliases": [],
+              "arguments": [],
+              "description": "Increase diagnostic detail in command failures.",
               "recursive": false,
-              "hidden": false
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--with-xmldoc",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--xmldoc-arg",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "ARG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String[]"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the arguments used to invoke the source  CLI's XML documentation export command.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
             }
           ],
-          "description": "Render documentation for InSpectra itself. Exports  opencli.json, xmldoc.xml, Markdown tree, and HTML bundle.",
+          "arguments": [
+            {
+              "name": "PROJECT",
+              "required": true,
+              "arity": {
+                "minimum": 1,
+                "maximum": 1
+              },
+              "acceptedValues": [],
+              "description": "Path to a .NET project file  (.csproj/.fsproj/.vbproj) or a directory containing one.",
+              "hidden": false,
+              "metadata": [
+                {
+                  "name": "ClrType",
+                  "value": "System.String"
+                }
+              ]
+            }
+          ],
+          "commands": [],
+          "exitCodes": [],
+          "description": "Generate opencli.json from a .NET project.",
           "hidden": false,
-          "examples": []
+          "examples": [],
+          "interactive": false,
+          "metadata": []
+        },
+        {
+          "name": "exec",
+          "aliases": [],
+          "options": [
+            {
+              "name": "--cli-framework",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "NAME",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Hint or override the detected CLI framework for  non-native analysis.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--command",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "NAME",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the root command name used for generated  OpenCLI documents.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--crawl-out",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "PATH",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Write crawl.json when the selected acquisition  mode produces crawl data.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--cwd",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "PATH",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Working directory to use when invoking the source  CLI.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--json",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Emit the stable machine-readable JSON envelope  instead of human output.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--opencli-arg",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "ARG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String[]"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the arguments used to invoke the source  CLI's OpenCLI export command.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--opencli-mode",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "MODE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "OpenCLI acquisition mode: native, auto, help,  clifx, static, or hook.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--out",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "FILE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Write the generated OpenCLI JSON to this file  instead of stdout.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--overwrite",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Allow an existing OpenCLI output file to be replaced.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--output",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "MODE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the output mode. Supported values are  human and json.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--source-arg",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "ARG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String[]"
+                    }
+                  ]
+                }
+              ],
+              "description": "Additional arguments passed directly to the source executable before the export command.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--timeout",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "SECONDS",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.Nullable<System.Int32>"
+                    }
+                  ]
+                }
+              ],
+              "description": "Timeout in seconds for source execution.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--verbose",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Increase diagnostic detail in command failures.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--with-xmldoc",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--xmldoc-arg",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "ARG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String[]"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the arguments used to invoke the source  CLI's XML documentation export command.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            }
+          ],
+          "arguments": [
+            {
+              "name": "SOURCE",
+              "required": true,
+              "arity": {
+                "minimum": 1,
+                "maximum": 1
+              },
+              "acceptedValues": [],
+              "description": "CLI executable or script to invoke.",
+              "hidden": false,
+              "metadata": [
+                {
+                  "name": "ClrType",
+                  "value": "System.String"
+                }
+              ]
+            }
+          ],
+          "commands": [],
+          "exitCodes": [],
+          "description": "Generate opencli.json from a local executable or  script.",
+          "hidden": false,
+          "examples": [],
+          "interactive": false,
+          "metadata": []
+        },
+        {
+          "name": "package",
+          "aliases": [],
+          "options": [
+            {
+              "name": "--cli-framework",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "NAME",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Hint or override the detected CLI framework for  non-native analysis.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--command",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "NAME",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the root command name used for generated  OpenCLI documents.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--crawl-out",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "PATH",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Write crawl.json when the selected acquisition  mode produces crawl data.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--json",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Emit the stable machine-readable JSON envelope  instead of human output.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--opencli-arg",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "ARG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String[]"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the arguments used to invoke the  installed tool's OpenCLI export command.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--opencli-mode",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "MODE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "OpenCLI acquisition mode: native, auto, help,  clifx, static, or hook.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--out",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "FILE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Write the generated OpenCLI JSON to this file  instead of stdout.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--overwrite",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Allow an existing OpenCLI output file to be replaced.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--output",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "MODE",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the output mode. Supported values are  human and json.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--timeout",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "SECONDS",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.Nullable<System.Int32>"
+                    }
+                  ]
+                }
+              ],
+              "description": "Timeout in seconds for package install and command execution.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--verbose",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Increase diagnostic detail in command failures.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--version",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "VERSION",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "description": "Package version to install and analyze.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--with-xmldoc",
+              "required": false,
+              "aliases": [],
+              "arguments": [],
+              "description": "Also run the source CLI's XML documentation export command and enrich the generated OpenCLI document with its output.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            },
+            {
+              "name": "--xmldoc-arg",
+              "required": false,
+              "aliases": [],
+              "arguments": [
+                {
+                  "name": "ARG",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String[]"
+                    }
+                  ]
+                }
+              ],
+              "description": "Override the arguments used to invoke the source  CLI's XML documentation export command.",
+              "recursive": false,
+              "hidden": false,
+              "metadata": []
+            }
+          ],
+          "arguments": [
+            {
+              "name": "PACKAGE_ID",
+              "required": true,
+              "arity": {
+                "minimum": 1,
+                "maximum": 1
+              },
+              "acceptedValues": [],
+              "description": "NuGet package id for the .NET tool package to  analyze.",
+              "hidden": false,
+              "metadata": [
+                {
+                  "name": "ClrType",
+                  "value": "System.String"
+                }
+              ]
+            }
+          ],
+          "commands": [],
+          "exitCodes": [],
+          "description": "Generate opencli.json by installing and analyzing a  .NET tool package.",
+          "hidden": false,
+          "examples": [],
+          "interactive": false,
+          "metadata": []
         }
       ],
+      "exitCodes": [],
+      "description": "Generate validated OpenCLI JSON from a package, executable, or  .NET project.",
+      "hidden": false,
+      "examples": [],
+      "interactive": false,
+      "metadata": []
+    },
+    {
+      "name": "render",
+      "aliases": [],
+      "options": [],
+      "arguments": [],
+      "commands": [
+        {
+          "name": "file",
+          "aliases": [],
+          "options": [],
+          "arguments": [],
+          "commands": [
+            {
+              "name": "html",
+              "aliases": [],
+              "options": [
+                {
+                  "name": "--accent",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "COLOR",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Custom accent color for light mode (hex, e.g.  \"#7c3aed\").",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--accent-dark",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "COLOR",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Custom accent color for dark mode (hex). Falls back to --accent if omitted.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--color-theme",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "NAME",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Set the color theme (cyan, indigo, emerald,  amber, rose, blue).",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--command-prefix",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "TEXT",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Override the CLI command prefix used in  generated examples and the composer.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--compression-level",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "LEVEL",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.Nullable<System.Int32>"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Compression level: 0 = none, 1 = compress embedded JSON in multi-file bundle mode, 2 = self-extracting single-file bundle (default).",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--dry-run",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Preview the resolved render plan without  writing files.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--enable-nuget-browser",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Enable the #/browse package browser route, package deep links such as #/pkg/<id>, and the Browse toolbar button in generated static HTML. Requires --show-home.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--enable-package-upload",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Enable the #/import route and import controls in generated static HTML. Requires --show-home.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--enable-url",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Allow ?opencli= or ?dir= to load alternate inputs in generated static HTML, with optional ?xmldoc= enrichment. When enabled, query parameters override the embedded input.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--include-hidden",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Include commands and options marked hidden by  the source CLI.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--include-metadata",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--json",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--label",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "TEXT",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Custom label shown in the viewer header (e.g.  a version string).",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--no-color",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Disable ANSI color sequences in human-readable console output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--no-composer",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Hide the interactive command composer from the generated HTML app.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--no-dark",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Disable dark mode in the generated HTML app.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--no-light",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Disable light mode in the generated HTML  app.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--no-theme-picker",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Hide the color theme picker from the viewer  toolbar.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--out-dir",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "DIR",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Directory where the HTML app bundle should be  written.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--output",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "MODE",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Override the output mode. Supported values are human and json.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--overwrite",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Allow existing output files or directories to  be replaced.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--quiet",
+                  "required": false,
+                  "aliases": [
+                    "-q"
+                  ],
+                  "arguments": [],
+                  "description": "Suppress non-essential console output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--show-home",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Show the Home button in the generated static HTML toolbar.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--single-file",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Emit a single self-contained HTML file with  all assets inlined. Works from file:// without a web server.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--theme",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "MODE",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Set the initial theme mode (light or dark).",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--title",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "TEXT",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Override the CLI title shown in the viewer  header and overview.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--verbose",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Increase diagnostic detail in command failures.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--xmldoc",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "PATH",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Optional XML documentation file used to enrich missing descriptions.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                }
+              ],
+              "arguments": [
+                {
+                  "name": "OPENCLI_JSON",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "description": "Path to the OpenCLI JSON export file to  render.",
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "commands": [],
+              "exitCodes": [],
+              "description": "Render an HTML app bundle from an OpenCLI JSON  file and optional XML enrichment file.",
+              "hidden": false,
+              "examples": [],
+              "interactive": false,
+              "metadata": []
+            },
+            {
+              "name": "markdown",
+              "aliases": [],
+              "options": [
+                {
+                  "name": "--command-prefix",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "TEXT",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Override the CLI command prefix used in  rendered Markdown examples.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--dry-run",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Preview the resolved render plan without  writing files.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--include-hidden",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Include commands and options marked hidden by  the source CLI.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--include-metadata",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Include metadata sections in the rendered  Markdown or HTML output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--json",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Emit the stable machine-readable JSON envelope instead of human output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--layout",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "LAYOUT",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Markdown layout mode. Supported values are  single, tree, and hybrid.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--no-color",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Disable ANSI color sequences in human-readable console output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--out",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "FILE",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Single Markdown file to write when using the  single layout.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--out-dir",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "DIR",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Output directory to write when using the tree  or hybrid layout.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--output",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "MODE",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Override the output mode. Supported values are human and json.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--overwrite",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Allow existing output files or directories to  be replaced.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--quiet",
+                  "required": false,
+                  "aliases": [
+                    "-q"
+                  ],
+                  "arguments": [],
+                  "description": "Suppress non-essential console output.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--split-depth",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "DEPTH",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.Nullable<System.Int32>"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Depth at which hybrid layout emits one file  per command group (defaults to 1).",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--title",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "TEXT",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Override the CLI title shown in Markdown  headings and overview text.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--verbose",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [],
+                  "description": "Increase diagnostic detail in command failures.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                },
+                {
+                  "name": "--xmldoc",
+                  "required": false,
+                  "aliases": [],
+                  "arguments": [
+                    {
+                      "name": "PATH",
+                      "required": true,
+                      "arity": {
+                        "minimum": 1,
+                        "maximum": 1
+                      },
+                      "acceptedValues": [],
+                      "hidden": false,
+                      "metadata": [
+                        {
+                          "name": "ClrType",
+                          "value": "System.String"
+                        }
+                      ]
+                    }
+                  ],
+                  "description": "Optional XML documentation file used to enrich missing descriptions.",
+                  "recursive": false,
+                  "hidden": false,
+                  "metadata": []
+                }
+              ],
+              "arguments": [
+                {
+                  "name": "OPENCLI_JSON",
+                  "required": true,
+                  "arity": {
+                    "minimum": 1,
+                    "maximum": 1
+                  },
+                  "acceptedValues": [],
+                  "description": "Path to the OpenCLI JSON export file to  render.",
+                  "hidden": false,
+                  "metadata": [
+                    {
+                      "name": "ClrType",
+                      "value": "System.String"
+                    }
+                  ]
+                }
+              ],
+              "commands": [],
+              "exitCodes": [],
+              "description": "Render Markdown from an OpenCLI JSON file and  optional XML enrichment file.",
+              "hidden": false,
+              "examples": [],
+              "interactive": false,
+              "metadata": []
+            }
+          ],
+          "exitCodes": [],
+          "description": "Render docs from saved OpenCLI export files.",
+          "hidden": false,
+          "examples": [],
+          "interactive": false,
+          "metadata": []
+        }
+      ],
+      "exitCodes": [],
       "description": "Render documentation from OpenCLI exports.",
       "hidden": false,
-      "examples": []
+      "examples": [],
+      "interactive": false,
+      "metadata": []
     }
-  ]
+  ],
+  "exitCodes": [],
+  "examples": [],
+  "interactive": false,
+  "metadata": []
 }

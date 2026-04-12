@@ -1,0 +1,16 @@
+global using InSpectra.Gen.Engine.Execution.Process;
+global using InSpectra.Gen.Engine.Execution.Workspace;
+global using InSpectra.Gen.Engine.Contracts;
+global using InSpectra.Gen.Engine.OpenCli.Enrichment;
+global using InSpectra.Gen.Engine.OpenCli.Model;
+global using InSpectra.Gen.Engine.OpenCli.Schema;
+global using InSpectra.Gen.Engine.OpenCli.Serialization;
+global using InSpectra.Gen.Engine.OpenCli.Validation;
+global using InSpectra.Gen.Engine.Rendering.Contracts;
+global using InSpectra.Gen.Engine.Rendering.Html;
+global using InSpectra.Gen.Engine.Rendering.Html.Bundle;
+global using InSpectra.Gen.Engine.Rendering.Markdown;
+global using InSpectra.Gen.Engine.Rendering.Pipeline;
+global using InSpectra.Gen.Engine.Targets.Inputs;
+global using InSpectra.Gen.Engine.Targets.Sources;
+global using InSpectra.Gen.Engine.UseCases.Generate;

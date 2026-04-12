@@ -17,13 +17,27 @@ export function renderHtml(options: {
   outDir?: string;
   title?: string;
   commandPrefix?: string;
+  singleFile?: boolean;
+  compressionLevel?: number;
 }): string {
   const outDir = options.outDir ?? fs.mkdtempSync(path.join(os.tmpdir(), "inspectra-e2e-"));
+  const ownsOutDir = !options.outDir;
+  const dotnetConfiguration = process.env.INSPECTRA_E2E_DOTNET_CONFIGURATION;
+  const noBuild = process.env.INSPECTRA_E2E_DOTNET_NO_BUILD === "1";
 
   const args = [
     "run", "--project", path.join(repoRoot, "src/InSpectra.Gen/InSpectra.Gen.csproj"),
-    "--", "render", "file", "html", options.opencliPath,
   ];
+
+  if (dotnetConfiguration) {
+    args.push("--configuration", dotnetConfiguration);
+  }
+
+  if (noBuild) {
+    args.push("--no-build");
+  }
+
+  args.push("--", "render", "file", "html", options.opencliPath);
 
   if (options.xmldocPath) {
     args.push("--xmldoc", options.xmldocPath);
@@ -37,27 +51,47 @@ export function renderHtml(options: {
     args.push("--command-prefix", options.commandPrefix);
   }
 
+  if (options.singleFile) {
+    args.push("--single-file");
+  }
+
+  if (options.compressionLevel !== undefined) {
+    args.push("--compression-level", String(options.compressionLevel));
+  }
+
   args.push("--out-dir", outDir, "--overwrite");
 
-  execFileSync("dotnet", args, { cwd: repoRoot, stdio: "pipe", timeout: 60_000 });
-  return outDir;
+  try {
+    execFileSync("dotnet", args, { cwd: repoRoot, stdio: "pipe", timeout: 60_000 });
+    return outDir;
+  } catch (error) {
+    if (ownsOutDir) {
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
+
+    throw error;
+  }
 }
 
 /**
  * Renders the test fixture opencli.json to an HTML bundle.
- * Uses the pre-built output at e2e/.rendered only for the default no-override case.
+ * Uses a fresh temporary output directory by default so E2E always exercises
+ * the current renderer output instead of any checked-in bundle snapshot.
  */
-export function renderTestFixture(options?: { outDir?: string; title?: string; commandPrefix?: string }): string {
-  const prebuilt = path.resolve(__dirname, ".rendered");
-  if (!options?.outDir && !options?.title && !options?.commandPrefix && fs.existsSync(path.join(prebuilt, "index.html"))) {
-    return prebuilt;
-  }
-
+export function renderTestFixture(options?: {
+  outDir?: string;
+  title?: string;
+  commandPrefix?: string;
+  singleFile?: boolean;
+  compressionLevel?: number;
+}): string {
   return renderHtml({
     opencliPath: path.join(repoRoot, "examples/jellyfin-cli/opencli.json"),
     xmldocPath: path.join(repoRoot, "examples/jellyfin-cli/xmldoc.xml"),
-    outDir: options?.outDir ?? prebuilt,
+    outDir: options?.outDir,
     title: options?.title,
     commandPrefix: options?.commandPrefix,
+    singleFile: options?.singleFile,
+    compressionLevel: options?.compressionLevel,
   });
 }

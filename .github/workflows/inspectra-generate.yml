@@ -18,25 +18,33 @@ name: InSpectra Generate
 on:
   workflow_call:
     inputs:
-      # ── render ───────────────────────────────────────────────────
+      # ── source selection / render ───────────────────────────────
       mode:
         type: string
         default: 'exec'
-        description: 'exec (invoke a live CLI), file (from saved opencli.json), or dotnet (run a .NET project from source)'
+        description: 'exec, file, dotnet, or package; non-file modes first generate opencli.json, then render it'
 
       format:
         type: string
         default: 'html'
-        description: 'html, markdown (tree), markdown-monolith (single file), or markdown-hybrid (README + per-group files)'
+        description: 'html, markdown (tree), markdown-monolith (single file), or markdown-hybrid (README + group files as needed; leaf-only CLIs may emit README only)'
 
       split-depth:
         type: string
-        description: 'Depth for markdown-hybrid output (default 1). Ignored for other formats.'
+        description: 'Depth for markdown-hybrid output (default 1). Group files are emitted only when groups exist; leaf-only CLIs may emit README only. Ignored for other formats.'
 
       # ── target CLI (exec mode) ──────────────────────────────────
       cli-name:
         type: string
         description: 'CLI executable name or path'
+
+      package-id:
+        type: string
+        description: 'NuGet package id for mode: package'
+
+      package-version:
+        type: string
+        description: 'NuGet package version for mode: package'
 
       dotnet-tool:
         type: string
@@ -52,15 +60,27 @@ on:
 
       opencli-args:
         type: string
-        description: 'Override OpenCLI export arguments (default: cli opencli)'
+        description: 'Override OpenCLI export arguments for generate-based modes (exec, dotnet, package; default: cli opencli)'
 
       xmldoc-args:
         type: string
-        description: 'Override xmldoc export arguments (default: cli xmldoc)'
+        description: 'Override xmldoc export arguments for generate-based modes (exec, dotnet, package; default: cli xmldoc)'
 
       timeout:
         type: string
-        description: 'Timeout in seconds for each CLI export command'
+        description: 'Timeout in seconds for each generate-mode export command (exec, dotnet, package)'
+
+      opencli-mode:
+        type: string
+        description: 'OpenCLI acquisition mode: native, auto, help, clifx, static, or hook'
+
+      command:
+        type: string
+        description: 'Override the generated root command name'
+
+      cli-framework:
+        type: string
+        description: 'Hint or override the detected CLI framework'
 
       # ── file mode ────────────────────────────────────────────────
       opencli-json:
@@ -78,25 +98,25 @@ on:
 
       configuration:
         type: string
-        description: 'Build configuration for `dotnet run` (e.g. Release)'
+        description: 'Build configuration for the dotnet acquisition step (e.g. Release)'
 
       framework:
         type: string
-        description: 'Target framework for `dotnet run` (e.g. net10.0)'
+        description: 'Target framework for the dotnet acquisition step (e.g. net10.0)'
 
       launch-profile:
         type: string
-        description: 'Launch profile for `dotnet run`'
+        description: 'Launch profile for the dotnet acquisition step'
 
       no-build:
         type: string
         default: 'false'
-        description: 'Pass --no-build to `dotnet run` (use after a separate build step)'
+        description: 'Pass --no-build to the dotnet acquisition step (use after a separate build step)'
 
       no-restore:
         type: string
         default: 'false'
-        description: 'Pass --no-restore to `dotnet run`'
+        description: 'Pass --no-restore to the dotnet acquisition step'
 
       # ── inspectra tool ───────────────────────────────────────────
       inspectra-version:
@@ -130,15 +150,23 @@ on:
         type: string
         description: 'Custom label shown in the viewer header (e.g. "v1.2.3")'
 
+      title:
+        type: string
+        description: 'Override the CLI title shown in the viewer header and overview'
+
+      command-prefix:
+        type: string
+        description: 'Override the CLI command prefix used in generated examples and the composer'
+
       single-file:
         type: string
         default: 'false'
-        description: 'Emit a single self-contained HTML file'
+        description: 'Force a single self-contained HTML file. HTML is also self-contained by default at compression-level 2.'
 
       compression-level:
         type: string
         default: '2'
-        description: 'Compression level (0=none, 1=compress JSON, 2=self-extracting)'
+        description: 'Compression level (0=none, 1=compress JSON, 2=self-extracting single-file bundle)'
 
       theme:
         type: string
@@ -166,6 +194,11 @@ on:
         description: 'Additional flags forwarded to the inspectra CLI'
 
       # ── output ───────────────────────────────────────────────────
+      output-dir:
+        type: string
+        default: 'inspectra-output'
+        description: 'Directory where the rendered output is written'
+
       artifact-name:
         type: string
         default: 'inspectra-docs'
@@ -205,18 +238,25 @@ jobs:
         shell: bash
         run: ${{ inputs.setup-command }}
 
-      # ── render ──────────────────────────────────────────────────
-      - name: Render with InSpectra
+      # ── acquire + render ────────────────────────────────────────
+      - name: Generate and render with InSpectra
         uses: JKamsker/InSpectra@v1
         with:
           mode: ${{ inputs.mode }}
           format: ${{ inputs.format }}
           split-depth: ${{ inputs.split-depth }}
           cli-name: ${{ inputs.cli-name }}
+          package-id: ${{ inputs.package-id }}
+          package-version: ${{ inputs.package-version }}
           label: ${{ inputs.label }}
+          title: ${{ inputs.title }}
+          command-prefix: ${{ inputs.command-prefix }}
           opencli-args: ${{ inputs.opencli-args }}
           xmldoc-args: ${{ inputs.xmldoc-args }}
           timeout: ${{ inputs.timeout }}
+          opencli-mode: ${{ inputs.opencli-mode }}
+          command: ${{ inputs.command }}
+          cli-framework: ${{ inputs.cli-framework }}
           opencli-json: ${{ inputs.opencli-json }}
           xmldoc: ${{ inputs.xmldoc }}
           project: ${{ inputs.project }}
@@ -225,7 +265,7 @@ jobs:
           launch-profile: ${{ inputs.launch-profile }}
           no-build: ${{ inputs.no-build }}
           no-restore: ${{ inputs.no-restore }}
-          output-dir: _inspectra-site
+          output-dir: ${{ inputs.output-dir }}
           single-file: ${{ inputs.single-file }}
           compression-level: ${{ inputs.compression-level }}
           theme: ${{ inputs.theme }}
@@ -246,4 +286,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact-name }}
-          path: _inspectra-site
+          path: ${{ inputs.output-dir }}

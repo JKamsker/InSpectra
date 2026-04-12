@@ -1,18 +1,45 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using InSpectra.Gen.Commands.Render;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests;
 
 public class CliHelpSurfaceTests
 {
-    [Theory]
-    [InlineData("file")]
-    [InlineData("exec")]
-    [InlineData("dotnet")]
-    public async Task Html_help_only_exposes_bundle_output_option(string mode)
+    [Fact]
+    public async Task Render_help_only_exposes_file_branch()
     {
-        var result = await RunRendererAsync(["render", mode, "html", "--help"]);
+        var result = await RunRendererAsync(["render", "--help"]);
+        var helpText = NormalizeHelpOutput(result.StandardOutput);
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Contains("file", helpText);
+        Assert.DoesNotContain("exec", helpText);
+        Assert.DoesNotContain("dotnet", helpText);
+        Assert.DoesNotContain("package", helpText);
+        Assert.DoesNotContain("self", helpText);
+    }
+
+    [Fact]
+    public async Task Version_command_uses_the_assembly_version()
+    {
+        var result = await RunRendererAsync(["--version"]);
+        var reportedVersion = result.StandardOutput.Trim();
+        var assemblyVersion = typeof(RenderRequestFactory).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion
+            ?.Split('+')[0];
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(assemblyVersion, reportedVersion);
+    }
+
+    [Fact]
+    public async Task Html_help_only_exposes_bundle_output_option()
+    {
+        var result = await RunRendererAsync(["render", "file", "html", "--help"]);
         var helpText = NormalizeHelpOutput(result.StandardOutput);
 
         Assert.Equal(0, result.ExitCode);
@@ -21,13 +48,10 @@ public class CliHelpSurfaceTests
         AssertNoOption(helpText, "--layout", "<LAYOUT>");
     }
 
-    [Theory]
-    [InlineData("file")]
-    [InlineData("exec")]
-    [InlineData("dotnet")]
-    public async Task Markdown_help_keeps_single_and_tree_output_options(string mode)
+    [Fact]
+    public async Task Markdown_help_keeps_single_and_tree_output_options()
     {
-        var result = await RunRendererAsync(["render", mode, "markdown", "--help"]);
+        var result = await RunRendererAsync(["render", "file", "markdown", "--help"]);
         var helpText = NormalizeHelpOutput(result.StandardOutput);
 
         Assert.Equal(0, result.ExitCode);
@@ -36,16 +60,31 @@ public class CliHelpSurfaceTests
         AssertOption(helpText, "--out-dir", "<DIR>");
     }
 
+    [Theory]
+    [InlineData("exec")]
+    [InlineData("dotnet")]
+    [InlineData("package")]
+    public async Task Generate_help_exposes_generate_output_options_only(string mode)
+    {
+        var result = await RunRendererAsync(["generate", mode, "--help"]);
+        var helpText = NormalizeHelpOutput(result.StandardOutput);
+
+        Assert.Equal(0, result.ExitCode);
+        AssertOption(helpText, "--out", "<FILE>");
+        AssertNoOption(helpText, "--out-dir", "<DIR>");
+        AssertNoOption(helpText, "--layout", "<LAYOUT>");
+        AssertOption(helpText, "--opencli-mode", "<MODE>");
+        AssertOption(helpText, "--with-xmldoc", string.Empty);
+        AssertOption(helpText, "--xmldoc-arg", "<ARG>");
+        AssertOption(helpText, "--crawl-out", "<PATH>");
+        AssertOption(helpText, "--overwrite", string.Empty);
+        AssertNoOption(helpText, "--quiet", string.Empty);
+        AssertNoOption(helpText, "--no-color", string.Empty);
+    }
+
     private static async Task<ProcessResult> RunRendererAsync(IReadOnlyList<string> arguments)
     {
-        var dllPath = Path.Combine(
-            FixturePaths.RepoRoot,
-            "src",
-            "InSpectra.Gen",
-            "bin",
-            "Release",
-            "net10.0",
-            "inspectra.dll");
+        var dllPath = ResolveBuiltRendererPath();
 
         var startInfo = new ProcessStartInfo
         {
@@ -79,6 +118,19 @@ public class CliHelpSurfaceTests
             await stderrTask);
     }
 
+    private static string ResolveBuiltRendererPath()
+    {
+        var candidatePaths = new[]
+        {
+            Path.Combine(FixturePaths.RepoRoot, "src", "InSpectra.Gen", "bin", "Debug", "net10.0", "inspectra.dll"),
+            Path.Combine(FixturePaths.RepoRoot, "src", "InSpectra.Gen", "bin", "Release", "net10.0", "inspectra.dll"),
+        };
+
+        var existingPath = candidatePaths.FirstOrDefault(File.Exists);
+        return existingPath
+            ?? throw new FileNotFoundException("Could not locate a built inspectra.dll.", candidatePaths[0]);
+    }
+
     private sealed record ProcessResult(int ExitCode, string StandardOutput, string StandardError);
 
     private static string NormalizeHelpOutput(string helpText)
@@ -101,8 +153,16 @@ public class CliHelpSurfaceTests
 
     private static Regex BuildOptionPattern(string optionName, string argumentName)
     {
+        if (string.IsNullOrEmpty(argumentName))
+        {
+            return new Regex(
+                $@"(?<!\S){Regex.Escape(optionName)}(?!\S)",
+                RegexOptions.CultureInvariant);
+        }
+
         return new Regex(
             $@"(?<!\S){Regex.Escape(optionName)}\s+{Regex.Escape(argumentName)}(?!\S)",
             RegexOptions.CultureInvariant);
     }
+
 }

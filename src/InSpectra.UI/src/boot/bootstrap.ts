@@ -61,9 +61,20 @@ export async function resolveStartupRequest(params: {
   href: string;
 }): Promise<StartupRequest> {
   const bootstrap = await readInjectedBootstrap(params.documentRef);
+  const queryLinks = resolveViewerLinksFromSearch(params.search, params.href);
 
   if (bootstrap?.mode === "inline") {
     const features = readFeatures(bootstrap.features, true);
+    if (features.urlLoading && queryLinks) {
+      return {
+        kind: "links",
+        links: queryLinks,
+        options: readOptions(bootstrap.options),
+        features,
+        source: "query",
+      };
+    }
+
     return {
       kind: "inline",
       openCli: bootstrap.openCli,
@@ -74,12 +85,22 @@ export async function resolveStartupRequest(params: {
   }
 
   if (bootstrap?.mode === "links") {
+    const features = readFeatures(bootstrap.features, true);
+    if (features.urlLoading && queryLinks) {
+      return {
+        kind: "links",
+        links: queryLinks,
+        options: readOptions(bootstrap.options),
+        features,
+        source: "query",
+      };
+    }
+
     const links = resolveViewerLinks(bootstrap, params.href);
     if (!links) {
       throw new Error("Injected links bootstrap must provide openCliUrl or directoryUrl.");
     }
 
-    const features = readFeatures(bootstrap.features, true);
     return {
       kind: "links",
       links,
@@ -91,17 +112,14 @@ export async function resolveStartupRequest(params: {
 
   const features = readFeatures(undefined, false);
 
-  if (features.urlLoading) {
-    const queryLinks = resolveViewerLinksFromSearch(params.search, params.href);
-    if (queryLinks) {
-      return {
-        kind: "links",
-        links: queryLinks,
-        options: defaultViewerOptions(),
-        features,
-        source: "query",
-      };
-    }
+  if (features.urlLoading && queryLinks) {
+    return {
+      kind: "links",
+      links: queryLinks,
+      options: defaultViewerOptions(),
+      features,
+      source: "query",
+    };
   }
 
   return {

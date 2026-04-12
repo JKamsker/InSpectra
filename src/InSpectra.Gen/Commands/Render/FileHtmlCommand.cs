@@ -1,14 +1,17 @@
-using System.ComponentModel;
-using InSpectra.Gen.Runtime;
-using InSpectra.Gen.Services;
+using InSpectra.Gen.Commands.Common;
+using InSpectra.Gen.Output;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Render;
 
-public sealed class FileHtmlCommand(HtmlRenderService renderService) : AsyncCommand<FileHtmlSettings>
+public sealed class FileHtmlCommand(IHtmlRenderService renderService) : AsyncCommand<FileHtmlSettings>
 {
     public override Task<int> ExecuteAsync(CommandContext context, FileHtmlSettings settings, CancellationToken cancellationToken)
     {
+        var outputMode = CommandValueResolver.ResolveOutputMode(settings.Json, settings.Output);
+        var quiet = CommandValueResolver.ResolveFlag(settings.Quiet, "INSPECTRA_GEN_QUIET");
+        var verbose = CommandValueResolver.ResolveFlag(settings.Verbose, "INSPECTRA_GEN_VERBOSE");
         var options = RenderRequestFactory.CreateHtmlOptions(settings, null, null, settings.OutputDirectory, timeoutSeconds: null, hasTimeoutSupport: false);
         var features = RenderRequestFactory.CreateHtmlFeatureFlags(settings);
         var themeOptions = RenderRequestFactory.CreateHtmlThemeOptions(settings);
@@ -18,28 +21,9 @@ public sealed class FileHtmlCommand(HtmlRenderService renderService) : AsyncComm
             options);
 
         return CommandOutputHandler.ExecuteAsync(
-            options.OutputMode,
-            options.Verbose,
+            outputMode,
+            quiet,
+            verbose,
             () => renderService.RenderFromFileAsync(request, features, cancellationToken, settings.Label, settings.Title, settings.CommandPrefix, themeOptions));
     }
-}
-
-/// <summary>
-/// Settings for rendering an HTML app bundle from saved OpenCLI export files.
-/// </summary>
-public sealed class FileHtmlSettings : HtmlCommandSettingsBase
-{
-    /// <summary>
-    /// Path to the OpenCLI JSON export file to render.
-    /// </summary>
-    [Description("Path to the OpenCLI JSON export file to render.")]
-    [CommandArgument(0, "<OPENCLI_JSON>")]
-    public string OpenCliJsonPath { get; init; } = string.Empty;
-
-    /// <summary>
-    /// Optional XML documentation file used to enrich missing descriptions.
-    /// </summary>
-    [Description("Optional XML documentation file used to enrich missing descriptions.")]
-    [CommandOption("--xmldoc <PATH>")]
-    public string? XmlDocPath { get; init; }
 }

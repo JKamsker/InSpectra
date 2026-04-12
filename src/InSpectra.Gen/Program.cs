@@ -1,39 +1,25 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using InSpectra.Gen.Commands.Generate;
 using InSpectra.Gen.Commands.Render;
-using InSpectra.Gen.Common;
-using InSpectra.Gen.Services;
-using Spectre.Console;
+using InSpectra.Gen.Composition;
 using Spectre.Console.Cli;
 
 var services = new ServiceCollection();
-services.AddSingleton(AnsiConsole.Console);
-services.AddSingleton<OpenCliSchemaProvider>();
-services.AddSingleton<OpenCliDocumentLoader>();
-services.AddSingleton<OpenCliDocumentCloner>();
-services.AddSingleton<OpenCliXmlEnricher>();
-services.AddSingleton<OpenCliNormalizer>();
-services.AddSingleton<ExecutableResolver>();
-services.AddSingleton<ProcessRunner>();
-services.AddSingleton(new ViewerBundleLocatorOptions());
-services.AddSingleton<RenderStatsFactory>();
-services.AddSingleton<RenderModelFormatter>();
-services.AddSingleton<OverviewFormatter>();
-services.AddSingleton<CommandPathResolver>();
-services.AddSingleton<MarkdownTableRenderer>();
-services.AddSingleton<MarkdownMetadataRenderer>();
-services.AddSingleton<MarkdownSectionRenderer>();
-services.AddSingleton<MarkdownRenderer>();
-services.AddSingleton<DocumentRenderService>();
-services.AddSingleton<ViewerBundleLocator>();
-services.AddSingleton<MarkdownRenderService>();
-services.AddSingleton<HtmlRenderService>();
+services.AddInSpectraGen();
 
 var app = new CommandApp(new TypeRegistrar(services));
+var version = typeof(TypeRegistrar).Assembly
+    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+    .InformationalVersion
+    .Split('+')[0]
+    ?? typeof(TypeRegistrar).Assembly.GetName().Version?.ToString()
+    ?? "0.0.0";
 
 app.Configure(config =>
 {
     config.SetApplicationName("inspectra");
-    config.SetApplicationVersion("0.1.0");
+    config.SetApplicationVersion(version);
 
     config.AddBranch("render", render =>
     {
@@ -47,27 +33,17 @@ app.Configure(config =>
             file.AddCommand<FileHtmlCommand>("html")
                 .WithDescription("Render an HTML app bundle from an OpenCLI JSON file and optional XML enrichment file.");
         });
+    });
 
-        render.AddBranch("exec", exec =>
-        {
-            exec.SetDescription("Render docs by executing a CLI that exposes `cli opencli`.");
-            exec.AddCommand<ExecMarkdownCommand>("markdown")
-                .WithDescription("Render Markdown from a live CLI process and optional `cli xmldoc` enrichment.");
-            exec.AddCommand<ExecHtmlCommand>("html")
-                .WithDescription("Render an HTML app bundle from a live CLI process and optional `cli xmldoc` enrichment.");
-        });
-
-        render.AddBranch("dotnet", dotnet =>
-        {
-            dotnet.SetDescription("Render docs by running a .NET project (csproj) that exposes `cli opencli`.");
-            dotnet.AddCommand<DotnetMarkdownCommand>("markdown")
-                .WithDescription("Render Markdown by invoking `dotnet run --project <csproj> -- cli opencli`.");
-            dotnet.AddCommand<DotnetHtmlCommand>("html")
-                .WithDescription("Render an HTML app bundle by invoking `dotnet run --project <csproj> -- cli opencli`.");
-        });
-
-        render.AddCommand<SelfDocCommand>("self")
-            .WithDescription("Render documentation for InSpectra itself. Exports opencli.json, xmldoc.xml, Markdown tree, and HTML bundle.");
+    config.AddBranch("generate", generate =>
+    {
+        generate.SetDescription("Generate validated OpenCLI JSON from a package, executable, or .NET project.");
+        generate.AddCommand<PackageGenerateCommand>("package")
+            .WithDescription("Generate opencli.json by installing and analyzing a .NET tool package.");
+        generate.AddCommand<ExecGenerateCommand>("exec")
+            .WithDescription("Generate opencli.json from a local executable or script.");
+        generate.AddCommand<DotnetGenerateCommand>("dotnet")
+            .WithDescription("Generate opencli.json from a .NET project.");
     });
 });
 
