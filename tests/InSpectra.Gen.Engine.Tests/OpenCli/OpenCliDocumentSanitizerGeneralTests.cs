@@ -176,14 +176,53 @@ public sealed class OpenCliDocumentSanitizerGeneralTests
         var option = Assert.Single(document["options"]!.AsArray());
         Assert.Equal("--output", option!["name"]?.GetValue<string>());
         // The =<FILENAME> suffix should be stripped during normalization,
-        // leaving --output as the normalized alias (which deduplicates with the
+        // leaving --output as the normalized base (which deduplicates with the
         // primary name). The -o alias must survive.
         var aliases = option["aliases"]?.AsArray()
             .Select(a => a?.GetValue<string>())
             .ToArray() ?? [];
         Assert.Contains("-o", aliases);
-        // The raw --output=<FILENAME> should NOT survive as-is (angle brackets are non-publishable)
+        // The raw --output=<FILENAME> should NOT survive as-is
         Assert.DoesNotContain("--output=<FILENAME>", aliases);
+    }
+
+    [Fact]
+    public void Sanitize_Preserves_Option_With_Only_Gnu_Style_Alias()
+    {
+        // migrator.database.cli case: --output has aliases -o AND --output=<FILENAME>.
+        // When --output=<FILENAME> is the only long-form alias distinguishing a second
+        // --output variant, stripping it must not silently drop the entire option.
+        var document = new JsonObject
+        {
+            ["opencli"] = "0.1-draft",
+            ["info"] = new JsonObject
+            {
+                ["title"] = "demo",
+                ["version"] = "1.0.0",
+            },
+            ["commands"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["name"] = "migrate",
+                    ["options"] = new JsonArray
+                    {
+                        new JsonObject
+                        {
+                            ["name"] = "--output=<FILENAME>",
+                            ["description"] = "Write output to file",
+                        },
+                    },
+                },
+            },
+        };
+
+        OpenCliDocumentSanitizer.Sanitize(document);
+
+        var options = document["commands"]![0]!["options"]!.AsArray();
+        var option = Assert.Single(options);
+        // The =<FILENAME> suffix should be stripped, leaving --output as the name
+        Assert.Equal("--output", option!["name"]?.GetValue<string>());
     }
 
     [Fact]

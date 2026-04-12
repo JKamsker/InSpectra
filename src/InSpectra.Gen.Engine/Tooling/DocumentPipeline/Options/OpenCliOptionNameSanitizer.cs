@@ -47,8 +47,10 @@ internal static class OpenCliOptionNameSanitizer
     private static List<string> GetPublishableTokens(JsonObject option)
     {
         var tokens = new List<string>();
-        foreach (var token in OpenCliOptionTokenValidationSupport.EnumerateOptionTokens(option))
+        foreach (var rawToken in OpenCliOptionTokenValidationSupport.EnumerateOptionTokens(option))
         {
+            var token = StripGnuStyleValueHint(rawToken);
+
             if (!OpenCliNameValidationSupport.IsPublishableOptionName(token))
             {
                 continue;
@@ -63,5 +65,11 @@ internal static class OpenCliOptionNameSanitizer
         }
 
         return tokens;
+    }
+
+    private static string StripGnuStyleValueHint(string token)
+    {
+        var equalsIndex = token.IndexOf('=', StringComparison.Ordinal);
+        return equalsIndex > 0 ? token[..equalsIndex] : token;
     }
 }
