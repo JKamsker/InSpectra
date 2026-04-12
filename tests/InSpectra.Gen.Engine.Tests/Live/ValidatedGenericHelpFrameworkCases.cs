@@ -69,6 +69,17 @@ internal static class ValidatedGenericHelpFrameworkCases
         return data;
     }
 
+    public static TheoryData<AutoAnalysisServiceLiveTests.LiveAutoToolCase> LoadForAutoLiveTests()
+    {
+        var items = LoadPlanItems();
+        var data = new TheoryData<AutoAnalysisServiceLiveTests.LiveAutoToolCase>();
+
+        AddAutoCase(data, items, "Cake.Tool");
+        AddAutoCase(data, items, "Husky");
+
+        return data;
+    }
+
     private static IReadOnlyList<PlanItem> LoadPlanItems()
     {
         var repositoryRoot = RepositoryPathResolver.ResolveRepositoryRoot();
@@ -103,6 +114,28 @@ internal static class ValidatedGenericHelpFrameworkCases
                 .Select(value => value.GetValue<string>())
                 .Where(value => !string.IsNullOrWhiteSpace(value))
                 .ToArray();
+
+    private static void AddAutoCase(
+        TheoryData<AutoAnalysisServiceLiveTests.LiveAutoToolCase> data,
+        IReadOnlyList<PlanItem> items,
+        string packageId)
+    {
+        var item = items.Single(candidate => string.Equals(candidate.PackageId, packageId, StringComparison.OrdinalIgnoreCase));
+        var framework = item.CliFramework
+            ?? throw new InvalidOperationException($"Plan item '{item.PackageId} {item.Version}' is missing cliFramework.");
+        var commandName = item.CommandName
+            ?? throw new InvalidOperationException($"Plan item '{item.PackageId} {item.Version}' is missing command.");
+
+        data.Add(new AutoAnalysisServiceLiveTests.LiveAutoToolCase(
+            framework,
+            item.AnalysisMode,
+            item.PackageId,
+            item.Version,
+            commandName,
+            item.ExpectedCommands,
+            item.ExpectedOptions,
+            item.ExpectedArguments));
+    }
 
     private sealed record PlanItem(
         string PackageId,

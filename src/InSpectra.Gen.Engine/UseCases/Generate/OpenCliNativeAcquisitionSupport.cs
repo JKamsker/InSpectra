@@ -4,6 +4,8 @@ using InSpectra.Gen.Engine.Execution.Process;
 using InSpectra.Gen.Engine.OpenCli.Validation;
 using InSpectra.Gen.Engine.UseCases.Generate.Requests;
 
+using System.Text.Json;
+
 namespace InSpectra.Gen.Engine.UseCases.Generate;
 
 internal sealed class OpenCliNativeAcquisitionSupport(IProcessRunner processRunner)
@@ -102,6 +104,24 @@ internal sealed class OpenCliNativeAcquisitionSupport(IProcessRunner processRunn
             process.Environment,
             process.CleanupRoot,
             cancellationToken);
+        string sanitizedOpenCliJson;
+        try
+        {
+            sanitizedOpenCliJson = OpenCliJsonSanitizer.Sanitize(openCliResult.StandardOutput);
+        }
+        catch (JsonException exception)
+        {
+            throw new CliSourceExecutionException(
+                "Native analysis produced an invalid OpenCLI artifact.",
+                details:
+                [
+                    "Classification: invalid-success-artifact",
+                    $"Parser error: {exception.Message}",
+                    $"Standard output:{Environment.NewLine}{openCliResult.StandardOutput}",
+                ],
+                innerException: exception);
+        }
+
         var xmlDocument = process.IncludeXmlDoc
             ? await RunXmlDocAsync(
                 process.ExecutablePath,
@@ -112,6 +132,6 @@ internal sealed class OpenCliNativeAcquisitionSupport(IProcessRunner processRunn
                 process.TimeoutSeconds,
                 cancellationToken)
             : null;
-        return (OpenCliJsonSanitizer.Sanitize(openCliResult.StandardOutput), xmlDocument);
+        return (sanitizedOpenCliJson, xmlDocument);
     }
 }

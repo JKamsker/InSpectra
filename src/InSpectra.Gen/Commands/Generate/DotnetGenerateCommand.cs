@@ -26,9 +26,9 @@ public sealed class DotnetGenerateCommand(IOpenCliGenerationService generationSe
                 CommandValueResolver.ResolveOpenCliMode(settings.OpenCliMode, OpenCliMode.Auto),
                 settings.CommandName,
                 settings.CliFramework,
-                settings.OpenCliArguments.Length > 0 ? settings.OpenCliArguments : ["cli", "opencli"],
+                settings.OpenCliArguments.Length > 0 ? settings.OpenCliArguments : OpenCliExportCommandDefaults.OpenCliArguments,
                 settings.WithXmlDoc,
-                settings.XmlDocArguments.Length > 0 ? settings.XmlDocArguments : ["cli", "xmldoc"],
+                settings.XmlDocArguments.Length > 0 ? settings.XmlDocArguments : OpenCliExportCommandDefaults.XmlDocArguments,
                 CommandValueResolver.ResolveTimeoutSeconds(settings.TimeoutSeconds, defaultSeconds: 120),
                 new OpenCliArtifactOptions(null, settings.CrawlOutputPath, settings.Overwrite)));
 

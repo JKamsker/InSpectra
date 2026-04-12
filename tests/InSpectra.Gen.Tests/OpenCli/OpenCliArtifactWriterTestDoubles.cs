@@ -77,6 +77,36 @@ internal sealed class CapturingProcessRunner : IProcessRunner
     }
 }
 
+internal sealed class InvalidJsonProcessRunner(string standardOutput) : IProcessRunner
+{
+    public Task<ProcessResult> RunAsync(
+        string executablePath,
+        string workingDirectory,
+        IReadOnlyList<string> arguments,
+        int timeoutSeconds,
+        CancellationToken cancellationToken)
+        => RunAsync(
+            executablePath,
+            workingDirectory,
+            arguments,
+            timeoutSeconds,
+            environment: null,
+            cleanupRoot: null,
+            cancellationToken);
+
+    public Task<ProcessResult> RunAsync(
+        string executablePath,
+        string workingDirectory,
+        IReadOnlyList<string> arguments,
+        int timeoutSeconds,
+        IReadOnlyDictionary<string, string>? environment,
+        string? cleanupRoot,
+        CancellationToken cancellationToken)
+        => Task.FromResult(new ProcessResult(
+            StandardOutput: standardOutput,
+            StandardError: string.Empty));
+}
+
 internal sealed class FakeLocalCliFrameworkDetector : ILocalCliFrameworkDetector
 {
     public LocalCliFrameworkDetection Detect(string installDirectory)

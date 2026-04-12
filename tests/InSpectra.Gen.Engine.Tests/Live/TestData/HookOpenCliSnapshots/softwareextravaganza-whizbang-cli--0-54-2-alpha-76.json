@@ -1,0 +1,79 @@
+{
+  "info": {
+    "title": "Whizbang CLI - Command-line tool for Whizbang",
+    "version": "0.54.2-alpha.76",
+    "description": "Command-line tool for Whizbang schema management and utilities"
+  },
+  "options": [
+    {
+      "name": "--help",
+      "description": "Show help and usage information",
+      "aliases": [
+        "-h"
+      ]
+    },
+    {
+      "name": "--version",
+      "description": "Show version information",
+      "aliases": [
+        "-v"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "name": "migrate",
+      "description": "Migrate from Marten/Wolverine to Whizbang",
+      "options": [
+        {
+          "name": "--project",
+          "description": "Project directory (default: current directory)",
+          "aliases": [
+            "-p"
+          ],
+          "arguments": [
+            {
+              "name": "PATH",
+              "arity": {
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          ]
+        },
+        {
+          "name": "--dry-run",
+          "description": "Preview changes without modifying files (apply only)",
+          "aliases": [
+            "-n"
+          ]
+        },
+        {
+          "name": "--guided",
+          "description": "Interactive mode: approve each file (apply only)",
+          "aliases": [
+            "-g"
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "analyze",
+          "description": "Analyze project for Marten/Wolverine patterns"
+        },
+        {
+          "name": "apply",
+          "description": "Apply transformations to migrate code"
+        },
+        {
+          "name": "status",
+          "description": "Show migration progress"
+        }
+      ]
+    },
+    {
+      "name": "schema",
+      "description": "Manage database schemas"
+    }
+  ]
+}

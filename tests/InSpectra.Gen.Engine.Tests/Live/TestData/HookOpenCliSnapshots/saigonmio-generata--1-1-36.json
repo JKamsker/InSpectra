@@ -1,0 +1,87 @@
+{
+  "info": {
+    "title": "Mio.Generata",
+    "version": "1.1.36",
+    "description": "Package Description"
+  },
+  "options": [
+    {
+      "name": "--check",
+      "description": "Checking and update latest version [default: False]",
+      "aliases": [
+        "-c"
+      ]
+    },
+    {
+      "name": "--help",
+      "description": "Show help and usage information",
+      "aliases": [
+        "-?",
+        "-h"
+      ]
+    },
+    {
+      "name": "--version",
+      "description": "Show version information",
+      "aliases": [
+        "-v"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "name": "gen",
+      "description": "Start generating project structure. [, , ]",
+      "options": [
+        {
+          "name": "--ajax",
+          "description": "Using create and update in modal with ajax [default: False]",
+          "aliases": [
+            "-a"
+          ]
+        },
+        {
+          "name": "--enable-old",
+          "description": "Enable compatibility with old source code that doesn\u0027t have the MioBaseController module, such as project \u0027XSchool\u0027. [default: False]",
+          "aliases": [
+            "-e"
+          ]
+        },
+        {
+          "name": "--help",
+          "description": "Show help and usage information",
+          "aliases": [
+            "-?",
+            "-h"
+          ]
+        }
+      ],
+      "arguments": [
+        {
+          "name": "AREA_NAME",
+          "description": "Area Name, e.g., Blog",
+          "arity": {
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        {
+          "name": "MODEL_NAME",
+          "description": "Model Name, e.g., Blog",
+          "arity": {
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        {
+          "name": "ROOT_PATH",
+          "description": "The root path of the project, where the .csproj file is located. If the current path already contains the .csproj file, you can leave this empty.",
+          "arity": {
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      ]
+    }
+  ]
+}

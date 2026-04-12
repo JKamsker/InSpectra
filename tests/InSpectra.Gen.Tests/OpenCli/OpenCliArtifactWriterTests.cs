@@ -247,6 +247,7 @@ public sealed class OpenCliArtifactWriterTests
         Assert.Contains("Standard output:", attempt.Detail, StringComparison.Ordinal);
         Assert.Contains("Standard error:", attempt.Detail, StringComparison.Ordinal);
     }
+
 }
 
 internal sealed class ThrowingProcessRunner(CliException exception) : IProcessRunner
