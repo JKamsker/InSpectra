@@ -9,4 +9,5 @@ internal sealed record InstalledToolAnalysisRequest(
     string OutputDirectory,
     InstalledToolContext InstalledTool,
     string WorkingDirectory,
-    int CommandTimeoutSeconds);
+    int CommandTimeoutSeconds,
+    bool PersistCrawlCaptures = false);

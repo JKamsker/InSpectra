@@ -47,12 +47,13 @@ internal sealed class AcquisitionAnalysisDispatcher
         string? framework,
         int timeoutSeconds,
         CancellationToken cancellationToken)
-        => await TryAnalyzeAsync(
+        => await TryAnalyzeCoreAsync(
             target,
             cleanupRoot: null,
             mode,
             framework,
             timeoutSeconds,
+            persistCrawlCaptures: true,
             cancellationToken);
 
     public async Task<AcquisitionAnalysisOutcome> TryAnalyzeAsync(
@@ -61,6 +62,23 @@ internal sealed class AcquisitionAnalysisDispatcher
         string mode,
         string? framework,
         int timeoutSeconds,
+        CancellationToken cancellationToken)
+        => await TryAnalyzeCoreAsync(
+            target,
+            cleanupRoot,
+            mode,
+            framework,
+            timeoutSeconds,
+            persistCrawlCaptures: false,
+            cancellationToken);
+
+    private async Task<AcquisitionAnalysisOutcome> TryAnalyzeCoreAsync(
+        CliTargetDescriptor target,
+        string? cleanupRoot,
+        string mode,
+        string? framework,
+        int timeoutSeconds,
+        bool persistCrawlCaptures,
         CancellationToken cancellationToken)
     {
         using var workspace = new TemporaryAnalysisWorkspace($"inspectra-{mode}");
@@ -92,6 +110,7 @@ internal sealed class AcquisitionAnalysisDispatcher
             effectiveFramework,
             outputDirectory,
             timeoutSeconds,
+            persistCrawlCaptures,
             cancellationToken);
 
         var disposition = result["disposition"]?.GetValue<string>();
@@ -127,6 +146,7 @@ internal sealed class AcquisitionAnalysisDispatcher
         string? framework,
         string outputDirectory,
         int timeoutSeconds,
+        bool persistCrawlCaptures,
         CancellationToken cancellationToken)
     {
         var request = new InstalledToolAnalysisRequest(
@@ -136,7 +156,8 @@ internal sealed class AcquisitionAnalysisDispatcher
             outputDirectory,
             installedTool,
             target.WorkingDirectory,
-            timeoutSeconds);
+            timeoutSeconds,
+            persistCrawlCaptures);
         switch (mode)
         {
             case AnalysisMode.Help:

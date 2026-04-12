@@ -152,7 +152,10 @@ internal sealed class InstalledToolAnalyzer
             return;
         }
 
-        WriteCrawlArtifact(request.OutputDirectory, crawl.Captures);
+        if (request.PersistCrawlCaptures)
+        {
+            WriteCrawlArtifact(request.OutputDirectory, crawl.Captures);
+        }
 
         var openCliDocument = _openCliBuilder.Build(request.CommandName, request.Version, crawl.Documents);
         if (!string.IsNullOrWhiteSpace(request.Result["cliFramework"]?.GetValue<string>()))
