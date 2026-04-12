@@ -1,22 +1,15 @@
 namespace InSpectra.Gen.Engine.Modes.Help.Crawling;
 
 using InSpectra.Gen.Engine.Contracts.Crawling;
-
 using InSpectra.Gen.Engine.Contracts.CrawlResults;
+using InSpectra.Gen.Engine.Contracts.Documents;
 using InSpectra.Gen.Engine.Contracts.Providers;
-
-using InSpectra.Gen.Engine.Modes.Help.Projection;
-
 using InSpectra.Gen.Engine.Contracts.Signatures;
 using InSpectra.Gen.Engine.Modes.Help.Inference.Usage.Commands;
-
-using InSpectra.Gen.Engine.Contracts.Documents;
-
 using InSpectra.Gen.Engine.Modes.Help.Parsing;
-
+using InSpectra.Gen.Engine.Modes.Help.Projection;
 using InSpectra.Gen.Engine.Tooling.DocumentPipeline.Documents;
 using InSpectra.Gen.Engine.Tooling.Process;
-
 
 using System.Text.Json.Nodes;
 
@@ -49,6 +42,7 @@ internal sealed class Crawler : IHelpCrawler
         var documents = new Dictionary<string, Document>(StringComparer.OrdinalIgnoreCase);
         var captures = new Dictionary<string, JsonObject>(StringComparer.OrdinalIgnoreCase);
         var captureSummaries = new Dictionary<string, CaptureSummary>(StringComparer.OrdinalIgnoreCase);
+        var documentFingerprints = new Dictionary<string, string>(StringComparer.Ordinal);
         string? guardrailFailureMessage = null;
 
         while (queue.Count > 0)
@@ -86,6 +80,11 @@ internal sealed class Crawler : IHelpCrawler
             documents[key] = capture.Document;
             if (commandSegments.Length >= HelpCrawlGuardrailSupport.MaxCommandDepth
                 || DocumentInspector.IsBuiltinAuxiliaryInventoryEcho(key, capture.Document))
+            {
+                continue;
+            }
+
+            if (DocumentFingerprintSupport.IsEchoedDocument(capture.Document, key, documentFingerprints))
             {
                 continue;
             }
