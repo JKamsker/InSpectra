@@ -30,8 +30,20 @@ Important:
   the user explicitly overrides it.
 - LOW findings do not block the stop condition, but they must still be
   aggregated and recorded. Do not ignore LOW findings.
-- Use gpt-5.4 with high reasoning for subagents if available, and spawn
+- Use gpt-5.4 with high reasoning for all subagents if available, and spawn
   subagents with fork_context: false.
+- Read-only / research subagents may be parallelized, with a standard cap of
+  6 in one wave.
+- Write-capable subagents must be serialized. Do not run multiple write
+  subagents against the repo at the same time.
+- Research waves are adaptive, not fixed:
+  - start with one wave of up to 6 read-only subagents
+  - prompts should be diverse by slice, but overlap is acceptable
+  - spawn a new wave only while the findings remain materially diverse
+  - if wave 1 mostly converges on the same findings, stop there and move to
+    fixing
+  - if wave 2 mostly repeats wave 1, do not run wave 3
+  - hard cap: 4 research waves per outer loop
 - Follow the documented orchestration pattern:
   investigation swarm -> aggregate/rank -> phases of 3–8 files ->
   implementation subagent per phase -> 6-verifier swarm per phase ->

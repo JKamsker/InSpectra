@@ -65,6 +65,32 @@ If a genuinely new smell family is discovered, record it in
 
 ## Orchestration
 
+### Subagent Policy
+
+Use the following subagent policy for every follow-up iteration:
+
+- All subagents should use `gpt-5.4` with `high` reasoning when available.
+- Spawn all subagents with `fork_context: false`.
+- Read-only and research subagents may be parallelized.
+- Write-capable implementation/fix subagents must be serialized. Do not run
+  multiple write subagents against the repo at the same time.
+- Standard read-only swarm size is up to `6` subagents in parallel.
+
+Research / code-smell hunter waves are adaptive rather than fixed:
+
+- Start with one research wave of up to `6` read-only subagents.
+- Prompts should be diverse by slice, but some overlap is acceptable.
+  Overlapping prompts are fine because agents often explore different paths.
+- After each wave, assess whether the findings are still materially diverse.
+- Spawn another research wave only if the previous wave produced sufficiently
+  new or different findings to justify more discovery.
+- Hard cap: `4` research waves per outer loop.
+- If wave 1 is mostly converging on the same findings, stop at one wave and
+  move to fixing.
+- If wave 2 mostly repeats wave 1, do not run wave 3; jump to fixing.
+- Apply the same rule to later waves: stop when the marginal diversity drops
+  off, even if the hard cap has not been reached.
+
 ### Todo Next Queue
 
 Before starting any new outer iteration, read [Todo Next Queue](TodoNext.md).

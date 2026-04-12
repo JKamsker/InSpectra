@@ -52,7 +52,7 @@ This folder replaces the old monolithic
 
 - [Runbook](Runbook.md)
   - Mission, reference material, orchestration, stop conditions, non-goals,
-    CI/push expectations, and final deliverable format.
+    subagent policy, CI/push expectations, and final deliverable format.
 - [Smell Catalog](SmellCatalog.md)
   - The structural, layering, composition, API, docs, and test smell families
     that future investigation swarms should replay against the tree.
