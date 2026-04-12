@@ -10,7 +10,7 @@ internal sealed class CliFxCoverageClassifier
 {
     private readonly CliFxRuntimeCompatibilityDetector _runtimeCompatibilityDetector = new();
 
-    public CliFxCoverageSummary Classify(int metadataCommandCount, CliFxHelpCrawler.CliFxCrawlResult crawl)
+    public CliFxCoverageSummary Classify(int metadataCommandCount, CliFxCrawlResult crawl)
     {
         var captures = crawl.CaptureSummaries.Values.ToArray();
         var runtimeIssues = captures

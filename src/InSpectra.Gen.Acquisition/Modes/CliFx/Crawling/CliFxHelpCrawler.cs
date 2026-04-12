@@ -204,12 +204,6 @@ internal sealed class CliFxHelpCrawler
             : 1;
     }
 
-    internal sealed record CliFxCrawlResult(
-        IReadOnlyDictionary<string, CliFxHelpDocument> Documents,
-        IReadOnlyDictionary<string, JsonObject> Captures,
-        IReadOnlyDictionary<string, CliFxCaptureSummary> CaptureSummaries,
-        string? GuardrailFailureMessage = null);
-
     private sealed record CliFxHelpCapture(
         string? HelpSwitch,
         CliFxRuntime.ProcessResult? ProcessResult,
@@ -248,14 +242,3 @@ internal sealed class CliFxHelpCrawler
         }
     }
 }
-
-internal sealed record CliFxCaptureSummary(
-    string Command,
-    string? HelpSwitch,
-    bool Parsed,
-    bool TimedOut,
-    int? ExitCode,
-    string? Stdout,
-    string? Stderr,
-    bool OutputLimitExceeded = false,
-    string? GuardrailFailureMessage = null);

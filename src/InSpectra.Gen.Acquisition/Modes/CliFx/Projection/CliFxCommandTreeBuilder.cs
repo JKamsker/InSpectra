@@ -137,11 +137,3 @@ internal sealed class CliFxCommandTreeBuilder
     }
 }
 
-internal sealed record CliFxCommandNode(
-    string FullName,
-    string DisplayName,
-    string? Description)
-{
-    public IReadOnlyList<CliFxCommandNode> Children { get; init; } = [];
-}
-
