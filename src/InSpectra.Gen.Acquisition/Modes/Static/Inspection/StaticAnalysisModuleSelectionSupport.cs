@@ -80,8 +80,3 @@ internal static class StaticAnalysisModuleSelectionSupport
             NormalizePath(right),
             OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 }
-
-internal sealed record ScannedModuleMetadata(
-    string Path,
-    string? AssemblyName,
-    IReadOnlyList<string> AssemblyReferences);
