@@ -5,7 +5,6 @@ using InSpectra.Gen.Engine.Tooling.Process;
 
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
-using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
 
 internal static class HookToolProcessInvocationResolver
@@ -144,7 +143,9 @@ internal static class HookToolProcessInvocationResolver
     {
         try
         {
-            if (!TryResolveTargetFrameworkMoniker(settingsPath, out var targetFrameworkMoniker))
+            if (!DotnetTargetFrameworkRuntimeSupport.TryResolveTargetFrameworkMonikerFromSettingsPath(
+                settingsPath,
+                out var targetFrameworkMoniker))
             {
                 return false;
             }
@@ -175,25 +176,6 @@ internal static class HookToolProcessInvocationResolver
         {
             return false;
         }
-    }
-
-    private static bool TryResolveTargetFrameworkMoniker(string settingsPath, out string targetFrameworkMoniker)
-    {
-        var normalized = settingsPath.Replace('\\', '/');
-        var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        for (var index = 0; index < segments.Length - 2; index++)
-        {
-            if (!string.Equals(segments[index], "tools", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            targetFrameworkMoniker = segments[index + 1];
-            return !string.IsNullOrWhiteSpace(targetFrameworkMoniker);
-        }
-
-        targetFrameworkMoniker = string.Empty;
-        return false;
     }
 
     private static bool TryValidateManagedEntryPoint(string entryPointPath, out string failureMessage)
@@ -237,44 +219,5 @@ internal static class HookToolProcessInvocationResolver
     }
 
     private static string ResolveDotnetHostPath()
-    {
-        foreach (var variableName in GetPreferredDotnetRootVariables())
-        {
-            var dotnetRoot = Environment.GetEnvironmentVariable(variableName);
-            if (string.IsNullOrWhiteSpace(dotnetRoot))
-            {
-                continue;
-            }
-
-            var dotnetPath = Path.Combine(dotnetRoot, OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet");
-            if (File.Exists(dotnetPath))
-            {
-                return dotnetPath;
-            }
-        }
-
-        var hostPath = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH");
-        if (!string.IsNullOrWhiteSpace(hostPath) && File.Exists(hostPath))
-        {
-            return hostPath;
-        }
-
-        return "dotnet";
-    }
-
-    private static IEnumerable<string> GetPreferredDotnetRootVariables()
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            yield return RuntimeInformation.ProcessArchitecture switch
-            {
-                Architecture.X64 => "DOTNET_ROOT_X64",
-                Architecture.X86 => "DOTNET_ROOT_X86",
-                Architecture.Arm64 => "DOTNET_ROOT_ARM64",
-                _ => "DOTNET_ROOT",
-            };
-        }
-
-        yield return "DOTNET_ROOT";
-    }
+        => DotnetHostPathResolutionSupport.ResolveDotnetHostPath();
 }

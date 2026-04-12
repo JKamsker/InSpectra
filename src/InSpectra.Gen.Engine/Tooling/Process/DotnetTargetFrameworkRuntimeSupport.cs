@@ -1,7 +1,43 @@
 namespace InSpectra.Gen.Engine.Tooling.Process;
 
+using InSpectra.Gen.Engine.Tooling.Json;
+using System.Text.Json.Nodes;
+
 internal static class DotnetTargetFrameworkRuntimeSupport
 {
+    public static bool TryResolveTargetFrameworkMonikerFromSettingsPath(
+        string settingsPath,
+        out string targetFrameworkMoniker)
+    {
+        targetFrameworkMoniker = string.Empty;
+        if (string.IsNullOrWhiteSpace(settingsPath))
+        {
+            return false;
+        }
+
+        try
+        {
+            var settingsDirectory = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(settingsPath))!);
+            var runtimeIdentifierDirectory = settingsDirectory;
+            var frameworkDirectory = runtimeIdentifierDirectory.Parent;
+            var toolsDirectory = frameworkDirectory?.Parent;
+            if (frameworkDirectory is null
+                || toolsDirectory is null
+                || !string.Equals(toolsDirectory.Name, "tools", StringComparison.OrdinalIgnoreCase)
+                || string.IsNullOrWhiteSpace(frameworkDirectory.Name))
+            {
+                return false;
+            }
+
+            targetFrameworkMoniker = frameworkDirectory.Name;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public static DotnetRuntimeRequirement? TryResolveRequirement(string targetFrameworkMoniker)
     {
         if (string.IsNullOrWhiteSpace(targetFrameworkMoniker))
@@ -26,15 +62,68 @@ internal static class DotnetTargetFrameworkRuntimeSupport
             return null;
         }
 
-        if (suffix.Length > 0 && !suffix.Contains("windows", StringComparison.OrdinalIgnoreCase))
+        if (suffix.Length > 0)
         {
             return null;
         }
 
-        var frameworkName = suffix.Contains("windows", StringComparison.OrdinalIgnoreCase)
-            ? "Microsoft.WindowsDesktop.App"
-            : "Microsoft.NETCore.App";
-        return new DotnetRuntimeRequirement(frameworkName, netChannel + ".0");
+        return new DotnetRuntimeRequirement("Microsoft.NETCore.App", netChannel + ".0");
+    }
+
+    public static IReadOnlyList<DotnetRuntimeRequirement> ResolveRequirementsFromRuntimeConfig(string entryPointPath)
+    {
+        if (string.IsNullOrWhiteSpace(entryPointPath))
+        {
+            return [];
+        }
+
+        var runtimeConfig = JsonNodeFileLoader.TryLoadJsonObject(Path.ChangeExtension(entryPointPath, ".runtimeconfig.json"));
+        if (runtimeConfig is null)
+        {
+            return [];
+        }
+
+        var requirements = new List<DotnetRuntimeRequirement>();
+        var runtimeOptions = runtimeConfig["runtimeOptions"] as JsonObject;
+        AddRequirementIfPresent(requirements, runtimeOptions?["framework"]);
+
+        if (runtimeOptions?["frameworks"] is JsonArray frameworks)
+        {
+            foreach (var frameworkNode in frameworks)
+            {
+                AddRequirementIfPresent(requirements, frameworkNode);
+            }
+        }
+
+        return requirements;
+    }
+
+    private static void AddRequirementIfPresent(ICollection<DotnetRuntimeRequirement> requirements, JsonNode? frameworkNode)
+    {
+        var requirement = TryResolveRequirementFromFrameworkNode(frameworkNode);
+        if (requirement is null
+            || requirements.Any(existing =>
+                string.Equals(existing.Name, requirement.Name, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(existing.Version, requirement.Version, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        requirements.Add(requirement);
+    }
+
+    private static DotnetRuntimeRequirement? TryResolveRequirementFromFrameworkNode(JsonNode? frameworkNode)
+    {
+        var framework = frameworkNode as JsonObject;
+        var frameworkName = framework?["name"]?.GetValue<string>();
+        var frameworkVersion = framework?["version"]?.GetValue<string>();
+        if (string.IsNullOrWhiteSpace(frameworkName)
+            || string.IsNullOrWhiteSpace(frameworkVersion))
+        {
+            return null;
+        }
+
+        return new DotnetRuntimeRequirement(frameworkName, frameworkVersion);
     }
 
     private static bool TryParseSupportedChannel(string value, out string channel)
