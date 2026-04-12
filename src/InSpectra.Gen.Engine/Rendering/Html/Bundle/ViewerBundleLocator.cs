@@ -147,36 +147,19 @@ internal class ViewerBundleLocator(IOptions<ViewerBundleLocatorOptions> options)
         if (!HasBundle(repositoryDist))
         {
             return allowBuild
-                ? await ResolveRepositoryBundleOrUsePackagedAsync(packagedPath, frontendRoot, cancellationToken, allowBuild)
+                ? await ResolveRepositoryBundleAsync(frontendRoot, cancellationToken, allowBuild)
                 : packagedPath;
         }
 
         if (!IsBundleStale(frontendRoot, repositoryDist)) return repositoryDist;
         if (!allowBuild) return SelectNewerBundle(packagedPath, repositoryDist);
-        return await ResolveRepositoryBundleOrUsePackagedAsync(packagedPath, frontendRoot, cancellationToken, allowBuild);
+        return await ResolveRepositoryBundleAsync(frontendRoot, cancellationToken, allowBuild);
     }
 
     private static bool HasFrontendProject(string frontendRoot) =>
         Directory.Exists(frontendRoot)
         && File.Exists(Path.Combine(frontendRoot, "package.json"))
         && File.Exists(Path.Combine(frontendRoot, "package-lock.json"));
-
-    private async Task<string> ResolveRepositoryBundleOrUsePackagedAsync(
-        string packagedPath,
-        string frontendRoot,
-        CancellationToken cancellationToken,
-        bool allowBuild)
-    {
-        try
-        {
-            return await ResolveRepositoryBundleAsync(frontendRoot, cancellationToken, allowBuild);
-        }
-        catch (CliUsageException)
-        {
-            var repositoryDist = Path.Combine(frontendRoot, "dist");
-            return HasBundle(repositoryDist) ? SelectNewerBundle(packagedPath, repositoryDist) : packagedPath;
-        }
-    }
 
     private static bool IsBundleStale(string frontendRoot, string bundleRoot)
     {

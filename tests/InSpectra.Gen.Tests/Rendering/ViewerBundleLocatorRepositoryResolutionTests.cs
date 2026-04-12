@@ -81,7 +81,7 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
     }
 
     [Fact]
-    public async Task Stale_packaged_bundle_remains_available_when_repo_build_fails()
+    public async Task Stale_packaged_bundle_with_missing_repo_dist_propagates_build_failure()
     {
         using var temp = new TempDirectory();
         var packagedRoot = CreateBundle(Path.Combine(temp.Path, "packaged"));
@@ -101,14 +101,14 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
                 RepositoryRootPath = repositoryRoot,
             }));
 
-        var resolved = await locator.ResolveAsync(CancellationToken.None);
+        var exception = await Assert.ThrowsAsync<CliUsageException>(() => locator.ResolveAsync(CancellationToken.None));
 
         Assert.True(locator.BuildInvoked);
-        Assert.Equal(packagedRoot, resolved);
+        Assert.Contains("simulated build failure", exception.Message);
     }
 
     [Fact]
-    public async Task Stale_packaged_bundle_remains_available_when_stale_repo_rebuild_fails()
+    public async Task Stale_packaged_bundle_with_stale_repo_bundle_propagates_build_failure()
     {
         using var temp = new TempDirectory();
         var packagedRoot = CreateBundle(Path.Combine(temp.Path, "packaged"));
@@ -130,14 +130,14 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
                 RepositoryRootPath = repositoryRoot,
             }));
 
-        var resolved = await locator.ResolveAsync(CancellationToken.None);
+        var exception = await Assert.ThrowsAsync<CliUsageException>(() => locator.ResolveAsync(CancellationToken.None));
 
         Assert.True(locator.BuildInvoked);
-        Assert.Equal(packagedRoot, resolved);
+        Assert.Contains("simulated build failure", exception.Message);
     }
 
     [Fact]
-    public async Task Newer_stale_repo_bundle_is_used_when_rebuild_fails()
+    public async Task Newer_stale_repo_bundle_does_not_mask_rebuild_failure()
     {
         using var temp = new TempDirectory();
         var packagedRoot = CreateBundle(Path.Combine(temp.Path, "packaged"));
@@ -160,10 +160,10 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
                 RepositoryRootPath = repositoryRoot,
             }));
 
-        var resolved = await locator.ResolveAsync(CancellationToken.None);
+        var exception = await Assert.ThrowsAsync<CliUsageException>(() => locator.ResolveAsync(CancellationToken.None));
 
         Assert.True(locator.BuildInvoked);
-        Assert.Equal(Path.Combine(frontendRoot, "dist"), resolved);
+        Assert.Contains("simulated build failure", exception.Message);
     }
 
     [Fact]

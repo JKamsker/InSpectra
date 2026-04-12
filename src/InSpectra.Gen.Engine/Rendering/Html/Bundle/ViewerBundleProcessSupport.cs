@@ -50,27 +50,28 @@ internal static class ViewerBundleProcessSupport
         }
 
         process.StandardInput.Close();
-        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        timeout.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
+        var timeout = TimeSpan.FromSeconds(timeoutSeconds);
+        var stopwatch = Stopwatch.StartNew();
+        var stdoutCapture = new ViewerBundleStreamCapture(process.StandardOutput);
+        var stderrCapture = new ViewerBundleStreamCapture(process.StandardError);
 
         try
         {
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(timeout.Token);
-            var stderrTask = process.StandardError.ReadToEndAsync(timeout.Token);
-
-            await process.WaitForExitAsync(timeout.Token);
-            _ = await stdoutTask;
-            var stderr = await stderrTask;
+            await WaitForExitAsync(process, timeout, cancellationToken);
+            var remainingDrainTime = RemainingDuration(timeout, stopwatch.Elapsed);
+            var (stdout, stderr) = await ReadOutputAsync(
+                stdoutCapture,
+                stderrCapture,
+                remainingDrainTime,
+                cancellationToken);
 
             if (process.ExitCode != 0)
             {
-                var details = new List<string> { $"Exit code: {process.ExitCode}" };
-                if (!string.IsNullOrWhiteSpace(stderr))
-                {
-                    details.Add(stderr.Trim());
-                }
-
-                throw CreateBuildFailure(workingDirectory, repositoryDist, $"`{executablePath}` exited with code {process.ExitCode}.", details);
+                throw CreateBuildFailure(
+                    workingDirectory,
+                    repositoryDist,
+                    $"`{executablePath}` exited with code {process.ExitCode}.",
+                    CreateExitDetails(process.ExitCode, stdout, stderr));
             }
         }
         catch (OperationCanceledException)
@@ -81,11 +82,23 @@ internal static class ViewerBundleProcessSupport
                 throw;
             }
 
+            stdoutCapture.ObserveFaults();
+            stderrCapture.ObserveFaults();
+            throw;
+        }
+        catch (TimeoutException)
+        {
+            TryTerminate(process);
+            var stdout = stdoutCapture.GetLatestText();
+            var stderr = stderrCapture.GetLatestText();
+            stdoutCapture.ObserveFaults();
+            stderrCapture.ObserveFaults();
+            cancellationToken.ThrowIfCancellationRequested();
             throw CreateBuildFailure(
                 workingDirectory,
                 repositoryDist,
                 $"`{executablePath}` did not finish within {timeoutSeconds} seconds.",
-                arguments.Count > 0 ? [$"Arguments: {string.Join(' ', arguments)}"] : []);
+                CreateTimeoutDetails(arguments, stdout, stderr));
         }
     }
 
@@ -134,6 +147,71 @@ internal static class ViewerBundleProcessSupport
 
     private static bool ContainsDirectorySeparator(string value)
         => value.Contains(Path.DirectorySeparatorChar) || value.Contains(Path.AltDirectorySeparatorChar);
+
+    private static async Task WaitForExitAsync(
+        Process process,
+        TimeSpan timeout,
+        CancellationToken cancellationToken)
+    {
+        var processExitTask = process.WaitForExitAsync(cancellationToken);
+        var timeoutTask = Task.Delay(timeout);
+        var completedTask = await Task.WhenAny(processExitTask, timeoutTask);
+        if (completedTask == processExitTask || processExitTask.IsCompleted)
+        {
+            await processExitTask;
+            return;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        throw new TimeoutException();
+    }
+
+    private static TimeSpan RemainingDuration(TimeSpan timeout, TimeSpan elapsed)
+        => timeout > elapsed ? timeout - elapsed : TimeSpan.Zero;
+
+    private static async Task<(string StandardOutput, string StandardError)> ReadOutputAsync(
+        ViewerBundleStreamCapture stdoutCapture,
+        ViewerBundleStreamCapture stderrCapture,
+        TimeSpan maxWait,
+        CancellationToken cancellationToken)
+    {
+        var stdoutTask = stdoutCapture.GetTextAsync(maxWait, cancellationToken);
+        var stderrTask = stderrCapture.GetTextAsync(maxWait, cancellationToken);
+        await Task.WhenAll(stdoutTask, stderrTask);
+        return (await stdoutTask, await stderrTask);
+    }
+
+    private static IReadOnlyList<string> CreateTimeoutDetails(
+        IReadOnlyList<string> arguments,
+        string stdout,
+        string stderr)
+    {
+        var details = new List<string>();
+        if (arguments.Count > 0)
+        {
+            details.Add($"Arguments: {string.Join(' ', arguments)}");
+        }
+
+        AddOutputDetail(details, "Standard output", stdout);
+        AddOutputDetail(details, "Standard error", stderr);
+        return details;
+    }
+
+    private static IReadOnlyList<string> CreateExitDetails(int exitCode, string stdout, string stderr)
+    {
+        var details = new List<string> { $"Exit code: {exitCode}" };
+        AddOutputDetail(details, "Standard output", stdout);
+        AddOutputDetail(details, "Standard error", stderr);
+        return details;
+    }
+
+    private static void AddOutputDetail(List<string> details, string label, string output)
+    {
+        if (!string.IsNullOrWhiteSpace(output))
+        {
+            details.Add($"{label}:{Environment.NewLine}{output.Trim()}");
+        }
+    }
 
     private static ProcessStartInfo CreateStartInfo(string executablePath, string workingDirectory)
         => new()
