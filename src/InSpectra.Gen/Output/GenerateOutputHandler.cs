@@ -3,6 +3,7 @@ using System.Text.Json;
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Output.Json;
 using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.UseCases.Generate;
 
 namespace InSpectra.Gen.Output;
 

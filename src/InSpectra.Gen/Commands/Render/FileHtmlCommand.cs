@@ -1,5 +1,6 @@
 using InSpectra.Gen.Output;
 using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Rendering.Html;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Render;
