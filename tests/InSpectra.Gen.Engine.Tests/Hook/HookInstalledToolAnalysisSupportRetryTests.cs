@@ -7,30 +7,33 @@ using InSpectra.Gen.Engine.Tests.TestSupport;
 
 using System.Text.Json;
 
-public sealed class HookInstalledToolAnalysisSupportPathTests
+public sealed class HookInstalledToolAnalysisSupportRetryTests
 {
     [Fact]
-    public async Task AnalyzeInstalledAsync_Keeps_Capture_Output_Separate_From_Working_Directory()
+    public async Task AnalyzeInstalledAsync_Preserves_Sandbox_Root_During_Alternate_Help_Retry()
     {
         using var tempDirectory = new RepositoryRegressionTestSupport.TemporaryDirectory();
         var hookDllPath = HookInstalledToolAnalysisTestSupport.CreateHookPlaceholder(tempDirectory.Path);
-        var outputDirectory = Path.Combine(tempDirectory.Path, "artifacts");
-        var workingDirectory = Path.Combine(tempDirectory.Path, "workspace");
-        Directory.CreateDirectory(outputDirectory);
-        Directory.CreateDirectory(workingDirectory);
-
         var installedTool = HookInstalledToolAnalysisTestSupport.CreateInstalledTool(tempDirectory);
         var expectedSandboxRoot = Path.GetFullPath(tempDirectory.Path);
+        var invocations = new List<HookInstalledToolAnalysisTestSupport.HookInvocation>();
         var runtime = new HookInstalledToolAnalysisTestSupport.FakeHookCommandRuntime(invocation =>
         {
-            Assert.Equal(workingDirectory, invocation.WorkingDirectory);
+            invocations.Add(invocation);
             Assert.Equal(expectedSandboxRoot, invocation.SandboxRoot);
-            Assert.NotEqual(invocation.WorkingDirectory, invocation.SandboxRoot);
+
+            if (invocations.Count == 1)
+            {
+                return new CommandRuntime.ProcessResult(
+                    Status: "failed",
+                    TimedOut: false,
+                    ExitCode: 1,
+                    DurationMs: 8,
+                    Stdout: string.Empty,
+                    Stderr: "error: Unrecognized command or argument '--help'.");
+            }
 
             var capturePath = invocation.Environment["INSPECTRA_CAPTURE_PATH"];
-            Assert.StartsWith(outputDirectory, capturePath, StringComparison.OrdinalIgnoreCase);
-            Assert.False(capturePath.StartsWith(workingDirectory, StringComparison.OrdinalIgnoreCase));
-
             File.WriteAllText(capturePath, JsonSerializer.Serialize(new HookCaptureResult
             {
                 CaptureVersion = 1,
@@ -51,10 +54,12 @@ public sealed class HookInstalledToolAnalysisSupportPathTests
         var result = HookInstalledToolAnalysisTestSupport.CreateInitialResult();
 
         await support.AnalyzeInstalledAsync(
-            new InstalledToolAnalysisRequest(result, "1.2.3", "demo", outputDirectory, installedTool, workingDirectory, 30),
+            new InstalledToolAnalysisRequest(result, "1.2.3", "demo", tempDirectory.Path, installedTool, tempDirectory.Path, 30),
             CancellationToken.None);
 
         Assert.Equal("success", result["disposition"]?.GetValue<string>());
-        Assert.Equal("opencli.json", result["artifacts"]?["opencliArtifact"]?.GetValue<string>());
+        Assert.True(invocations.Count >= 2);
+        Assert.Contains(invocations, invocation => invocation.ArgumentList.SequenceEqual(["--help"]));
+        Assert.Contains(invocations, invocation => !invocation.ArgumentList.SequenceEqual(["--help"]));
     }
 }

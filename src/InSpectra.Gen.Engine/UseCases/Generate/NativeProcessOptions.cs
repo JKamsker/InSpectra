@@ -8,4 +8,5 @@ internal sealed record NativeProcessOptions(
     IReadOnlyList<string> XmlDocArguments,
     string WorkingDirectory,
     IReadOnlyDictionary<string, string>? Environment,
+    string? CleanupRoot,
     int TimeoutSeconds);

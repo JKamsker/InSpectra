@@ -58,6 +58,7 @@ public static class EngineServiceCollectionExtensions
         services.AddSingleton<CliFxInstalledToolAnalysisSupport>();
         services.AddSingleton<StaticInstalledToolAnalysisSupport>();
         services.AddSingleton<HookInstalledToolAnalysisSupport>();
+        services.AddSingleton<AcquisitionAnalysisDispatcher>();
 
         // Public composition seams for the app shell. These adapters let
         // `InSpectra.Gen` depend on `Contracts.Providers` only, with no reach-in
@@ -65,7 +66,8 @@ public static class EngineServiceCollectionExtensions
         services.AddSingleton<ICliFrameworkCatalog, CliFrameworkCatalogAdapter>();
         services.AddSingleton<ILocalCliFrameworkDetector, LocalCliFrameworkDetector>();
         services.AddSingleton<IPackageCliToolInstaller, PackageCliToolInstaller>();
-        services.AddSingleton<IAcquisitionAnalysisDispatcher, AcquisitionAnalysisDispatcher>();
+        services.AddSingleton<IAcquisitionAnalysisDispatcher>(sp => sp.GetRequiredService<AcquisitionAnalysisDispatcher>());
+        services.AddSingleton<IAcquisitionAnalysisDispatcherInternal>(sp => sp.GetRequiredService<AcquisitionAnalysisDispatcher>());
 
         return services;
     }

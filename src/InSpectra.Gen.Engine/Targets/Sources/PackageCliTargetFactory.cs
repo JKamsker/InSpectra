@@ -33,6 +33,7 @@ internal sealed class PackageCliTargetFactory(IPackageCliToolInstaller installer
             Environment: installation.Environment,
             CliFramework: installation.CliFramework,
             HookCliFramework: installation.HookCliFramework,
+            CleanupRoot: Path.GetFullPath(tempRoot),
             PackageTitle: installation.PackageTitle,
             PackageDescription: installation.PackageDescription);
     }

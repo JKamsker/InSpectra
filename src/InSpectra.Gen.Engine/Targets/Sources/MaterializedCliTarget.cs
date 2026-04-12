@@ -11,6 +11,7 @@ internal sealed record MaterializedCliTarget(
     IReadOnlyDictionary<string, string> Environment,
     string? CliFramework,
     string? HookCliFramework,
+    string? CleanupRoot = null,
     string? XmlDocCommandPath = null,
     string? PackageTitle = null,
     string? PackageDescription = null);

@@ -5,6 +5,7 @@ using InSpectra.Gen.Engine.Contracts.Crawling;
 using InSpectra.Gen.Engine.Modes.CliFx.Crawling;
 using InSpectra.Gen.Engine.Modes.Help.Crawling;
 using InSpectra.Gen.Engine.Tooling.Process;
+using InSpectra.Gen.Engine.Tests.TestSupport;
 
 using Xunit;
 
@@ -13,14 +14,21 @@ public sealed class CliFxHelpCrawlerTests
     [Fact]
     public async Task CrawlAsync_Retries_With_DotnetRollForward_When_Shared_Runtime_Is_Missing()
     {
+        using var tempDirectory = new RepositoryRegressionTestSupport.TemporaryDirectory();
         var runtime = new FakeCommandRuntime();
         var crawler = new CliFxHelpCrawler(runtime);
+        var sandboxRoot = Path.Combine(tempDirectory.Path, "sandbox");
+        var workingDirectory = Path.Combine(tempDirectory.Path, "workspace");
+        Directory.CreateDirectory(sandboxRoot);
+        Directory.CreateDirectory(workingDirectory);
+        var sandboxEnvironment = runtime.CreateSandboxEnvironment(sandboxRoot);
 
         var result = await crawler.CrawlAsync(
             "demo",
-            workingDirectory: Environment.CurrentDirectory,
-            environment: new Dictionary<string, string>(),
+            workingDirectory: workingDirectory,
+            environment: sandboxEnvironment.Values,
             timeoutSeconds: 30,
+            sandboxCleanupRoot: Path.GetFullPath(sandboxRoot),
             cancellationToken: CancellationToken.None);
 
         Assert.True(result.Documents.ContainsKey(string.Empty));
@@ -31,6 +39,12 @@ public sealed class CliFxHelpCrawlerTests
         Assert.Equal(
             DotnetRuntimeCompatibilitySupport.DotnetRollForwardMajorValue,
             runtime.Invocations[1].Environment[DotnetRuntimeCompatibilitySupport.DotnetRollForwardEnvironmentVariableName]);
+        Assert.All(runtime.Invocations, invocation =>
+        {
+            Assert.Equal(workingDirectory, invocation.WorkingDirectory);
+            Assert.Equal(Path.GetFullPath(sandboxRoot), invocation.SandboxRoot);
+            Assert.NotEqual(invocation.WorkingDirectory, invocation.SandboxRoot);
+        });
         Assert.Equal("--help", result.CaptureSummaries[string.Empty].HelpSwitch);
     }
 
@@ -56,11 +70,37 @@ public sealed class CliFxHelpCrawlerTests
             workingDirectory: Environment.CurrentDirectory,
             environment: new Dictionary<string, string>(),
             timeoutSeconds: 30,
+            sandboxCleanupRoot: null,
             cancellationToken: CancellationToken.None);
 
         Assert.NotNull(result.GuardrailFailureMessage);
         Assert.Contains(HelpCrawlGuardrailSupport.MaxChildCommandsPerDocument.ToString(), result.GuardrailFailureMessage);
         Assert.Equal([""], result.Documents.Keys);
+        Assert.Null(runtime.LastSandboxRoot);
+    }
+
+    [Fact]
+    public async Task CrawlAsync_Normalizes_Root_Qualified_Command_Entries()
+    {
+        var runtime = new RootQualifiedCommandRuntime();
+        var crawler = new CliFxHelpCrawler(runtime);
+
+        var result = await crawler.CrawlAsync(
+            "demo",
+            workingDirectory: Environment.CurrentDirectory,
+            environment: new Dictionary<string, string>(),
+            timeoutSeconds: 30,
+            sandboxCleanupRoot: null,
+            cancellationToken: CancellationToken.None);
+
+        Assert.Equal(
+            [
+                "--help",
+                "child --help",
+            ],
+            runtime.Invocations);
+        Assert.Contains("child", result.Documents.Keys);
+        Assert.DoesNotContain("demo child", result.Documents.Keys, StringComparer.OrdinalIgnoreCase);
     }
 
     private static CommandRuntime.ProcessResult MissingFrameworkResult()
@@ -112,7 +152,9 @@ public sealed class CliFxHelpCrawlerTests
         {
             var invocation = new InvocationRecord(
                 argumentList.ToArray(),
-                new Dictionary<string, string>(environment, StringComparer.OrdinalIgnoreCase));
+                new Dictionary<string, string>(environment, StringComparer.OrdinalIgnoreCase),
+                workingDirectory,
+                sandboxRoot);
             Invocations.Add(invocation);
 
             var result = invocation.Environment.ContainsKey(DotnetRuntimeCompatibilitySupport.DotnetRollForwardEnvironmentVariableName)
@@ -124,6 +166,8 @@ public sealed class CliFxHelpCrawlerTests
 
     private sealed class FanoutCommandRuntime(string helpText) : CommandRuntime
     {
+        public string? LastSandboxRoot { get; private set; }
+
         public override Task<ProcessResult> InvokeProcessCaptureAsync(
             string filePath,
             IReadOnlyList<string> argumentList,
@@ -132,16 +176,65 @@ public sealed class CliFxHelpCrawlerTests
             int timeoutSeconds,
             string? sandboxRoot,
             CancellationToken cancellationToken)
-            => Task.FromResult(new ProcessResult(
+        {
+            LastSandboxRoot = sandboxRoot;
+            return Task.FromResult(new ProcessResult(
                 Status: "ok",
                 TimedOut: false,
                 ExitCode: 0,
                 DurationMs: 1,
                 Stdout: helpText,
                 Stderr: string.Empty));
+        }
+    }
+
+    private sealed class RootQualifiedCommandRuntime : CommandRuntime
+    {
+        public List<string> Invocations { get; } = [];
+
+        public override Task<ProcessResult> InvokeProcessCaptureAsync(
+            string filePath,
+            IReadOnlyList<string> argumentList,
+            string workingDirectory,
+            IReadOnlyDictionary<string, string> environment,
+            int timeoutSeconds,
+            string? sandboxRoot,
+            CancellationToken cancellationToken)
+        {
+            var invocation = string.Join(' ', argumentList);
+            Invocations.Add(invocation);
+
+            return Task.FromResult(new ProcessResult(
+                Status: "ok",
+                TimedOut: false,
+                ExitCode: 0,
+                DurationMs: 1,
+                Stdout: string.Equals(invocation, "--help", StringComparison.Ordinal)
+                    ? """
+                      demo
+
+                      USAGE
+                        demo [command]
+
+                      COMMANDS
+                        demo child    Child command.
+                      """
+                    : """
+                      demo child
+
+                      USAGE
+                        demo child [options]
+
+                      OPTIONS
+                        --verbose  Verbose output.
+                      """,
+                Stderr: string.Empty));
+        }
     }
 
     private sealed record InvocationRecord(
         string[] Arguments,
-        IReadOnlyDictionary<string, string> Environment);
+        IReadOnlyDictionary<string, string> Environment,
+        string WorkingDirectory,
+        string? SandboxRoot);
 }

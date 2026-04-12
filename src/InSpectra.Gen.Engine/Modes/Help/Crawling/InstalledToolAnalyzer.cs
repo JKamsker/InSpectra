@@ -62,7 +62,14 @@ internal sealed class InstalledToolAnalyzer
     {
         var crawlStopwatch = Stopwatch.StartNew();
         var crawler = new Crawler(_runtime);
-        var crawl = await crawler.CrawlAsync(request.InstalledTool.CommandPath, request.CommandName, request.WorkingDirectory, request.InstalledTool.Environment, request.CommandTimeoutSeconds, cancellationToken);
+        var crawl = await crawler.CrawlAsync(
+            request.InstalledTool.CommandPath,
+            request.CommandName,
+            request.WorkingDirectory,
+            request.InstalledTool.Environment,
+            request.CommandTimeoutSeconds,
+            request.InstalledTool.CleanupRoot,
+            cancellationToken);
         crawlStopwatch.Stop();
         var outputLimitExceededCommands = crawl.CaptureSummaries.Values
             .Where(summary => summary.OutputLimitExceeded)

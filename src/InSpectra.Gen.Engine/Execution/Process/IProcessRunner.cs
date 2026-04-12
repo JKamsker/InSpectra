@@ -15,5 +15,6 @@ internal interface IProcessRunner
         IReadOnlyList<string> arguments,
         int timeoutSeconds,
         IReadOnlyDictionary<string, string>? environment,
+        string? cleanupRoot,
         CancellationToken cancellationToken);
 }

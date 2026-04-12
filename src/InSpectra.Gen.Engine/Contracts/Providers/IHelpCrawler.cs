@@ -15,5 +15,6 @@ internal interface IHelpCrawler
         string workingDirectory,
         IReadOnlyDictionary<string, string> environment,
         int timeoutSeconds,
+        string? sandboxCleanupRoot,
         CancellationToken cancellationToken);
 }

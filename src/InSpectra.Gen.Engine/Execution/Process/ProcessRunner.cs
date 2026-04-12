@@ -1,17 +1,37 @@
 using System.Diagnostics;
 using InSpectra.Gen.Core;
+using InSpectra.Gen.Engine.Tooling.Process;
 
 namespace InSpectra.Gen.Engine.Execution.Process;
 
 internal sealed class ProcessRunner : IProcessRunner
 {
+    private readonly Action<string?> _terminateSandboxProcesses;
+
+    public ProcessRunner()
+        : this(CommandProcessSupport.TerminateSandboxProcesses)
+    {
+    }
+
+    internal ProcessRunner(Action<string?> terminateSandboxProcesses)
+    {
+        _terminateSandboxProcesses = terminateSandboxProcesses;
+    }
+
     public async Task<ProcessResult> RunAsync(
         string executablePath,
         string workingDirectory,
         IReadOnlyList<string> arguments,
         int timeoutSeconds,
         CancellationToken cancellationToken)
-        => await RunAsync(executablePath, workingDirectory, arguments, timeoutSeconds, environment: null, cancellationToken);
+        => await RunAsync(
+            executablePath,
+            workingDirectory,
+            arguments,
+            timeoutSeconds,
+            environment: null,
+            cleanupRoot: null,
+            cancellationToken);
 
     public async Task<ProcessResult> RunAsync(
         string executablePath,
@@ -19,6 +39,7 @@ internal sealed class ProcessRunner : IProcessRunner
         IReadOnlyList<string> arguments,
         int timeoutSeconds,
         IReadOnlyDictionary<string, string>? environment,
+        string? cleanupRoot,
         CancellationToken cancellationToken)
     {
         var startInfo = new ProcessStartInfo
@@ -86,9 +107,11 @@ internal sealed class ProcessRunner : IProcessRunner
             TryTerminate(process);
             if (cancellationToken.IsCancellationRequested)
             {
+                _terminateSandboxProcesses(cleanupRoot);
                 throw;
             }
 
+            _terminateSandboxProcesses(cleanupRoot);
             throw new CliSourceExecutionException(
                 $"`{executablePath}` did not finish within {timeoutSeconds} seconds.",
                 details: arguments.Count > 0 ? [$"Arguments: {string.Join(' ', arguments)}"] : [],

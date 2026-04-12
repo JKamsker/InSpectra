@@ -3,6 +3,7 @@ using InSpectra.Gen.Core;
 using InSpectra.Gen.Engine.Contracts.Providers;
 using InSpectra.Gen.Engine.Execution.Process;
 using InSpectra.Gen.Engine.Execution.Workspace;
+using InSpectra.Gen.Engine.Orchestration;
 using InSpectra.Gen.Engine.Targets.Inputs;
 using InSpectra.Gen.Engine.Targets.Sources;
 using InSpectra.Gen.Engine.UseCases.Generate.Requests;
@@ -16,7 +17,7 @@ internal sealed class OpenCliAcquisitionService(
     PackageCliTargetFactory packageCliTargetFactory,
     DotnetBuildOutputResolver dotnetBuildOutputResolver,
     ICliFrameworkCatalog cliFrameworkCatalog,
-    IAcquisitionAnalysisDispatcher acquisitionAnalysisDispatcher)
+    IAcquisitionAnalysisDispatcherInternal acquisitionAnalysisDispatcher)
     : IOpenCliAcquisitionService
 {
     public async Task<OpenCliAcquisitionResult> AcquireFromExecAsync(
@@ -86,6 +87,7 @@ internal sealed class OpenCliAcquisitionService(
             options.IncludeXmlDoc,
             options.XmlDocArguments,
             request.WorkingDirectory,
+            null,
             null,
             options.TimeoutSeconds);
 
@@ -166,6 +168,7 @@ internal sealed class OpenCliAcquisitionService(
             options.XmlDocArguments,
             target.WorkingDirectory,
             target.Environment,
+            target.CleanupRoot,
             options.TimeoutSeconds);
 
         if (options.Mode == OpenCliMode.Native)
@@ -204,6 +207,7 @@ internal sealed class OpenCliAcquisitionService(
         {
             var outcome = await acquisitionAnalysisDispatcher.TryAnalyzeAsync(
                 targetDescriptor,
+                target.CleanupRoot,
                 plannedAttempt.Mode,
                 plannedAttempt.Framework,
                 options.TimeoutSeconds,
@@ -225,6 +229,7 @@ internal sealed class OpenCliAcquisitionService(
                     options.XmlDocArguments,
                     target.WorkingDirectory,
                     target.Environment,
+                    target.CleanupRoot,
                     options.TimeoutSeconds,
                     cancellationToken)
                 : null;

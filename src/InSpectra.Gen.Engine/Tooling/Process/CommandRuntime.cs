@@ -70,7 +70,8 @@ internal class CommandRuntime
 
     public sealed record SandboxEnvironment(
         IReadOnlyDictionary<string, string> Values,
-        IReadOnlyList<string> Directories);
+        IReadOnlyList<string> Directories,
+        string CleanupRoot);
 
     public sealed record ProcessResult(
         string Status,
@@ -94,4 +95,3 @@ internal class CommandRuntime
             };
     }
 }
-

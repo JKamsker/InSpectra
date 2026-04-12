@@ -16,7 +16,7 @@ internal static class HookProcessRetrySupport
     {
         var capturePublisher = new RetryCapturePublisher(capturePath);
         var attemptedHelpInvocations = new HashSet<string>(StringComparer.Ordinal);
-        attemptedHelpInvocations.Add(BuildInvocationKey(invocation));
+        attemptedHelpInvocations.Add(BuildAttemptKey(invocation, environment));
         var retryResult = await InvokeWithCompatibilityRetriesAsync(
             invocation,
             environment,
@@ -28,18 +28,17 @@ internal static class HookProcessRetrySupport
         {
             return capturePublisher.Publish(retryResult);
         }
-
+        var effectiveEnvironment = retryResult.Environment;
         foreach (var fallbackInvocation in HookToolProcessInvocationResolver.BuildHelpFallbackInvocations(invocation))
         {
-            if (!attemptedHelpInvocations.Add(BuildInvocationKey(fallbackInvocation)))
+            if (!attemptedHelpInvocations.Add(BuildAttemptKey(fallbackInvocation, effectiveEnvironment)))
             {
                 continue;
             }
-
             capturePublisher.DeleteAttemptCapture(retryResult);
             retryResult = await InvokeWithCompatibilityRetriesAsync(
                 fallbackInvocation,
-                environment,
+                effectiveEnvironment,
                 capturePublisher,
                 attemptedHelpInvocations,
                 invokeAsync,
@@ -48,8 +47,8 @@ internal static class HookProcessRetrySupport
             {
                 return capturePublisher.Publish(retryResult);
             }
+            effectiveEnvironment = retryResult.Environment;
         }
-
         return capturePublisher.Publish(retryResult);
     }
 
@@ -62,67 +61,37 @@ internal static class HookProcessRetrySupport
         CancellationToken cancellationToken)
     {
         var effectiveEnvironment = environment;
-        var retryResult = await InvokeAttemptAsync(
-            invocation,
-            effectiveEnvironment,
-            capturePublisher,
-            invokeAsync,
-            cancellationToken);
-        if (!retryResult.HasCapture
-            && DotnetRuntimeCompatibilitySupport.LooksLikeMissingIcu(retryResult.ProcessResult)
-            && !effectiveEnvironment.ContainsKey(DotnetRuntimeCompatibilitySupport.GlobalizationInvariantEnvironmentVariableName))
+        while (true)
         {
-            effectiveEnvironment = new Dictionary<string, string>(effectiveEnvironment, StringComparer.OrdinalIgnoreCase)
-            {
-                [DotnetRuntimeCompatibilitySupport.GlobalizationInvariantEnvironmentVariableName] = "1",
-            };
-
-            retryResult = await InvokeAttemptAsync(
+            var retryResult = await InvokeWithHelpFallbackVariantsAsync(
                 invocation,
                 effectiveEnvironment,
                 capturePublisher,
+                attemptedHelpInvocations,
                 invokeAsync,
                 cancellationToken);
-            if (retryResult.HasCapture || !HookRejectedHelpSupport.LooksLikeRejectedHelpInvocation(retryResult.ProcessResult))
+
+            if (retryResult.HasCapture
+                || !TryBuildRetryEnvironment(retryResult.ProcessResult, effectiveEnvironment, out var retryEnvironment))
             {
                 return retryResult;
             }
 
-            foreach (var fallbackInvocation in HookToolProcessInvocationResolver.BuildHelpFallbackInvocations(invocation))
-            {
-                if (!attemptedHelpInvocations.Add(BuildInvocationKey(fallbackInvocation)))
-                {
-                    continue;
-                }
-
-                retryResult = await InvokeAttemptAsync(
-                    fallbackInvocation,
-                    effectiveEnvironment,
-                    capturePublisher,
-                    invokeAsync,
-                    cancellationToken);
-                if (retryResult.HasCapture || !HookRejectedHelpSupport.LooksLikeRejectedHelpInvocation(retryResult.ProcessResult))
-                {
-                    return retryResult;
-                }
-            }
+            effectiveEnvironment = retryEnvironment;
         }
+    }
 
-        if (retryResult.HasCapture
-            || !DotnetRuntimeCompatibilitySupport.LooksLikeMissingSharedRuntime(retryResult.ProcessResult)
-            || effectiveEnvironment.ContainsKey(DotnetRuntimeCompatibilitySupport.DotnetRollForwardEnvironmentVariableName))
-        {
-            return retryResult;
-        }
-
-        effectiveEnvironment = new Dictionary<string, string>(effectiveEnvironment, StringComparer.OrdinalIgnoreCase)
-        {
-            [DotnetRuntimeCompatibilitySupport.DotnetRollForwardEnvironmentVariableName] = DotnetRuntimeCompatibilitySupport.DotnetRollForwardMajorValue,
-        };
-
-        retryResult = await InvokeAttemptAsync(
+    private static async Task<RetryInvocationResult> InvokeWithHelpFallbackVariantsAsync(
+        HookToolProcessInvocation invocation,
+        IReadOnlyDictionary<string, string> environment,
+        RetryCapturePublisher capturePublisher,
+        ISet<string> attemptedHelpInvocations,
+        Func<HookToolProcessInvocation, IReadOnlyDictionary<string, string>, CancellationToken, Task<CommandRuntime.ProcessResult>> invokeAsync,
+        CancellationToken cancellationToken)
+    {
+        var retryResult = await InvokeAttemptAsync(
             invocation,
-            effectiveEnvironment,
+            environment,
             capturePublisher,
             invokeAsync,
             cancellationToken);
@@ -133,14 +102,14 @@ internal static class HookProcessRetrySupport
 
         foreach (var fallbackInvocation in HookToolProcessInvocationResolver.BuildHelpFallbackInvocations(invocation))
         {
-            if (!attemptedHelpInvocations.Add(BuildInvocationKey(fallbackInvocation)))
+            if (!attemptedHelpInvocations.Add(BuildAttemptKey(fallbackInvocation, environment)))
             {
                 continue;
             }
 
             retryResult = await InvokeAttemptAsync(
                 fallbackInvocation,
-                effectiveEnvironment,
+                environment,
                 capturePublisher,
                 invokeAsync,
                 cancellationToken);
@@ -152,6 +121,58 @@ internal static class HookProcessRetrySupport
 
         return retryResult;
     }
+
+    private static bool TryBuildRetryEnvironment(
+        CommandRuntime.ProcessResult processResult,
+        IReadOnlyDictionary<string, string> environment,
+        out IReadOnlyDictionary<string, string> retryEnvironment)
+    {
+        if (DotnetRuntimeCompatibilitySupport.LooksLikeMissingIcu(processResult)
+            && !HasExpectedEnvironmentValue(
+                environment,
+                DotnetRuntimeCompatibilitySupport.GlobalizationInvariantEnvironmentVariableName,
+                "1"))
+        {
+            retryEnvironment = WithEnvironmentValue(
+                environment,
+                DotnetRuntimeCompatibilitySupport.GlobalizationInvariantEnvironmentVariableName,
+                "1");
+            return true;
+        }
+
+        if (DotnetRuntimeCompatibilitySupport.LooksLikeMissingSharedRuntime(processResult)
+            && !HasExpectedEnvironmentValue(
+                environment,
+                DotnetRuntimeCompatibilitySupport.DotnetRollForwardEnvironmentVariableName,
+                DotnetRuntimeCompatibilitySupport.DotnetRollForwardMajorValue))
+        {
+            retryEnvironment = WithEnvironmentValue(
+                environment,
+                DotnetRuntimeCompatibilitySupport.DotnetRollForwardEnvironmentVariableName,
+                DotnetRuntimeCompatibilitySupport.DotnetRollForwardMajorValue);
+            return true;
+        }
+
+        retryEnvironment = environment;
+        return false;
+    }
+
+    private static bool HasExpectedEnvironmentValue(
+        IReadOnlyDictionary<string, string> environment,
+        string key,
+        string expectedValue)
+        => environment.Any(pair =>
+            string.Equals(pair.Key, key, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(pair.Value, expectedValue, StringComparison.OrdinalIgnoreCase));
+
+    private static IReadOnlyDictionary<string, string> WithEnvironmentValue(
+        IReadOnlyDictionary<string, string> environment,
+        string key,
+        string value)
+        => new Dictionary<string, string>(environment, StringComparer.OrdinalIgnoreCase)
+        {
+            [key] = value,
+        };
 
     private static async Task<RetryInvocationResult> InvokeAttemptAsync(
         HookToolProcessInvocation invocation,
@@ -166,7 +187,7 @@ internal static class HookProcessRetrySupport
             [CapturePathEnvironmentVariableName] = attemptCapturePath,
         };
         var processResult = await invokeAsync(invocation, effectiveEnvironment, cancellationToken);
-        return new RetryInvocationResult(processResult, attemptCapturePath);
+        return new RetryInvocationResult(processResult, attemptCapturePath, environment);
     }
 
     private static bool ShouldRetryWithAlternateHelp(RetryInvocationResult retryResult)
@@ -204,7 +225,21 @@ internal static class HookProcessRetrySupport
             '\u001f',
             [invocation.FilePath, invocation.PreferredAssemblyPath ?? string.Empty, .. invocation.ArgumentList]);
 
-    private sealed record RetryInvocationResult(CommandRuntime.ProcessResult ProcessResult, string CapturePath)
+    private static string BuildAttemptKey(
+        HookToolProcessInvocation invocation,
+        IReadOnlyDictionary<string, string> environment)
+        => string.Join(
+            '\u001f',
+            [
+                BuildInvocationKey(invocation),
+                TryGetEnvironmentValue(environment, DotnetRuntimeCompatibilitySupport.GlobalizationInvariantEnvironmentVariableName),
+                TryGetEnvironmentValue(environment, DotnetRuntimeCompatibilitySupport.DotnetRollForwardEnvironmentVariableName),
+            ]);
+
+    private static string TryGetEnvironmentValue(IReadOnlyDictionary<string, string> environment, string key)
+        => environment.TryGetValue(key, out var value) ? value : string.Empty;
+
+    private sealed record RetryInvocationResult(CommandRuntime.ProcessResult ProcessResult, string CapturePath, IReadOnlyDictionary<string, string> Environment)
     {
         public bool HasCapture => File.Exists(CapturePath);
     }

@@ -82,6 +82,7 @@ internal sealed class HookInstalledToolAnalysisSupport
 
         // Prepare capture path and hook environment.
         var capturePath = Path.Combine(request.OutputDirectory, $"inspectra-capture.{Guid.NewGuid():N}.json");
+        var sandboxCleanupRoot = request.InstalledTool.CleanupRoot;
         var hookEnvironment = new Dictionary<string, string>(request.InstalledTool.Environment, StringComparer.OrdinalIgnoreCase)
         {
             ["DOTNET_STARTUP_HOOKS"] = hookDllPath,
@@ -128,6 +129,7 @@ internal sealed class HookInstalledToolAnalysisSupport
                 request.WorkingDirectory,
                 effectiveEnvironment,
                 request.CommandTimeoutSeconds,
+                sandboxCleanupRoot,
                 token),
             cancellationToken);
         var processResult = retryResult.ProcessResult;
@@ -217,6 +219,7 @@ internal sealed class HookInstalledToolAnalysisSupport
         string workingDirectory,
         IReadOnlyDictionary<string, string> environment,
         int timeoutSeconds,
+        string? sandboxCleanupRoot,
         CancellationToken cancellationToken)
         => _runtime.InvokeProcessCaptureAsync(
             invocation.FilePath,
@@ -224,7 +227,7 @@ internal sealed class HookInstalledToolAnalysisSupport
             workingDirectory,
             environment,
             timeoutSeconds,
-            workingDirectory,
+            sandboxCleanupRoot,
             cancellationToken);
 
     private static bool TryApplyMissingSharedRuntimeFailure(

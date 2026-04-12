@@ -64,6 +64,7 @@ internal sealed class OpenCliNativeAcquisitionSupport(IProcessRunner processRunn
         IReadOnlyList<string> xmlDocArguments,
         string workingDirectory,
         IReadOnlyDictionary<string, string>? environment,
+        string? cleanupRoot,
         int timeoutSeconds,
         CancellationToken cancellationToken)
     {
@@ -73,6 +74,7 @@ internal sealed class OpenCliNativeAcquisitionSupport(IProcessRunner processRunn
             xmlDocArguments,
             timeoutSeconds,
             environment,
+            cleanupRoot,
             cancellationToken);
         return xmlResult.StandardOutput;
     }
@@ -87,6 +89,7 @@ internal sealed class OpenCliNativeAcquisitionSupport(IProcessRunner processRunn
             process.SourceArguments.Concat(process.OpenCliArguments).ToArray(),
             process.TimeoutSeconds,
             process.Environment,
+            process.CleanupRoot,
             cancellationToken);
         var xmlDocument = process.IncludeXmlDoc
             ? await RunXmlDocAsync(
@@ -94,6 +97,7 @@ internal sealed class OpenCliNativeAcquisitionSupport(IProcessRunner processRunn
                 process.SourceArguments.Concat(process.XmlDocArguments).ToArray(),
                 process.WorkingDirectory,
                 process.Environment,
+                process.CleanupRoot,
                 process.TimeoutSeconds,
                 cancellationToken)
             : null;

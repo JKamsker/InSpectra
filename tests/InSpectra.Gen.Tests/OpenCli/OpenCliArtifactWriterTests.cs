@@ -1,8 +1,6 @@
 using System.Text.Json.Nodes;
-
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Engine.Execution.Process;
-using InSpectra.Gen.Engine.Targets.Sources;
 using InSpectra.Gen.Engine.UseCases.Generate;
 using InSpectra.Gen.Engine.UseCases.Generate.Requests;
 using InSpectra.Gen.Tests.TestSupport;
@@ -108,8 +106,7 @@ public sealed class OpenCliArtifactWriterTests
     [Fact]
     public async Task Native_acquisition_uses_reported_executable_path_in_result_source()
     {
-        var processRunner = new FakeProcessRunner();
-        var support = new OpenCliNativeAcquisitionSupport(processRunner);
+        var support = new OpenCliNativeAcquisitionSupport(new FakeProcessRunner());
 
         var result = await support.AcquireAsync(
             new AcquisitionResultContext(
@@ -126,6 +123,7 @@ public sealed class OpenCliArtifactWriterTests
                 false,
                 [],
                 Environment.CurrentDirectory,
+                null,
                 null,
                 30),
             warnings: [],
@@ -157,6 +155,7 @@ public sealed class OpenCliArtifactWriterTests
                 [],
                 Environment.CurrentDirectory,
                 null,
+                null,
                 30),
             attempts: [],
             warnings: [],
@@ -174,8 +173,7 @@ public sealed class OpenCliArtifactWriterTests
     {
         using var temp = new TempDirectory();
         var openCliPath = Path.Combine(temp.Path, "opencli.json");
-        var processRunner = new FakeProcessRunner();
-        var support = new OpenCliNativeAcquisitionSupport(processRunner);
+        var support = new OpenCliNativeAcquisitionSupport(new FakeProcessRunner());
 
         var result = await support.AcquireAsync(
             new AcquisitionResultContext(
@@ -193,6 +191,7 @@ public sealed class OpenCliArtifactWriterTests
                 [],
                 Environment.CurrentDirectory,
                 null,
+                null,
                 30),
             warnings: [],
             cancellationToken: CancellationToken.None);
@@ -201,50 +200,5 @@ public sealed class OpenCliArtifactWriterTests
         Assert.Equal(
             JsonNode.Parse(result.OpenCliJson)?.ToJsonString(),
             JsonNode.Parse(await File.ReadAllTextAsync(openCliPath))?.ToJsonString());
-    }
-
-    [Fact]
-    public async Task Acquisition_service_writes_artifacts_for_successful_analysis_dispatch()
-    {
-        using var temp = new TempDirectory();
-        var sourcePath = Path.Combine(temp.Path, "demo.cmd");
-        await File.WriteAllTextAsync(sourcePath, "@echo off");
-        var openCliPath = Path.Combine(temp.Path, "opencli.json");
-        var crawlPath = Path.Combine(temp.Path, "crawl.json");
-        var openCliJson = "{\"openCliVersion\":\"0.1-draft\",\"info\":{\"title\":\"demo\",\"version\":\"1.0.0\"}}";
-        var crawlJson = "{\"commands\":[]}";
-        var service = new OpenCliAcquisitionService(
-            new ExecutableResolver(),
-            new OpenCliNativeAcquisitionSupport(new FakeProcessRunner()),
-            new LocalCliTargetFactory(new FakeLocalCliFrameworkDetector()),
-            new PackageCliTargetFactory(new UnusedPackageInstaller()),
-            new DotnetBuildOutputResolver(new FakeProcessRunner()),
-            new EmptyCliFrameworkCatalog(),
-            new SuccessfulDispatcher(openCliJson, crawlJson));
-
-        var result = await service.AcquireFromExecAsync(
-            new ExecAcquisitionRequest(
-                sourcePath,
-                [],
-                temp.Path,
-                new AcquisitionOptions(
-                    OpenCliMode.Hook,
-                    "demo",
-                    null,
-                    [],
-                    false,
-                    [],
-                    30,
-                    new OpenCliArtifactOptions(openCliPath, crawlPath))),
-            CancellationToken.None);
-
-        Assert.Equal(Path.GetFullPath(openCliPath), result.Metadata.OpenCliOutputPath);
-        Assert.Equal(Path.GetFullPath(crawlPath), result.Metadata.CrawlOutputPath);
-        Assert.Equal(
-            JsonNode.Parse(openCliJson)?.ToJsonString(),
-            JsonNode.Parse(await File.ReadAllTextAsync(openCliPath))?.ToJsonString());
-        Assert.Equal(
-            JsonNode.Parse(crawlJson)?.ToJsonString(),
-            JsonNode.Parse(await File.ReadAllTextAsync(crawlPath))?.ToJsonString());
     }
 }

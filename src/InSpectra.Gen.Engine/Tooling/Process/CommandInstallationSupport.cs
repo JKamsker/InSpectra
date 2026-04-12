@@ -62,7 +62,8 @@ internal static class CommandInstallationSupport
             Environment: sandbox.Values,
             InstallDirectory: installDirectory,
             CommandPath: commandPath,
-            PreferredEntryPointPath: InstalledDotnetToolCommandSupport.TryResolve(installDirectory, commandName)?.EntryPointPath);
+            PreferredEntryPointPath: InstalledDotnetToolCommandSupport.TryResolve(installDirectory, commandName)?.EntryPointPath,
+            CleanupRoot: sandbox.CleanupRoot);
     }
 
     private static void EnsureDirectories(IReadOnlyList<string> directories)

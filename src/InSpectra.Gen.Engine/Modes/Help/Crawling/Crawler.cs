@@ -36,6 +36,7 @@ internal sealed class Crawler : IHelpCrawler
         string workingDirectory,
         IReadOnlyDictionary<string, string> environment,
         int timeoutSeconds,
+        string? sandboxCleanupRoot,
         CancellationToken cancellationToken)
     {
         var queue = new Queue<string[]>();
@@ -65,7 +66,15 @@ internal sealed class Crawler : IHelpCrawler
                 continue;
             }
 
-            var capture = await CaptureHelpAsync(commandPath, rootCommandName, commandSegments, workingDirectory, environment, timeoutSeconds, cancellationToken);
+            var capture = await CaptureHelpAsync(
+                commandPath,
+                rootCommandName,
+                commandSegments,
+                workingDirectory,
+                environment,
+                timeoutSeconds,
+                sandboxCleanupRoot,
+                cancellationToken);
             captures[key] = capture.ToJsonObject(commandSegments);
             captureSummaries[key] = capture.ToSummary(commandSegments);
 
@@ -121,6 +130,7 @@ internal sealed class Crawler : IHelpCrawler
         string workingDirectory,
         IReadOnlyDictionary<string, string> environment,
         int timeoutSeconds,
+        string? sandboxCleanupRoot,
         CancellationToken cancellationToken)
     {
         Capture? bestCapture = null;
@@ -135,7 +145,7 @@ internal sealed class Crawler : IHelpCrawler
                 workingDirectory,
                 environment,
                 timeoutSeconds,
-                workingDirectory,
+                sandboxCleanupRoot,
                 cancellationToken);
 
             var capture = BuildCapture(rootCommandName, commandSegments, candidate, processResult);

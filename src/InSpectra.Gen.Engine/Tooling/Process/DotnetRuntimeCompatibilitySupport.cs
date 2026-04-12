@@ -20,23 +20,9 @@ internal static partial class DotnetRuntimeCompatibilitySupport
         CancellationToken cancellationToken)
     {
         var effectiveEnvironment = environment;
-        var processResult = await runtime.InvokeProcessCaptureAsync(
-            filePath,
-            argumentList,
-            workingDirectory,
-            effectiveEnvironment,
-            timeoutSeconds,
-            sandboxRoot,
-            cancellationToken);
-
-        if (LooksLikeMissingIcu(processResult)
-            && !effectiveEnvironment.ContainsKey(GlobalizationInvariantEnvironmentVariableName))
+        while (true)
         {
-            effectiveEnvironment = new Dictionary<string, string>(effectiveEnvironment, StringComparer.OrdinalIgnoreCase)
-            {
-                [GlobalizationInvariantEnvironmentVariableName] = "1",
-            };
-            processResult = await runtime.InvokeProcessCaptureAsync(
+            var processResult = await runtime.InvokeProcessCaptureAsync(
                 filePath,
                 argumentList,
                 workingDirectory,
@@ -44,37 +30,24 @@ internal static partial class DotnetRuntimeCompatibilitySupport
                 timeoutSeconds,
                 sandboxRoot,
                 cancellationToken);
-        }
 
-        if (LooksLikeMissingSharedRuntime(processResult)
-            && !effectiveEnvironment.ContainsKey(DotnetRollForwardEnvironmentVariableName))
-        {
-            effectiveEnvironment = new Dictionary<string, string>(effectiveEnvironment, StringComparer.OrdinalIgnoreCase)
+            if (!TryBuildRetryEnvironment(processResult, effectiveEnvironment, out var retryEnvironment))
             {
-                [DotnetRollForwardEnvironmentVariableName] = DotnetRollForwardMajorValue,
-            };
-            processResult = await runtime.InvokeProcessCaptureAsync(
-                filePath,
-                argumentList,
-                workingDirectory,
-                effectiveEnvironment,
-                timeoutSeconds,
-                sandboxRoot,
-                cancellationToken);
-        }
+                return processResult;
+            }
 
-        return processResult;
+            effectiveEnvironment = retryEnvironment;
+        }
     }
 
     public static DotnetRuntimeIssue? DetectMissingFramework(string? command, string? stdout, string? stderr)
     {
-        var message = !string.IsNullOrWhiteSpace(stderr) ? stderr : stdout;
-        if (string.IsNullOrWhiteSpace(message)
-            || !message.Contains(MissingFrameworkMessage, StringComparison.Ordinal))
+        if (!LooksLikeMissingSharedRuntime(stdout, stderr))
         {
             return null;
         }
 
+        var message = BuildCombinedText(stdout, stderr);
         var match = RequiredFrameworkRegex().Match(message);
         var requirement = match.Success
             ? new DotnetRuntimeRequirement(
@@ -119,6 +92,58 @@ internal static partial class DotnetRuntimeCompatibilitySupport
 
     public static string ToDisplayCommand(string? command)
         => string.IsNullOrWhiteSpace(command) ? "<root>" : command;
+
+    private static bool TryBuildRetryEnvironment(
+        CommandRuntime.ProcessResult processResult,
+        IReadOnlyDictionary<string, string> environment,
+        out IReadOnlyDictionary<string, string> retryEnvironment)
+    {
+        if (LooksLikeMissingIcu(processResult)
+            && !HasExpectedEnvironmentValue(
+                environment,
+                GlobalizationInvariantEnvironmentVariableName,
+                "1"))
+        {
+            retryEnvironment = WithEnvironmentValue(
+                environment,
+                GlobalizationInvariantEnvironmentVariableName,
+                "1");
+            return true;
+        }
+
+        if (LooksLikeMissingSharedRuntime(processResult)
+            && !HasExpectedEnvironmentValue(
+                environment,
+                DotnetRollForwardEnvironmentVariableName,
+                DotnetRollForwardMajorValue))
+        {
+            retryEnvironment = WithEnvironmentValue(
+                environment,
+                DotnetRollForwardEnvironmentVariableName,
+                DotnetRollForwardMajorValue);
+            return true;
+        }
+
+        retryEnvironment = environment;
+        return false;
+    }
+
+    private static bool HasExpectedEnvironmentValue(
+        IReadOnlyDictionary<string, string> environment,
+        string key,
+        string expectedValue)
+        => environment.Any(pair =>
+            string.Equals(pair.Key, key, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(pair.Value, expectedValue, StringComparison.OrdinalIgnoreCase));
+
+    private static IReadOnlyDictionary<string, string> WithEnvironmentValue(
+        IReadOnlyDictionary<string, string> environment,
+        string key,
+        string value)
+        => new Dictionary<string, string>(environment, StringComparer.OrdinalIgnoreCase)
+        {
+            [key] = value,
+        };
 
     private static bool LooksLikeMissingIcu(string? stdout, string? stderr)
     {

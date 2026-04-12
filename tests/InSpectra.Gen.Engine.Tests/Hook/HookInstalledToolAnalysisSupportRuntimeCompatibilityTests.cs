@@ -25,9 +25,11 @@ public sealed class HookInstalledToolAnalysisSupportRuntimeCompatibilityTests
         var hookDllPath = HookInstalledToolAnalysisTestSupport.CreateHookPlaceholder(tempDirectory.Path);
         var installedTool = HookInstalledToolAnalysisTestSupport.CreateInstalledTool(tempDirectory);
         var invocationCount = 0;
+        var expectedSandboxRoot = Path.GetFullPath(tempDirectory.Path);
         var runtime = new HookInstalledToolAnalysisTestSupport.FakeHookCommandRuntime(invocation =>
         {
             invocationCount++;
+            Assert.Equal(expectedSandboxRoot, invocation.SandboxRoot);
             if (invocationCount == 1)
             {
                 Assert.False(invocation.Environment.ContainsKey(HookInstalledToolAnalysisSupport.DotnetRollForwardEnvironmentVariableName));
@@ -78,9 +80,11 @@ public sealed class HookInstalledToolAnalysisSupportRuntimeCompatibilityTests
         var hookDllPath = HookInstalledToolAnalysisTestSupport.CreateHookPlaceholder(tempDirectory.Path);
         var installedTool = HookInstalledToolAnalysisTestSupport.CreateInstalledTool(tempDirectory);
         var invocationCount = 0;
+        var expectedSandboxRoot = Path.GetFullPath(tempDirectory.Path);
         var runtime = new HookInstalledToolAnalysisTestSupport.FakeHookCommandRuntime(invocation =>
         {
             invocationCount++;
+            Assert.Equal(expectedSandboxRoot, invocation.SandboxRoot);
             if (invocationCount == 1)
             {
                 Assert.False(invocation.Environment.ContainsKey(HookInstalledToolAnalysisSupport.DotnetRollForwardEnvironmentVariableName));

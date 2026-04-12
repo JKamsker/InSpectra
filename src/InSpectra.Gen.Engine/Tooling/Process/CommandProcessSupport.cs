@@ -1,7 +1,6 @@
 namespace InSpectra.Gen.Engine.Tooling.Process;
 
 using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
 
 internal static partial class CommandProcessSupport
@@ -20,6 +19,7 @@ internal static partial class CommandProcessSupport
         using var readerCancellation = new CancellationTokenSource();
         var stdout = ProcessOutputCaptureSupport.CreateBuffer();
         var stderr = ProcessOutputCaptureSupport.CreateBuffer();
+        var sandboxCleanupRequested = false;
         var stopwatch = Stopwatch.StartNew();
         ownedProcess.Start();
 
@@ -27,6 +27,17 @@ internal static partial class CommandProcessSupport
         var stderrTask = PumpStreamAsync(ownedProcess.StandardError, stderr, readerCancellation.Token);
         var waitTask = ownedProcess.WaitForExitAsync(cancellationToken);
         var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
+
+        void TerminateSandboxProcessesOnce()
+        {
+            if (sandboxCleanupRequested)
+            {
+                return;
+            }
+
+            sandboxCleanupRequested = true;
+            terminateSandboxProcesses(sandboxRoot);
+        }
 
         try
         {
@@ -36,6 +47,7 @@ internal static partial class CommandProcessSupport
             {
                 TryKillProcess(ownedProcess);
                 await WaitForExitAsync(ownedProcess, ExitGracePeriod);
+                TerminateSandboxProcessesOnce();
             }
             else
             {
@@ -46,7 +58,7 @@ internal static partial class CommandProcessSupport
             if (!drained)
             {
                 timedOut = true;
-                terminateSandboxProcesses(sandboxRoot);
+                TerminateSandboxProcessesOnce();
                 readerCancellation.Cancel();
                 await TryWaitForCompletionAsync(stdoutTask, stderrTask, OutputDrainGracePeriod);
             }
@@ -64,7 +76,7 @@ internal static partial class CommandProcessSupport
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             TryKillProcess(ownedProcess);
-            terminateSandboxProcesses(sandboxRoot);
+            TerminateSandboxProcessesOnce();
             readerCancellation.Cancel();
             await TryWaitForCompletionAsync(stdoutTask, stderrTask, OutputDrainGracePeriod);
             throw;
@@ -78,7 +90,7 @@ internal static partial class CommandProcessSupport
             return;
         }
 
-        var sandboxPath = Path.GetFullPath(sandboxRoot);
+        var sandboxPath = SandboxProcessMatchSupport.NormalizeDirectoryPath(sandboxRoot);
         foreach (var candidate in Process.GetProcesses())
         {
             using (candidate)
@@ -90,7 +102,7 @@ internal static partial class CommandProcessSupport
 
                 var executablePath = TryGetExecutablePath(candidate);
                 if (executablePath is null
-                    || !executablePath.StartsWith(sandboxPath, StringComparison.OrdinalIgnoreCase))
+                    || !SandboxProcessMatchSupport.MatchesSandboxProcess(sandboxPath, executablePath, candidate))
                 {
                     continue;
                 }
@@ -99,6 +111,12 @@ internal static partial class CommandProcessSupport
             }
         }
     }
+
+    internal static bool IsWithinSandboxRoot(string sandboxRoot, string executablePath)
+        => SandboxProcessMatchSupport.IsWithinSandboxRoot(sandboxRoot, executablePath);
+
+    internal static bool MatchesSandboxProcess(string sandboxRoot, string executablePath, string? commandLine)
+        => SandboxProcessMatchSupport.MatchesSandboxProcess(sandboxRoot, executablePath, commandLine);
 
     public static string? ResolveInstalledCommandPath(string installDirectory, string commandName)
     {
@@ -207,4 +225,3 @@ internal static partial class CommandProcessSupport
     [GeneratedRegex(@"\x1B[@-_]", RegexOptions.Compiled)]
     private static partial Regex AnsiEscapeRegex();
 }
-

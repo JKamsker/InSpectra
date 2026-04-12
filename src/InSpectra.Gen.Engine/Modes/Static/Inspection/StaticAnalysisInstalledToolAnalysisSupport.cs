@@ -88,7 +88,14 @@ internal sealed class StaticInstalledToolAnalysisSupport
             return;
         }
 
-        var crawl = await _helpCrawler.CrawlAsync(request.InstalledTool.CommandPath, request.CommandName, request.WorkingDirectory, request.InstalledTool.Environment, request.CommandTimeoutSeconds, cancellationToken);
+        var crawl = await _helpCrawler.CrawlAsync(
+            request.InstalledTool.CommandPath,
+            request.CommandName,
+            request.WorkingDirectory,
+            request.InstalledTool.Environment,
+            request.CommandTimeoutSeconds,
+            request.InstalledTool.CleanupRoot,
+            cancellationToken);
         crawlStopwatch.Stop();
 
         var staticCommands = inspection.Commands;

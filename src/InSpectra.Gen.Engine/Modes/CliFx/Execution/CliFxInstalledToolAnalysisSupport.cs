@@ -74,7 +74,13 @@ internal sealed class CliFxInstalledToolAnalysisSupport
         var crawlStopwatch = Stopwatch.StartNew();
         var staticCommands = NormalizeCommandLookup(_metadataInspector.Inspect(request.InstalledTool.InstallDirectory));
         var crawler = new CliFxHelpCrawler(_runtime);
-        var crawl = await crawler.CrawlAsync(request.InstalledTool.CommandPath, request.WorkingDirectory, request.InstalledTool.Environment, request.CommandTimeoutSeconds, cancellationToken);
+        var crawl = await crawler.CrawlAsync(
+            request.InstalledTool.CommandPath,
+            request.WorkingDirectory,
+            request.InstalledTool.Environment,
+            request.CommandTimeoutSeconds,
+            request.InstalledTool.CleanupRoot,
+            cancellationToken);
         crawlStopwatch.Stop();
         var coverage = _coverageClassifier.Classify(staticCommands.Count, crawl);
         var coverageJson = coverage.ToJsonObject();

@@ -17,7 +17,8 @@ namespace InSpectra.Gen.Engine.Orchestration;
 /// Implements the public <see cref="IAcquisitionAnalysisDispatcher"/> so the app shell
 /// can depend on Contracts only.
 /// </summary>
-internal sealed class AcquisitionAnalysisDispatcher : IAcquisitionAnalysisDispatcher
+internal sealed class AcquisitionAnalysisDispatcher
+    : IAcquisitionAnalysisDispatcher, IAcquisitionAnalysisDispatcherInternal
 {
     private readonly InstalledToolAnalyzer _helpAnalyzer;
     private readonly CliFxInstalledToolAnalysisSupport _cliFxAnalyzer;
@@ -38,6 +39,21 @@ internal sealed class AcquisitionAnalysisDispatcher : IAcquisitionAnalysisDispat
 
     public async Task<AcquisitionAnalysisOutcome> TryAnalyzeAsync(
         CliTargetDescriptor target,
+        string mode,
+        string? framework,
+        int timeoutSeconds,
+        CancellationToken cancellationToken)
+        => await TryAnalyzeAsync(
+            target,
+            cleanupRoot: null,
+            mode,
+            framework,
+            timeoutSeconds,
+            cancellationToken);
+
+    public async Task<AcquisitionAnalysisOutcome> TryAnalyzeAsync(
+        CliTargetDescriptor target,
+        string? cleanupRoot,
         string mode,
         string? framework,
         int timeoutSeconds,
@@ -63,11 +79,7 @@ internal sealed class AcquisitionAnalysisDispatcher : IAcquisitionAnalysisDispat
         result["nugetTitle"] = target.PackageTitle;
         result["nugetDescription"] = target.PackageDescription;
 
-        var installedTool = new InstalledToolContext(
-            target.Environment,
-            target.InstallDirectory,
-            target.CommandPath,
-            target.PreferredEntryPointPath);
+        var installedTool = CreateInstalledToolContext(target, cleanupRoot);
         await RunAnalyzerAsync(
             mode,
             result,
@@ -139,6 +151,16 @@ internal sealed class AcquisitionAnalysisDispatcher : IAcquisitionAnalysisDispat
                 throw new InvalidOperationException($"Mode `{mode}` is not supported by the discovery analyzer bridge.");
         }
     }
+
+    internal static InstalledToolContext CreateInstalledToolContext(
+        CliTargetDescriptor target,
+        string? cleanupRoot)
+        => new(
+            target.Environment,
+            target.InstallDirectory,
+            target.CommandPath,
+            target.PreferredEntryPointPath,
+            cleanupRoot);
 
     private static string ResolveFrameworkOrThrow(string mode, string? framework)
     {

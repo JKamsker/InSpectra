@@ -48,17 +48,25 @@ internal static class HookInstalledToolAnalysisTestSupport
     public static InstalledToolContext CreateInstalledTool(
         RepositoryRegressionTestSupport.TemporaryDirectory tempDirectory,
         string? preferredEntryPointPath = null)
+        => CreateInstalledToolWithCleanupRoot(tempDirectory, preferredEntryPointPath, tempDirectory.Path);
+
+    public static InstalledToolContext CreateInstalledToolWithCleanupRoot(
+        RepositoryRegressionTestSupport.TemporaryDirectory tempDirectory,
+        string? preferredEntryPointPath,
+        string? cleanupRoot)
     {
         var installDirectory = Path.Combine(tempDirectory.Path, "tool");
         Directory.CreateDirectory(installDirectory);
         var commandPath = Path.Combine(installDirectory, "demo.cmd");
         File.WriteAllText(commandPath, "@echo off");
+        var sandboxEnvironment = new CommandRuntime().CreateSandboxEnvironment(tempDirectory.Path);
 
         return new InstalledToolContext(
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
+            sandboxEnvironment.Values,
             installDirectory,
             commandPath,
-            preferredEntryPointPath);
+            preferredEntryPointPath,
+            cleanupRoot);
     }
 
     internal sealed class FakeHookCommandRuntime(

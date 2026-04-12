@@ -5,6 +5,7 @@ using InSpectra.Gen.Engine.Contracts.Crawling;
 using InSpectra.Gen.Engine.Modes.CliFx.Metadata;
 
 using InSpectra.Gen.Engine.Modes.CliFx.Execution;
+using InSpectra.Gen.Engine.Tooling.DocumentPipeline.Documents;
 using InSpectra.Gen.Engine.Tooling.Process;
 
 
@@ -26,6 +27,7 @@ internal sealed class CliFxHelpCrawler
         string workingDirectory,
         IReadOnlyDictionary<string, string> environment,
         int timeoutSeconds,
+        string? sandboxCleanupRoot,
         CancellationToken cancellationToken)
     {
         var queue = new Queue<string[]>();
@@ -35,6 +37,7 @@ internal sealed class CliFxHelpCrawler
         var captures = new Dictionary<string, JsonObject>(StringComparer.OrdinalIgnoreCase);
         var captureSummaries = new Dictionary<string, CliFxCaptureSummary>(StringComparer.OrdinalIgnoreCase);
         string? guardrailFailureMessage = null;
+        var rootCommandName = Path.GetFileNameWithoutExtension(commandPath);
 
         while (queue.Count > 0)
         {
@@ -51,7 +54,14 @@ internal sealed class CliFxHelpCrawler
                 continue;
             }
 
-            var capture = await CaptureHelpAsync(commandPath, commandSegments, workingDirectory, environment, timeoutSeconds, cancellationToken);
+            var capture = await CaptureHelpAsync(
+                commandPath,
+                commandSegments,
+                workingDirectory,
+                environment,
+                timeoutSeconds,
+                sandboxCleanupRoot,
+                cancellationToken);
             captures[key] = capture.ToJsonObject(commandSegments);
             captureSummaries[key] = capture.ToSummary(commandSegments);
 
@@ -69,8 +79,8 @@ internal sealed class CliFxHelpCrawler
 
             foreach (var child in capture.Document.Commands)
             {
-                var childSegments = commandSegments.Concat(
-                    child.Key.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)).ToArray();
+                var resolvedChildKey = CommandPathSupport.ResolveChildKey(rootCommandName, key, child.Key);
+                var childSegments = CommandPathSupport.SplitSegments(resolvedChildKey);
                 if (childSegments.Length > HelpCrawlGuardrailSupport.MaxCommandDepth)
                 {
                     continue;
@@ -93,6 +103,7 @@ internal sealed class CliFxHelpCrawler
         string workingDirectory,
         IReadOnlyDictionary<string, string> environment,
         int timeoutSeconds,
+        string? sandboxCleanupRoot,
         CancellationToken cancellationToken)
     {
         CliFxHelpCapture? fallbackCapture = null;
@@ -106,7 +117,7 @@ internal sealed class CliFxHelpCrawler
                 workingDirectory,
                 environment,
                 timeoutSeconds,
-                workingDirectory,
+                sandboxCleanupRoot,
                 cancellationToken);
             if (processResult.OutputLimitExceeded)
             {
