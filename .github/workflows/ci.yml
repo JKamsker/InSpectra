@@ -132,7 +132,7 @@ jobs:
           test -n "$nupkg"
           version="0.0.${{ github.run_number }}"
           tool_dir="$(mktemp -d)"
-          package_source_dir="$(dirname "$nupkg")"
+          package_source_dir="$(cd "$(dirname "$nupkg")" && pwd -P)"
           nuget_config="$(mktemp)"
           echo "Found package: $nupkg"
           cat > "$nuget_config" <<EOF
