@@ -2,6 +2,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Json.Schema;
 using InSpectra.Gen.Core;
+using InSpectra.Gen.OpenCli.Model;
+using InSpectra.Gen.OpenCli.Schema;
 
 namespace InSpectra.Gen.OpenCli.Serialization;
 

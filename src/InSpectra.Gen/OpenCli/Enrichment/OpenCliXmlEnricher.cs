@@ -1,6 +1,7 @@
 using System.Xml;
 using System.Xml.Linq;
 using InSpectra.Gen.Core;
+using InSpectra.Gen.OpenCli.Model;
 
 namespace InSpectra.Gen.OpenCli.Enrichment;
 

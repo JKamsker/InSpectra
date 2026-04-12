@@ -1,4 +1,5 @@
 using System.Text.Json;
+using InSpectra.Gen.OpenCli.Model;
 
 namespace InSpectra.Gen.OpenCli.Serialization;
 
