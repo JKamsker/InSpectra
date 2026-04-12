@@ -70,8 +70,3 @@ internal sealed class DnlibAssemblyScanner
                 .Cast<string>()
                 .ToArray());
 }
-
-internal sealed record ScannedModule(string Path, ModuleDefMD Module) : IDisposable
-{
-    public void Dispose() => Module.Dispose();
-}
