@@ -19,6 +19,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>cli;opencli;inspection;dotnet;nuget</PackageTags>
+    <StartupHookTargetFramework>netcoreapp3.1</StartupHookTargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +36,24 @@
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Link="README.md" />
+  </ItemGroup>
+
+  <!-- Ensure the StartupHook project builds before packing -->
+  <ItemGroup>
+    <ProjectReference Include="..\InSpectra.Gen.StartupHook\InSpectra.Gen.StartupHook.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Pack the StartupHook DLLs and MSBuild targets into the nupkg -->
+  <ItemGroup>
+    <None Include="..\InSpectra.Gen.StartupHook\bin\$(Configuration)\$(StartupHookTargetFramework)\InSpectra.Gen.StartupHook.dll"
+          Pack="true" PackagePath="tools\hooks\" />
+    <None Include="..\InSpectra.Gen.StartupHook\bin\$(Configuration)\$(StartupHookTargetFramework)\0Harmony.dll"
+          Pack="true" PackagePath="tools\hooks\" />
+    <None Include="build\InSpectra.Lib.targets"
+          Pack="true" PackagePath="build\" />
   </ItemGroup>
 
 </Project>

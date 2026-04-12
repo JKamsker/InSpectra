@@ -1,0 +1,14 @@
+<Project>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\tools\hooks\InSpectra.Gen.StartupHook.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          Link="hooks\InSpectra.Gen.StartupHook.dll"
+          Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)..\tools\hooks\0Harmony.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest"
+          Link="hooks\0Harmony.dll"
+          Visible="false" />
+  </ItemGroup>
+</Project>
