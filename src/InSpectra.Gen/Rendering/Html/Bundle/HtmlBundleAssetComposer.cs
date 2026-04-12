@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using InSpectra.Gen.Core;
 using InSpectra.Gen.Rendering.Contracts;
 using InSpectra.Gen.Rendering.Pipeline;
 
@@ -159,6 +160,7 @@ internal static class HtmlBundleAssetComposer
         }
 
         AddReferencedAssets(referenced, html);
+        HtmlBundleAssetValidation.AssertReferencedAssetsExist(bundleRoot, referenced);
         return referenced;
     }
 

@@ -1,3 +1,4 @@
+using InSpectra.Gen.Core;
 using InSpectra.Gen.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 using Microsoft.Extensions.Options;
@@ -198,6 +199,43 @@ public class HtmlRenderServiceTests
         Assert.DoesNotContain("href=\"./assets/app.css\"", index, StringComparison.Ordinal);
         Assert.Contains("console.log('bundle');", index);
         Assert.Contains("body { color: black; }", index);
+    }
+
+    [Fact]
+    public async Task Render_rejects_incomplete_bundle_assets()
+    {
+        using var temp = new TempDirectory();
+        var bundleRoot = CreateBundle(temp.Path, "packaged");
+        File.Delete(Path.Combine(bundleRoot, "assets", "app.css"));
+        var service = CreateHtmlRenderService(new ViewerBundleLocatorOptions
+        {
+            PackagedRootPath = bundleRoot,
+            RepositoryRootPath = temp.Path,
+        });
+
+        var request = new FileRenderRequest(
+            FixturePaths.OpenCliJson,
+            FixturePaths.XmlDoc,
+            new RenderExecutionOptions(
+                RenderLayout.App,
+                ResolvedOutputMode.Human,
+                DryRun: false,
+                Quiet: false,
+                Verbose: false,
+                NoColor: false,
+                IncludeHidden: false,
+                IncludeMetadata: false,
+                Overwrite: false,
+                SingleFile: false,
+                CompressLevel: 0,
+                OutputFile: null,
+                OutputDirectory: Path.Combine(temp.Path, "html")));
+
+        var exception = await Assert.ThrowsAsync<CliUsageException>(() =>
+            service.RenderFromFileAsync(request, DefaultFeatures, CancellationToken.None));
+
+        Assert.Contains("incomplete", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("app.css", string.Join(Environment.NewLine, exception.Details));
     }
 
     private static HtmlRenderService CreateHtmlRenderService(ViewerBundleLocatorOptions options)

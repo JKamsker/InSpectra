@@ -85,6 +85,26 @@ public sealed class OutputPathHelperTests
     }
 
     [Fact]
+    public async Task PublishDirectoryAsync_Replaces_Existing_Empty_Output_Directory()
+    {
+        using var temp = new TempDirectory();
+        var outputDirectory = Path.Combine(temp.Path, "out");
+        Directory.CreateDirectory(outputDirectory);
+
+        await OutputPathHelper.PublishDirectoryAsync<bool>(
+            outputDirectory,
+            overwrite: false,
+            async (stagingDirectory, cancellationToken) =>
+            {
+                await File.WriteAllTextAsync(Path.Combine(stagingDirectory, "new.txt"), "new", cancellationToken);
+                return true;
+            },
+            CancellationToken.None);
+
+        Assert.True(File.Exists(Path.Combine(outputDirectory, "new.txt")));
+    }
+
+    [Fact]
     public void EnsureFileWritable_Rejects_Existing_Directory_Path()
     {
         using var temp = new TempDirectory();

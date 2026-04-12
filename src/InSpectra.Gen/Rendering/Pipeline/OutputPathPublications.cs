@@ -86,22 +86,14 @@ internal sealed class OutputPathDirectoryPublication : IDisposable
     {
         if (_targetExists && Directory.Exists(_targetPath))
         {
-            if (Directory.EnumerateFileSystemEntries(_targetPath).Any())
+            var hasEntries = Directory.EnumerateFileSystemEntries(_targetPath).Any();
+            if (hasEntries && !_overwrite)
             {
-                if (!_overwrite)
-                {
-                    throw new CliUsageException($"Output directory `{_targetPath}` is not empty. Use `--overwrite` to replace it.");
-                }
+                throw new CliUsageException($"Output directory `{_targetPath}` is not empty. Use `--overwrite` to replace it.");
+            }
 
-                _backupPath = _targetPath + $".{Guid.NewGuid():N}.bak";
-                Directory.Move(_targetPath, _backupPath);
-            }
-            else
-            {
-                PromoteStagingContentsToExistingDirectory();
-                _committed = true;
-                return;
-            }
+            _backupPath = _targetPath + $".{Guid.NewGuid():N}.bak";
+            Directory.Move(_targetPath, _backupPath);
         }
 
         try
@@ -127,21 +119,6 @@ internal sealed class OutputPathDirectoryPublication : IDisposable
         {
             OutputPathCleanupSupport.TryDeleteDirectory(_backupPath);
         }
-    }
-
-    private void PromoteStagingContentsToExistingDirectory()
-    {
-        foreach (var directory in Directory.EnumerateDirectories(_stagingPath))
-        {
-            Directory.Move(directory, Path.Combine(_targetPath, Path.GetFileName(directory)));
-        }
-
-        foreach (var file in Directory.EnumerateFiles(_stagingPath))
-        {
-            File.Move(file, Path.Combine(_targetPath, Path.GetFileName(file)), overwrite: false);
-        }
-
-        Directory.Delete(_stagingPath);
     }
 
     private void RestoreBackup()
