@@ -40,8 +40,8 @@ public sealed class ArchitectureGenInternalLayeringTests
             "OpenCli",
             forbiddenPrefixes:
             [
-                "InSpectra.Gen.Engine.Rendering",
-                "InSpectra.Gen.Engine.UseCases",
+                "InSpectra.Lib.Rendering",
+                "InSpectra.Lib.UseCases",
             ]);
 
     [Fact]
@@ -49,7 +49,7 @@ public sealed class ArchitectureGenInternalLayeringTests
         => AssertNoUpstreamImport(
             EngineProjectRoot,
             "Rendering",
-            forbiddenPrefixes: ["InSpectra.Gen.Engine.UseCases"]);
+            forbiddenPrefixes: ["InSpectra.Lib.UseCases"]);
 
     [Fact]
     public void Engine_execution_does_not_depend_on_modes_rendering_or_use_cases()
@@ -58,9 +58,9 @@ public sealed class ArchitectureGenInternalLayeringTests
             "Execution",
             forbiddenPrefixes:
             [
-                "InSpectra.Gen.Engine.Modes",
-                "InSpectra.Gen.Engine.Rendering",
-                "InSpectra.Gen.Engine.UseCases",
+                "InSpectra.Lib.Modes",
+                "InSpectra.Lib.Rendering",
+                "InSpectra.Lib.UseCases",
             ]);
 
     [Fact]
@@ -70,8 +70,8 @@ public sealed class ArchitectureGenInternalLayeringTests
             "Targets",
             forbiddenPrefixes:
             [
-                "InSpectra.Gen.Engine.Modes",
-                "InSpectra.Gen.Engine.Rendering",
+                "InSpectra.Lib.Modes",
+                "InSpectra.Lib.Rendering",
             ]);
 
     private static void AssertNoUpstreamImport(

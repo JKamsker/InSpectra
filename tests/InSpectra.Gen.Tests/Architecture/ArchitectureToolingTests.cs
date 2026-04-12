@@ -11,18 +11,18 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// </summary>
 public sealed class ArchitectureToolingTests
 {
-    /// <summary>Absolute path to <c>src/InSpectra.Gen.Engine/Tooling</c>.</summary>
+    /// <summary>Absolute path to <c>src/InSpectra.Lib/Tooling</c>.</summary>
     private static readonly string ToolingRoot = Path.Combine(
         ArchitecturePolicyScanner.SrcRoot,
         ArchitecturePolicyScanner.EngineProjectName,
         "Tooling");
 
     /// <summary>
-    /// Matches <c>using InSpectra.Gen.Engine.Modes.&lt;ModeName&gt;</c> at any depth.
+    /// Matches <c>using InSpectra.Lib.Modes.&lt;ModeName&gt;</c> at any depth.
     /// Captures the first segment after <c>Modes.</c> so failure messages name the target.
     /// </summary>
     private static readonly Regex ModeUsingDirective = new(
-        @"^\s*using\s+InSpectra\.Gen\.Engine\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)",
+        @"^\s*using\s+InSpectra\.Lib\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     /// <summary>
@@ -31,7 +31,7 @@ public sealed class ArchitectureToolingTests
     /// surface and would pass vacuously.
     /// </summary>
     private static readonly Regex ToolingNamespaceDeclaration = new(
-        @"^\s*namespace\s+InSpectra\.Gen\.Engine\.Tooling(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
+        @"^\s*namespace\s+InSpectra\.Lib\.Tooling(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class ArchitectureToolingTests
                 var referencedMode = match.Groups["mode"].Value;
                 violations.Add(
                     $"- {ArchitecturePolicyScanner.GetRelativeRepoPath(filePath)}"
-                    + $" imports 'InSpectra.Gen.Engine.Modes.{referencedMode}'");
+                    + $" imports 'InSpectra.Lib.Modes.{referencedMode}'");
             }
         }
 
@@ -72,7 +72,7 @@ public sealed class ArchitectureToolingTests
 
         Assert.True(
             toolingNamespacesSeen > 0,
-            $"Expected Tooling scan under '{ToolingRoot}' to encounter at least one InSpectra.Gen.Engine.Tooling namespace declaration but found none.");
+            $"Expected Tooling scan under '{ToolingRoot}' to encounter at least one InSpectra.Lib.Tooling namespace declaration but found none.");
 
         Assert.True(
             violations.Count == 0,

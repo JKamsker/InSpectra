@@ -1,5 +1,5 @@
-using InSpectra.Gen.Core;
-using InSpectra.Gen.Engine.Rendering.Contracts;
+using InSpectra.Lib;
+using InSpectra.Lib.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
 
 namespace InSpectra.Gen.Commands.Render;

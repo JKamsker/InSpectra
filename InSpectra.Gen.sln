@@ -13,11 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSpectra.Gen.Tests", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSpectra.Gen.StartupHook", "src\InSpectra.Gen.StartupHook\InSpectra.Gen.StartupHook.csproj", "{3F958973-E6BE-4A0D-A621-157CA063BF5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSpectra.Gen.Engine.Tests", "tests\InSpectra.Gen.Engine.Tests\InSpectra.Gen.Engine.Tests.csproj", "{AF380D6A-3285-4ACC-AE78-A2589A794B2E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSpectra.Lib.Tests", "tests\InSpectra.Lib.Tests\InSpectra.Lib.Tests.csproj", "{AF380D6A-3285-4ACC-AE78-A2589A794B2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSpectra.Gen.Engine", "src\InSpectra.Gen.Engine\InSpectra.Gen.Engine.csproj", "{539EF9C8-C39F-406E-A729-17D3E0EB0CBD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSpectra.Gen.Core", "src\InSpectra.Gen.Core\InSpectra.Gen.Core.csproj", "{F97146BE-A156-4148-A645-356A9A190B1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InSpectra.Lib", "src\InSpectra.Lib\InSpectra.Lib.csproj", "{539EF9C8-C39F-406E-A729-17D3E0EB0CBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,18 +87,6 @@ Global
 		{539EF9C8-C39F-406E-A729-17D3E0EB0CBD}.Release|x64.Build.0 = Release|Any CPU
 		{539EF9C8-C39F-406E-A729-17D3E0EB0CBD}.Release|x86.ActiveCfg = Release|Any CPU
 		{539EF9C8-C39F-406E-A729-17D3E0EB0CBD}.Release|x86.Build.0 = Release|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Debug|x64.Build.0 = Debug|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Debug|x86.Build.0 = Debug|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Release|x64.ActiveCfg = Release|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Release|x64.Build.0 = Release|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Release|x86.ActiveCfg = Release|Any CPU
-		{F97146BE-A156-4148-A645-356A9A190B1D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -111,6 +97,5 @@ Global
 		{3F958973-E6BE-4A0D-A621-157CA063BF5F} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{AF380D6A-3285-4ACC-AE78-A2589A794B2E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{539EF9C8-C39F-406E-A729-17D3E0EB0CBD} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{F97146BE-A156-4148-A645-356A9A190B1D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal

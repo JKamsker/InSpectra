@@ -14,28 +14,28 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// </summary>
 public sealed class ArchitectureModeTests
 {
-    /// <summary>Absolute path to <c>src/InSpectra.Gen.Engine/Modes</c>.</summary>
+    /// <summary>Absolute path to <c>src/InSpectra.Lib/Modes</c>.</summary>
     private static readonly string ModesRoot = Path.Combine(
         ArchitecturePolicyScanner.SrcRoot,
         ArchitecturePolicyScanner.EngineProjectName,
         "Modes");
 
     /// <summary>
-    /// Matches <c>using InSpectra.Gen.Engine.Modes.&lt;ModeName&gt;</c> at any depth.
+    /// Matches <c>using InSpectra.Lib.Modes.&lt;ModeName&gt;</c> at any depth.
     /// Captures the first segment after <c>Modes.</c> so the test can identify the target mode.
     /// </summary>
     private static readonly Regex ModeUsingDirective = new(
-        @"^\s*using\s+InSpectra\.Gen\.Engine\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)",
+        @"^\s*using\s+InSpectra\.Lib\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     /// <summary>
     /// Positive anchor for the modes scan: the scanned <c>Modes/</c> surface should contain
-    /// at least one matching <c>InSpectra.Gen.Engine.Modes.&lt;Mode&gt;...</c>
+    /// at least one matching <c>InSpectra.Lib.Modes.&lt;Mode&gt;...</c>
     /// namespace declaration. Without that anchor, the test could scan the wrong surface
     /// and still pass on zero meaningful matches.
     /// </summary>
     private static readonly Regex ModeNamespaceDeclaration = new(
-        @"^\s*namespace\s+InSpectra\.Gen\.Engine\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
+        @"^\s*namespace\s+InSpectra\.Lib\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class ArchitectureModeTests
 
         Assert.True(
             matchingNamespacesSeen > 0,
-            $"Expected Modes scan under '{ModesRoot}' to encounter at least one InSpectra.Gen.Engine.Modes.<Mode> namespace declaration but found none.");
+            $"Expected Modes scan under '{ModesRoot}' to encounter at least one InSpectra.Lib.Modes.<Mode> namespace declaration but found none.");
 
         Assert.True(
             violations.Count == 0,

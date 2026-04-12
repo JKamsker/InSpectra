@@ -1,8 +1,8 @@
-using InSpectra.Gen.Engine.Contracts;
-using InSpectra.Gen.Engine.Contracts.Providers;
-using InSpectra.Gen.Core;
-using InSpectra.Gen.Engine.Execution.Process;
-using InSpectra.Gen.Engine.Tooling.Process;
+using InSpectra.Lib.Contracts;
+using InSpectra.Lib.Contracts.Providers;
+using InSpectra.Lib;
+using InSpectra.Lib.Execution.Process;
+using InSpectra.Lib.Tooling.Process;
 
 namespace InSpectra.Gen.Tests.OpenCli;
 

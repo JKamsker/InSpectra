@@ -1,7 +1,7 @@
-using InSpectra.Gen.Core;
+using InSpectra.Lib;
 using System.Text.Json.Nodes;
-using InSpectra.Gen.Engine.UseCases.Generate.Requests;
-using InSpectra.Gen.Engine.Rendering.Contracts;
+using InSpectra.Lib.UseCases.Generate.Requests;
+using InSpectra.Lib.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.OpenCli;

@@ -1,4 +1,4 @@
-using InSpectra.Gen.Engine.UseCases.Generate.Requests;
+using InSpectra.Lib.UseCases.Generate.Requests;
 
 namespace InSpectra.Gen.Tests.Targets;
 

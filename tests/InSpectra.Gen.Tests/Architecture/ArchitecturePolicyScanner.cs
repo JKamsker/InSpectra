@@ -15,21 +15,21 @@ internal static class ArchitecturePolicyScanner
     public const string AppShellProjectName = "InSpectra.Gen";
 
     /// <summary>Name of the engine module project.</summary>
-    public const string EngineProjectName = "InSpectra.Gen.Engine";
+    public const string EngineProjectName = "InSpectra.Lib";
 
     /// <summary>Name of the startup-hook project.</summary>
     public const string StartupHookProjectName = "InSpectra.Gen.StartupHook";
 
     /// <summary>Name of the cross-module foundational primitives project.</summary>
-    public const string CoreProjectName = "InSpectra.Gen.Core";
+    public const string CoreProjectName = "InSpectra.Lib";
 
     /// <summary>Absolute path to <c>src/</c> in the repo.</summary>
     public static string SrcRoot { get; } = Path.Combine(FixturePaths.RepoRoot, "src");
 
     /// <summary>
     /// Returns all backend C# projects that own the architecture charter:
-    /// <c>InSpectra.Gen</c>, <c>InSpectra.Gen.Engine</c>, <c>InSpectra.Gen.StartupHook</c>,
-    /// <c>InSpectra.Gen.Core</c>. <c>InSpectra.UI</c> is a Vite/TypeScript frontend and is
+    /// <c>InSpectra.Gen</c>, <c>InSpectra.Lib</c>, <c>InSpectra.Gen.StartupHook</c>,
+    /// <c>InSpectra.Lib</c>. <c>InSpectra.UI</c> is a Vite/TypeScript frontend and is
     /// intentionally excluded.
     /// </summary>
     public static IReadOnlyList<CsProject> EnumerateBackendProjects()
@@ -55,8 +55,8 @@ internal static class ArchitecturePolicyScanner
     /// <summary>
     /// Returns the set of <c>&lt;ProjectReference Include="..."/&gt;</c> target project names
     /// for the given .csproj. Project names are the file name without extension,
-    /// so references like <c>..\InSpectra.Gen.Engine\InSpectra.Gen.Engine.csproj</c>
-    /// produce <c>InSpectra.Gen.Engine</c>. Missing files throw.
+    /// so references like <c>..\InSpectra.Lib\InSpectra.Lib.csproj</c>
+    /// produce <c>InSpectra.Lib</c>. Missing files throw.
     /// </summary>
     public static IReadOnlyList<string> GetProjectReferences(CsProject project)
     {

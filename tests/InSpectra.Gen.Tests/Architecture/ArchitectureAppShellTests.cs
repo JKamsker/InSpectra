@@ -10,7 +10,7 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// forbidden because they hide cross-module imports from the regex-based architecture
 /// scanners that enforce those same layering rules.
 ///
-/// The four <c>Cli*Exception</c> types live in <c>InSpectra.Gen.Core</c> so both the app
+/// The four <c>Cli*Exception</c> types live in <c>InSpectra.Lib</c> so both the app
 /// shell and engine can reference them without widening the engine surface.
 /// </summary>
 public sealed class ArchitectureAppShellTests
@@ -18,25 +18,29 @@ public sealed class ArchitectureAppShellTests
     /// <summary>
     /// Only these engine namespaces may appear in <c>using</c> directives inside
     /// the <c>InSpectra.Gen</c> project. The rule uses prefix match so that
-    /// <c>InSpectra.Gen.Engine.UseCases.Generate.Requests</c> is allowed when
-    /// <c>InSpectra.Gen.Engine.UseCases.Generate</c> is in this set.
+    /// <c>InSpectra.Lib.UseCases.Generate.Requests</c> is allowed when
+    /// <c>InSpectra.Lib.UseCases.Generate</c> is in this set.
     /// </summary>
     private static readonly IReadOnlyList<string> AllowedEngineNamespacePrefixes = new[]
     {
-        "InSpectra.Gen.Engine.Composition",
-        "InSpectra.Gen.Engine.Contracts",
-        "InSpectra.Gen.Engine.Rendering.Contracts",
-        "InSpectra.Gen.Engine.UseCases.Generate",
+        "InSpectra.Lib.Composition",
+        "InSpectra.Lib.Contracts",
+        "InSpectra.Lib.Rendering.Contracts",
+        "InSpectra.Lib.UseCases.Generate",
     };
 
-    /// <summary>Matches <c>using InSpectra.Gen.Engine.X.Y;</c> at the top of a file.</summary>
+    /// <summary>
+    /// Matches <c>using InSpectra.Lib.X.Y;</c> at the top of a file. Uses <c>+</c>
+    /// (one-or-more sub-segments) so that the bare <c>using InSpectra.Lib;</c> — which
+    /// exposes only the shared exception types — is not flagged.
+    /// </summary>
     private static readonly Regex EngineUsingDirective = new(
-        @"^\s*using\s+(?<ns>InSpectra\.Gen\.Engine(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*;",
+        @"^\s*using\s+(?<ns>InSpectra\.Lib(?:\.[A-Za-z_][A-Za-z0-9_]*)+)\s*;",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     /// <summary>
     /// Matches project-wide internal global usings like
-    /// <c>global using InSpectra.Gen.Engine.Rendering.Contracts;</c>. Those make the
+    /// <c>global using InSpectra.Lib.Rendering.Contracts;</c>. Those make the
     /// downstream layering tests look only at the consumer file body while the real
     /// dependency is smuggled in through a project-root import surface.
     /// </summary>
@@ -124,7 +128,7 @@ public sealed class ArchitectureAppShellTests
     /// <summary>
     /// Returns true when <paramref name="ns"/> equals or starts-with-dot one of the
     /// allowed namespace prefixes. The dot check avoids false positives like
-    /// <c>InSpectra.Gen.Engine.ContractsShadow</c> matching <c>Contracts</c>.
+    /// <c>InSpectra.Lib.ContractsShadow</c> matching <c>Contracts</c>.
     /// </summary>
     private static bool IsAllowedNamespace(string ns)
     {

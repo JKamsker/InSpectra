@@ -1,4 +1,4 @@
-using InSpectra.Gen.Core;
+using InSpectra.Lib;
 
 namespace InSpectra.Gen.Targets.Inputs;
 

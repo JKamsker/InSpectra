@@ -1,4 +1,4 @@
-using InSpectra.Gen.Core;
+using InSpectra.Lib;
 using InSpectra.Gen.Tests.TestSupport;
 using Microsoft.Extensions.Options;
 

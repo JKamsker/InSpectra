@@ -1,5 +1,5 @@
-using InSpectra.Gen.Core;
-using InSpectra.Gen.Engine.Rendering.Html.Bundle;
+using InSpectra.Lib;
+using InSpectra.Lib.Rendering.Html.Bundle;
 
 namespace InSpectra.Gen.Tests.Rendering;
 

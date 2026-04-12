@@ -1,4 +1,4 @@
-using InSpectra.Gen.Engine.Composition;
+using InSpectra.Lib.Composition;
 
 namespace InSpectra.Gen.Tests.Architecture;
 
@@ -6,12 +6,13 @@ public sealed class ArchitectureEnginePublicSurfaceTests
 {
     private static readonly HashSet<string> AllowedNamespaces = new(StringComparer.Ordinal)
     {
-        "InSpectra.Gen.Engine.Composition",
-        "InSpectra.Gen.Engine.Contracts",
-        "InSpectra.Gen.Engine.Contracts.Providers",
-        "InSpectra.Gen.Engine.Rendering.Contracts",
-        "InSpectra.Gen.Engine.UseCases.Generate",
-        "InSpectra.Gen.Engine.UseCases.Generate.Requests",
+        "InSpectra.Lib",
+        "InSpectra.Lib.Composition",
+        "InSpectra.Lib.Contracts",
+        "InSpectra.Lib.Contracts.Providers",
+        "InSpectra.Lib.Rendering.Contracts",
+        "InSpectra.Lib.UseCases.Generate",
+        "InSpectra.Lib.UseCases.Generate.Requests",
     };
 
     [Fact]

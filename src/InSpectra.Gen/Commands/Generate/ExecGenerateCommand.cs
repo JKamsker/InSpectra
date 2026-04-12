@@ -1,7 +1,7 @@
 using InSpectra.Gen.Commands.Common;
-using InSpectra.Gen.Engine.UseCases.Generate.Requests;
+using InSpectra.Lib.UseCases.Generate.Requests;
 using InSpectra.Gen.Output;
-using InSpectra.Gen.Engine.UseCases.Generate;
+using InSpectra.Lib.UseCases.Generate;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Generate;

@@ -23,8 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InSpectra.Gen.Core\InSpectra.Gen.Core.csproj" />
-    <ProjectReference Include="..\InSpectra.Gen.Engine\InSpectra.Gen.Engine.csproj" />
+    <ProjectReference Include="..\InSpectra.Lib\InSpectra.Lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

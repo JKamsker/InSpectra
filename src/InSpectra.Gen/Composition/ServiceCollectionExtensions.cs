@@ -1,4 +1,4 @@
-using InSpectra.Gen.Engine.Composition;
+using InSpectra.Lib.Composition;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InSpectra.Gen.Composition;

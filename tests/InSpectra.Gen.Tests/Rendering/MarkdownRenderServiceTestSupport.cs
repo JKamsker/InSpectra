@@ -1,4 +1,4 @@
-using InSpectra.Gen.Engine.Rendering.Contracts;
+using InSpectra.Lib.Rendering.Contracts;
 using InSpectra.Gen.Output;
 using InSpectra.Gen.Tests.TestSupport;
 

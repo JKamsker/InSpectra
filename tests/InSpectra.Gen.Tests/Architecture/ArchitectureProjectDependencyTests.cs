@@ -7,11 +7,11 @@ namespace InSpectra.Gen.Tests.Architecture;
 ///
 /// Active rule set:
 /// <list type="bullet">
-///   <item><c>InSpectra.Gen</c> may reference <c>InSpectra.Gen.Engine</c>,
-///         <c>InSpectra.Gen.StartupHook</c>, and <c>InSpectra.Gen.Core</c>.</item>
-///   <item><c>InSpectra.Gen.Engine</c> may reference <c>InSpectra.Gen.Core</c>.</item>
+///   <item><c>InSpectra.Gen</c> may reference <c>InSpectra.Lib</c>,
+///         <c>InSpectra.Gen.StartupHook</c>, and <c>InSpectra.Lib</c>.</item>
+///   <item><c>InSpectra.Lib</c> may reference <c>InSpectra.Lib</c>.</item>
 ///   <item><c>InSpectra.Gen.StartupHook</c> must have zero project references.</item>
-///   <item><c>InSpectra.Gen.Core</c> must have zero project references.</item>
+///   <item><c>InSpectra.Lib</c> must have zero project references.</item>
 /// </list>
 /// </summary>
 public sealed class ArchitectureProjectDependencyTests

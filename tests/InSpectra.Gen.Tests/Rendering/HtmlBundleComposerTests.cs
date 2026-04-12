@@ -1,8 +1,8 @@
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
-using InSpectra.Gen.Engine.Rendering.Pipeline.Model;
-using InSpectra.Gen.Engine.UseCases.Generate.Requests;
+using InSpectra.Lib.Rendering.Pipeline.Model;
+using InSpectra.Lib.UseCases.Generate.Requests;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Rendering;

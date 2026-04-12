@@ -1,4 +1,4 @@
-using InSpectra.Gen.Core;
+using InSpectra.Lib;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Output;

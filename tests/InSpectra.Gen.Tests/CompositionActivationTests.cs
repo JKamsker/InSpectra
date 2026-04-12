@@ -1,6 +1,6 @@
 using InSpectra.Gen.Composition;
-using InSpectra.Gen.Engine.UseCases.Generate;
-using InSpectra.Gen.Engine.Targets.Sources;
+using InSpectra.Lib.UseCases.Generate;
+using InSpectra.Lib.Targets.Sources;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InSpectra.Gen.Tests;

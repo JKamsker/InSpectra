@@ -20,20 +20,20 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// </summary>
 public sealed class ArchitectureContractsModesTests
 {
-    /// <summary>Absolute path to <c>src/InSpectra.Gen.Engine/Contracts</c>.</summary>
+    /// <summary>Absolute path to <c>src/InSpectra.Lib/Contracts</c>.</summary>
     private static readonly string ContractsRoot = Path.Combine(
         ArchitecturePolicyScanner.SrcRoot,
         ArchitecturePolicyScanner.EngineProjectName,
         "Contracts");
 
     /// <summary>
-    /// Matches any textual reference to the <c>InSpectra.Gen.Engine.Modes</c>
+    /// Matches any textual reference to the <c>InSpectra.Lib.Modes</c>
     /// namespace anywhere in the file, including <c>using</c> directives,
     /// fully-qualified <c>global::</c> identifiers, and XML doc comments. Word
     /// boundaries on both sides prevent false positives on longer namespace suffixes.
     /// </summary>
     private static readonly Regex ModesNamespaceReference = new(
-        @"\bInSpectra\.Gen\.Engine\.Modes\b",
+        @"\bInSpectra\.Lib\.Modes\b",
         RegexOptions.Compiled);
 
     /// <summary>
@@ -42,7 +42,7 @@ public sealed class ArchitectureContractsModesTests
     /// surface and would pass vacuously.
     /// </summary>
     private static readonly Regex ContractsNamespaceDeclaration = new(
-        @"^\s*namespace\s+InSpectra\.Gen\.Engine\.Contracts(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
+        @"^\s*namespace\s+InSpectra\.Lib\.Contracts(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     [Fact]
@@ -81,7 +81,7 @@ public sealed class ArchitectureContractsModesTests
                 {
                     violations.Add(
                         $"- {relativePath}:{lineIndex + 1} references "
-                        + $"'InSpectra.Gen.Engine.Modes' (any reference is forbidden: "
+                        + $"'InSpectra.Lib.Modes' (any reference is forbidden: "
                         + $"using directives, global:: qualifiers, and doc comments all count)");
                 }
             }
@@ -93,7 +93,7 @@ public sealed class ArchitectureContractsModesTests
 
         Assert.True(
             contractsNamespacesSeen > 0,
-            $"Expected Contracts scan under '{ContractsRoot}' to encounter at least one InSpectra.Gen.Engine.Contracts namespace declaration but found none.");
+            $"Expected Contracts scan under '{ContractsRoot}' to encounter at least one InSpectra.Lib.Contracts namespace declaration but found none.");
 
         Assert.True(
             violations.Count == 0,

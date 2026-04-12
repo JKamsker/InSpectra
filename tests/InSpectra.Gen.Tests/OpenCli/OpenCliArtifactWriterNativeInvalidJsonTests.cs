@@ -1,7 +1,7 @@
-using InSpectra.Gen.Core;
-using InSpectra.Gen.Engine.Contracts;
-using InSpectra.Gen.Engine.UseCases.Generate;
-using InSpectra.Gen.Engine.UseCases.Generate.Requests;
+using InSpectra.Lib;
+using InSpectra.Lib.Contracts;
+using InSpectra.Lib.UseCases.Generate;
+using InSpectra.Lib.UseCases.Generate.Requests;
 
 namespace InSpectra.Gen.Tests.OpenCli;
 

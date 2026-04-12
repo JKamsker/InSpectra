@@ -1,8 +1,8 @@
-using InSpectra.Gen.Core;
+using InSpectra.Lib;
 using InSpectra.Gen.Commands.Generate;
 using InSpectra.Gen.Commands.Render;
-using InSpectra.Gen.Engine.UseCases.Generate.Requests;
-using InSpectra.Gen.Engine.Rendering.Contracts;
+using InSpectra.Lib.UseCases.Generate.Requests;
+using InSpectra.Lib.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
 using InSpectra.Gen.Output;
 
