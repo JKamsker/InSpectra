@@ -152,6 +152,8 @@ internal sealed class InstalledToolAnalyzer
             return;
         }
 
+        WriteCrawlArtifact(request.OutputDirectory, crawl.Captures);
+
         var openCliDocument = _openCliBuilder.Build(request.CommandName, request.Version, crawl.Documents);
         if (!string.IsNullOrWhiteSpace(request.Result["cliFramework"]?.GetValue<string>()))
         {
@@ -169,5 +171,20 @@ internal sealed class InstalledToolAnalyzer
             openCliDocument,
             successClassification: "help-crawl",
             artifactSource: "crawled-from-help");
+    }
+
+    private static void WriteCrawlArtifact(
+        string outputDirectory,
+        IReadOnlyDictionary<string, JsonObject> captures)
+    {
+        var commands = new JsonArray();
+        foreach (var capture in captures.Values)
+        {
+            commands.Add(capture.DeepClone());
+        }
+
+        RepositoryPathResolver.WriteJsonFile(
+            Path.Combine(outputDirectory, "crawl.json"),
+            new JsonObject { ["commands"] = commands });
     }
 }

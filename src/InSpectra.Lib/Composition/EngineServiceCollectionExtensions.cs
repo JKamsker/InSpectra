@@ -60,6 +60,8 @@ public static class EngineServiceCollectionExtensions
         services.AddSingleton<StaticInstalledToolAnalysisSupport>();
         services.AddSingleton<HookInstalledToolAnalysisSupport>();
         services.AddSingleton<NativeInstalledToolAnalysisSupport>();
+        services.AddSingleton<CrawlArtifactRebuilder>();
+        services.AddSingleton<ICrawlArtifactRebuilder>(sp => sp.GetRequiredService<CrawlArtifactRebuilder>());
         services.AddSingleton<AcquisitionAnalysisDispatcher>();
 
         // Public composition seams for the app shell. These adapters let
