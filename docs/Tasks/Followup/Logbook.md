@@ -1,21 +1,22 @@
 # Follow-up Logbook
 
-> **Status (2026-04-12): 43 PHASES PUSHED WITH GREEN HOSTED CI, WITH OUTER
-> ITERATION 9 FRESH-SWARM WAVE 1 CONVERGED AND `TN-2026-04-12-04` IN PROGRESS
-> FROM CLEAN TIP `f2f07dc`.**
+> **Status (2026-04-12): 44 PHASES PUSHED WITH GREEN HOSTED CI, WITH OUTER
+> ITERATION 10 FRESH-SWARM WAVE 1 CONVERGED ON `99a2c5a` AND LOCAL PHASE `g45`
+> NOW IN PROGRESS.**
 > Seven outer iterations shipped phases `g1`–`g39` on `feat/merge-tool`, the
 > queue-driven thin-shell phase `g40`, the installed-tool process-safety phase
-> `g41`, the packaged-tool verification phase `g42`, and the hosted follow-up
-> fix `g43` are now pushed, and `6bb272d` is the current hosted-validated code
-> tip.
+> `g41`, the packaged-tool verification phase `g42`, the hosted follow-up
+> fix `g43`, and the Playwright hosted-CI phase `g44` are now pushed, and
+> `99a2c5a` is the current hosted-validated code tip.
 > The original zero-BLOCKER/HIGH/MEDIUM stop condition is still **not** met:
-> `g42`/`g43` closed the packaged-tool verification HIGH, but multiple other
-> ranked HIGH/MEDIUM clusters remain open after the fresh post-`6bb272d`
-> wave-1 ranking.
+> `g44` closed the hosted Playwright CI HIGH plus its adjacent local E2E
+> mediums, but multiple other ranked HIGH/MEDIUM clusters remain open after
+> the fresh post-`99a2c5a` wave-1 ranking.
 >
-> Current validated pushed tip: `6bb272d` with **354 unit tests / 0 failed / 0
+> Current validated pushed tip: `99a2c5a` with **30 frontend unit tests**,
+> **12 Playwright E2E tests**, **354 backend unit tests / 0 failed / 0
 > skipped**, **17 architecture policy tests**, and green `pull_request` run
-> `24300661250`.
+> `24301203450`.
 >
 > The latest green `workflow_dispatch` run is still `24296167355` on pushed tip
 > `a3390bb`, including `live-tests`.
@@ -38,9 +39,10 @@
 ## Todo Next Snapshot
 
 - Queue source of truth: [Todo Next Queue](TodoNext.md)
-- Active queued phase:
+- No non-completed queued items remain.
+- `TN-2026-04-12-04` completed on `g44` (`99a2c5a`):
   [TN-2026-04-12-04](TodoNext/2026-04-12-playwright-ci-and-e2e-hygiene.md)
-  (`In Progress`, resumed from clean `f2f07dc` on `2026-04-12`)
+  (green `pull_request` run `24301203450`)
 - `TN-2026-04-12-03` completed on `g42`/`g43` (`6ccb5b7`, `6bb272d`):
   [Close the packaged-tool hook-verification HIGH](TodoNext/2026-04-12-packaged-tool-hook-verification.md)
 - `TN-2026-04-12-02` completed on `g41` (`29a526c`):
@@ -48,51 +50,53 @@
 - `TN-2026-04-12-01` completed locally in `g40` (`8b3c0bc`):
   [Finalize the InSpectra.Gen thin-shell architecture](TodoNext/2026-04-12-thin-shell-architecture.md)
 
-## Current Open Items After `g43` Fresh-Swarm Wave 1 (2026-04-12)
+## Current Open Items After `g44` Fresh-Swarm Wave 1 (2026-04-12)
 
 This section supersedes the older post-`g43` hosted-validation snapshot below
 for current execution state.
 
 **Current validated pushed tip and CI surface:**
 
-- pushed branch tip: `6bb272d`
-- green `pull_request` run `24300661250`
+- pushed branch tip: `99a2c5a`
+- green `pull_request` run `24301203450`
 - latest green `workflow_dispatch` remains `24296167355` on `a3390bb`
 
 **Wave summary and ranking outcome:**
 
 - wave 1 converged strongly on the already-ranked remaining clusters rather
   than surfacing a materially new smell family
-- the repeated HIGHs were: hosted Playwright CI coverage, generated static-HTML
-  public-contract drift, and frontend code-size policy enforcement
-- the repeated MEDIUMs were: local Playwright stale-cache / weak-assertion
-  hygiene, process and viewer diagnostics preservation, installed-tool
-  determinism, static-analysis degradation handling, docs/UI drift, and
+- `TN-2026-04-12-04` is complete on `g44` (`99a2c5a`): hosted CI now runs
+  Playwright against the Release build, the shared `e2e/.rendered` reuse is
+  gone, and the theme-toggle assertion is now explicit and round-trip checked
+- the repeated HIGHs were: generated static-HTML public-contract drift,
+  frontend code-size policy enforcement, and public docs/UI truthfulness drift
+- the repeated MEDIUMs were: process and viewer diagnostics preservation,
+  installed-tool determinism, static-analysis degradation handling, and
   architecture-scanner / boundary-assertion gaps
 - active implementation pick:
-  `TN-2026-04-12-04` targets the Playwright CI gap first because it closes one
-  remaining HIGH together with two adjacent MEDIUMs in a narrow CI/E2E slice
-- queue state: `TN-2026-04-12-04` is now active from clean branch tip
-  `f2f07dc`; implementation is restricted to the CI/E2E file cluster unless
-  validation forces a minimal adjacent config change
+  local phase `g45` targets the `AboutPage` / `CIGuidePage` truthfulness slice
+  next because it closes one remaining HIGH together with adjacent docs/UI
+  MEDIUMs in a narrow two-file cluster
 - no new smell category was discovered in wave 1
 
 **Still-open ranked clusters after wave 1:**
 
-- **HIGH: hosted CI still does not execute the Playwright E2E suite.**
-  `.github/workflows/ci.yml` still runs frontend unit tests plus build, but not
-  `npm run test:e2e`.
 - **HIGH: generated static HTML still overstates several public viewer
   features.**
-  The generated static viewer still renders `Home` without honoring the
-  `--show-home` contract and still does not implement the advertised static
-  `browse` / `upload` flows.
+  The pushed static viewer still advertises `--show-home`,
+  `--enable-package-upload`, `--enable-nuget-browser`, and `--enable-url`,
+  but the generated app remains overview/command-only and still prefers
+  injected bootstrap over query params.
 - **HIGH: frontend code-size policy is unenforced and already violated.**
-  `RepositoryCodeFilePolicyTests.cs` still ignores `*.ts` / `*.tsx`, while
-  `CIGuidePage.tsx` and `NugetBrowser.tsx` exceed the repo hard cap.
-- **MEDIUM: local Playwright still has stale-cache and weak-assertion risks.**
-  The shared `.rendered` cache can mask current-output regressions, and the
-  theme-toggle E2E still passes when the toggle is absent.
+  `RepositoryCodeFilePolicyTests.cs` still ignores tracked `*.ts` / `*.tsx`,
+  while `CIGuidePage.tsx` and `NugetBrowser.tsx` exceed the repo hard cap on
+  the validated pushed tip.
+- **HIGH: public website quickstart and CI guide still drift from the real
+  product contract on the latest pushed tip.**
+  The pushed `AboutPage` still teaches removed `render exec` / `render dotnet`
+  commands, and the pushed `CIGuidePage` still overstates its action-input
+  coverage and project-mutation behavior. Local phase `g45` is addressing this
+  slice now.
 - **MEDIUM: process and viewer failure diagnostics still discard useful
   stdout/timeout evidence.**
   `ProcessRunner.cs` and
@@ -108,10 +112,6 @@ for current execution state.
   `StaticAnalysisInstalledToolAnalysisSupport.cs` does not fail on help-crawl
   output-limit or guardrail failures the way the sibling help/CliFx analyzers
   do.
-- **MEDIUM: public docs, website copy, and the CI guide still drift from the
-  real product contract.**
-  Current gaps include stale package-mode XML-doc claims and website wording
-  around temporary project mutation, plus broader CI-guide input drift.
 - **MEDIUM: architecture enforcement is still bypassable in several places.**
   The shell/engine scanners still rely on plain `using` detection in multiple
   suites, leaving fully qualified or alias-based forbidden edges invisible.

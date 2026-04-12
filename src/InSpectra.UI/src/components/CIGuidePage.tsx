@@ -38,7 +38,7 @@ steps:
       mode: dotnet
       project: src/MyCli              # .csproj path or directory
       configuration: Release
-      format: html                    # html / markdown / markdown-monolith
+      format: html                    # html / markdown / markdown-monolith / markdown-hybrid
       output-dir: docs/cli
 
   - uses: actions/upload-artifact@v4
@@ -138,7 +138,7 @@ jobs:
           dotnet-tool: MyCli.Tool
           cli-name: mycli
           output-dir: _site
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with: { path: _site }
 
   deploy:
@@ -179,7 +179,7 @@ function UsagePanel({ tab }: { tab: UsageTab }) {
           {"      "}<span className="ci-guide-syn-arg">mode</span>: dotnet{"\n"}
           {"      "}<span className="ci-guide-syn-arg">project</span>: src/MyCli{"              "}<YamlComment># .csproj path or directory</YamlComment>{"\n"}
           {"      "}<span className="ci-guide-syn-arg">configuration</span>: Release{"\n"}
-          {"      "}<span className="ci-guide-syn-arg">format</span>: html{"                    "}<YamlComment># html / markdown / markdown-monolith</YamlComment>{"\n"}
+          {"      "}<span className="ci-guide-syn-arg">format</span>: html{"                    "}<YamlComment># html / markdown / markdown-monolith / markdown-hybrid</YamlComment>{"\n"}
           {"      "}<span className="ci-guide-syn-arg">output-dir</span>: docs/cli{"\n"}
           {"\n"}
           {"  "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/upload-artifact@v4</span>{"\n"}
@@ -292,12 +292,12 @@ interface InputDef {
 const inputs: InputDef[] = [
   {
     name: "mode",
-    desc: <>Render mode: <code>exec</code> invokes a live CLI, <code>file</code> reads from saved JSON, <code>dotnet</code> runs a .NET project from source.</>,
+    desc: <>Render mode: <code>exec</code> invokes a live CLI, <code>file</code> reads from saved JSON, <code>dotnet</code> runs a .NET project from source, and <code>package</code> analyzes a published .NET tool package.</>,
     defaultVal: <><code>exec</code></>,
   },
   {
     name: "format",
-    desc: <>Output format: <code>html</code> (interactive SPA), <code>markdown</code> (tree), or <code>markdown-monolith</code> (single file).</>,
+    desc: <>Output format: <code>html</code> (interactive SPA), <code>markdown</code> (tree), <code>markdown-monolith</code> (single file), or <code>markdown-hybrid</code> (README plus group files as needed).</>,
     defaultVal: <><code>html</code></>,
   },
   {
@@ -373,7 +373,7 @@ const inputs: InputDef[] = [
   {
     name: "timeout",
     desc: <>Timeout in seconds for each CLI export command (exec / dotnet / package mode).</>,
-    defaultVal: <>Optional</>,
+    defaultVal: <><code>30</code> (exec) / <code>120</code> (dotnet, package)</>,
   },
   {
     name: "extra-args",
@@ -593,10 +593,12 @@ export function CIGuidePage({ section }: { section?: string }) {
                 The action installs <strong>.NET</strong> and <strong>InSpectra.Gen</strong> automatically.
                 In <code>dotnet</code> mode it also reads your project's{" "}
                 <code>TargetFramework</code> and installs the matching SDK
-                (skipping versions already on the runner), and adds the{" "}
-                <code>InSpectra.Cli</code> <code>PackageReference</code> for you so{" "}
-                <code>cli opencli</code> / <code>cli xmldoc</code> work without touching your{" "}
-                <code>.csproj</code>. In <code>exec</code> mode you still install your CLI
+                (skipping versions already on the runner). When <code>opencli-mode</code>{" "}
+                is left empty or set to <code>native</code>, and unless you set{" "}
+                <code>skip-inspectra-cli: 'true'</code>, it may also add the{" "}
+                <code>InSpectra.Cli</code> <code>PackageReference</code> to the checked-out
+                project so <code>cli opencli</code> / <code>cli xmldoc</code> are available
+                for the rest of the job. In <code>exec</code> mode you still install your CLI
                 yourself (or use <code>dotnet-tool</code>).
               </p>
             </div>
@@ -610,7 +612,8 @@ export function CIGuidePage({ section }: { section?: string }) {
             <div className="ci-guide-section-label">Reference</div>
             <h2 className="ci-guide-section-title">Inputs</h2>
             <p className="ci-guide-section-desc">
-              All inputs accepted by <code>JKamsker/InSpectra@v1</code>.
+              Common inputs used by the examples on this page. This is not an exhaustive
+              mirror of <code>JKamsker/InSpectra@v1</code>.
             </p>
 
             <div className="ci-guide-callout">
@@ -670,7 +673,7 @@ export function CIGuidePage({ section }: { section?: string }) {
               </p>
               <p>
                 <strong>2. Add a deploy job</strong> &mdash;
-                Download the artifact, re-upload as a Pages artifact, and deploy. Grant{" "}
+                Upload the generated site as a Pages artifact, then deploy it. Grant{" "}
                 <code>pages: write</code> and <code>id-token: write</code> permissions.
               </p>
             </div>
@@ -705,7 +708,7 @@ export function CIGuidePage({ section }: { section?: string }) {
                 {"          "}<span className="ci-guide-syn-arg">dotnet-tool</span>: MyCli.Tool{"\n"}
                 {"          "}<span className="ci-guide-syn-arg">cli-name</span>: mycli{"\n"}
                 {"          "}<span className="ci-guide-syn-arg">output-dir</span>: _site{"\n"}
-                {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/upload-pages-artifact@v3</span>{"\n"}
+                {"      "}- <span className="ci-guide-syn-flag">uses</span>: <span className="ci-guide-syn-str">actions/upload-pages-artifact@v4</span>{"\n"}
                 {"        "}<span className="ci-guide-syn-flag">with</span>: {"{ "}<span className="ci-guide-syn-arg">path</span>: _site{" }"}{"\n"}
                 {"\n"}
                 {"  "}<span className="ci-guide-syn-arg">deploy</span>:{"\n"}
@@ -748,9 +751,14 @@ export function CIGuidePage({ section }: { section?: string }) {
             <div className="ci-guide-prose">
               <p>
                 <strong>For dotnet mode</strong> (recommended when the CLI source lives in the
-                same repo), the action checks out your project, auto-adds the{" "}
-                <code>InSpectra.Cli</code> <code>PackageReference</code> if it isn't already there,
-                and runs <code>dotnet run --project &lt;PROJECT&gt; -- cli opencli</code>. CLIs built with{" "}
+                same repo), start with a normal checkout step in your workflow, then point the
+                action at the project. When <code>opencli-mode</code> is left empty or set to{" "}
+                <code>native</code>, the action can auto-add the <code>InSpectra.Cli</code>{" "}
+                <code>PackageReference</code> if it isn't already there and run{" "}
+                <code>dotnet run --project &lt;PROJECT&gt; -- cli opencli</code>. That
+                project-file change remains in the checked-out workspace for later steps unless you
+                set <code>skip-inspectra-cli: 'true'</code> or manage the dependency yourself. CLIs
+                built with{" "}
                 <a
                   href="https://github.com/spectreconsole/spectre.console"
                   target="_blank"
@@ -759,7 +767,7 @@ export function CIGuidePage({ section }: { section?: string }) {
                 >
                   Spectre.Console.Cli
                 </a>{" "}
-                work out of the box because <code>InSpectra.Cli</code> wires up the export commands for you.
+                are a common fit because <code>InSpectra.Cli</code> wires up the export commands for you.
               </p>
               <p>
                 <strong>For exec mode</strong>, your CLI needs to implement the <code>cli opencli</code> command

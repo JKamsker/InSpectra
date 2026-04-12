@@ -8,26 +8,31 @@ This folder replaces the old monolithic
 - Working branch: `feat/merge-tool`
 - Current follow-up docs live on the branch tip; verify `HEAD` before
   resuming work.
-- Latest fully validated pushed tip: `6bb272d`
+- Latest fully validated pushed tip: `99a2c5a`
 - Seven outer iterations shipped phases `g1`–`g39` on `feat/merge-tool`, and
   the queue-driven thin-shell phase `g40`, the installed-tool
   process-safety phase `g41`, the packaged-tool verification phase `g42`, and
-  the hosted follow-up fix `g43` are now pushed and hosted validated.
-- The pushed tip `6bb272d` is hosted validated:
-  - `354 / 0 / 0` unit tests
+  the hosted follow-up fix `g43` and the Playwright hosted-CI phase `g44` are
+  now pushed and hosted validated.
+- The pushed tip `99a2c5a` is hosted validated:
+  - `30` frontend unit tests
+  - `12` Playwright E2E tests
+  - `354 / 0 / 0` backend unit tests
   - `17` architecture policy tests
-  - green `pull_request` run `24300661250`
+  - green `pull_request` run `24301203450`
 - The latest green `workflow_dispatch` validation is still on pushed tip
   `a3390bb`:
   - green `workflow_dispatch` run `24296167355`, including `live-tests`
-- Outer iteration 9 fresh-swarm wave 1 restarted from `6bb272d` and
+- Outer iteration 10 fresh-swarm wave 1 restarted from `99a2c5a` and
   converged on the remaining pre-existing HIGH/MEDIUM clusters.
 - The original zero-BLOCKER/HIGH/MEDIUM stop condition was not reached.
-  `g42`/`g43` closed the packaged-tool verification HIGH, but multiple other
-  ranked HIGH/MEDIUM clusters remain open after the fresh post-`6bb272d`
-  wave-1 ranking.
+  `g44` closed the hosted Playwright CI HIGH plus its adjacent local E2E
+  mediums, but multiple other ranked HIGH/MEDIUM clusters remain open after
+  the fresh post-`99a2c5a` wave-1 ranking.
 - Active todo-next queue:
-  - `TN-2026-04-12-04` in progress from clean tip `f2f07dc`:
+  - no non-completed queued items remain
+  - `TN-2026-04-12-04` completed on `g44` (`99a2c5a`) with green
+    `pull_request` run `24301203450`:
     [TodoNext/2026-04-12-playwright-ci-and-e2e-hygiene.md](TodoNext/2026-04-12-playwright-ci-and-e2e-hygiene.md)
   - `TN-2026-04-12-03` completed on `g42`/`g43`
     (`6ccb5b7`, `6bb272d`):
@@ -41,7 +46,7 @@ This folder replaces the old monolithic
 ## Current Handoff State
 
 - Source of truth for current open work:
-  [Logbook](Logbook.md#current-open-items-after-g43-fresh-swarm-wave-1-2026-04-12)
+  [Logbook](Logbook.md#current-open-items-after-g44-fresh-swarm-wave-1-2026-04-12)
 - Source of truth for how to resume the loop:
   [Runbook](Runbook.md)
 - Source of truth for mandatory queued work before the next swarm:

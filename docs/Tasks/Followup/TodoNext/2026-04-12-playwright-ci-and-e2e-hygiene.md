@@ -1,7 +1,7 @@
 # Todo Next: Playwright CI And E2E Hygiene
 
 - ID: `TN-2026-04-12-04`
-- State: `In Progress`
+- State: `Completed`
 - Added: `2026-04-12`
 - Source: outer iteration 9 post-`g43` fresh-swarm wave 1 on hosted-green tip
   `6bb272d`
@@ -12,6 +12,7 @@
   dated rationale and update [Logbook](../Logbook.md) accordingly.
 - Active start: resumed from clean `feat/merge-tool` tip `f2f07dc` on
   `2026-04-12`
+- Completed: `g44` (`99a2c5a`) with green `pull_request` run `24301203450`
 
 ## Why This Phase Goes Next
 
@@ -39,14 +40,16 @@ Wave-1 evidence on `6bb272d`:
   conditional on the toggle existing, which turns a missing toggle into a
   silent pass
 
-## Planned Scope
+## Completed Scope
 
 Keep the phase focused on the hosted Playwright gap and its adjacent test debt:
 
-- add a PR-safe Playwright lane to hosted CI
-- ensure the E2E suite renders fresh output or otherwise proves the rendered
-  input is current
-- make the theme-toggle contract assertive rather than conditional
+- added a PR-safe Playwright lane to hosted CI, including Playwright browser
+  install plus Release/no-build execution against the hosted build
+- made the E2E suite render fresh temp output instead of reusing
+  `e2e/.rendered`
+- made the theme-toggle contract assertive and round-trip checked instead of
+  conditional
 
 Expected file cluster:
 
