@@ -1,19 +1,24 @@
 # Follow-up Logbook
 
-> **Status (2026-04-12): 39 CODE/TEST PHASES SHIPPED, THE FOLLOW-UP DOCS NOW
-> LIVE UNDER `docs/Tasks/Followup/`, AND THE PUSHED `g39` TIP HAS GREEN
-> HOSTED CI.**
-> Seven outer iterations shipped phases `g1`–`g39` on `feat/merge-tool`.
+> **Status (2026-04-12): 39 PHASES PUSHED WITH GREEN HOSTED CI, PLUS LOCAL
+> PHASE `g40` (`8b3c0bc`) COMMITTED AND LOCALLY VALIDATED.**
+> Seven outer iterations shipped phases `g1`–`g39` on `feat/merge-tool`, and
+> the queue-driven thin-shell phase `g40` is now committed locally.
 > The original zero-BLOCKER/HIGH/MEDIUM stop condition is still **not** met:
 > the final fresh swarm left one HIGH and several MEDIUM findings open, and
 > the outer loop stopped only because the user explicitly ended it after
 > iteration 7.
 >
-> Current validated tip: `a3390bb` with **319 unit tests / 0 failed / 0
+> Current validated pushed tip: `a3390bb` with **319 unit tests / 0 failed / 0
 > skipped**, **15 architecture policy tests**, targeted live NuGet API slice
 > **3 / 0 / 0** (`NuGetApiClientLiveTests`), green `pull_request` run
 > `24296163756`, and green `workflow_dispatch` run `24296167355` including
 > `live-tests`.
+>
+> The current local committed tip `8b3c0bc` (`g40`) passes **325 unit tests /
+> 0 failed / 0 skipped**, **17 architecture policy tests**, and a targeted
+> engine architecture slice of **3 / 0 / 0**. This tip has not been pushed or
+> hosted validated yet.
 >
 > Use this file for shipped history, test/CI ledger, lessons learned, and the
 > current open-findings list. Use [README](README.md), [Runbook](Runbook.md),
@@ -33,9 +38,62 @@
 ## Todo Next Snapshot
 
 - Queue source of truth: [Todo Next Queue](TodoNext.md)
-- Current mandatory queued item before the next fresh swarm:
-  - `TN-2026-04-12-01` `Ready`:
-    [Finalize the InSpectra.Gen thin-shell architecture](TodoNext/2026-04-12-thin-shell-architecture.md)
+- Current mandatory queued item before the next fresh swarm: none
+- `TN-2026-04-12-01` completed locally in `g40` (`8b3c0bc`):
+  [Finalize the InSpectra.Gen thin-shell architecture](TodoNext/2026-04-12-thin-shell-architecture.md)
+
+## Current Open Items After Thin-Shell Queue Handling (2026-04-12)
+
+This section supersedes the older iteration-7 snapshot below now that
+`TN-2026-04-12-01` has landed locally in `g40`.
+
+**Current local validation surface:**
+
+- `dotnet test InSpectra.Gen.sln` ✅ (`160 / 0 / 0`
+  `InSpectra.Gen.Engine.Tests`, `165 / 0 / 0` `InSpectra.Gen.Tests`)
+- `dotnet test tests/InSpectra.Gen.Tests/InSpectra.Gen.Tests.csproj --filter Architecture --no-restore`
+  ✅ (`17 / 0 / 0`)
+- targeted engine architecture slice ✅ (`3 / 0 / 0`)
+
+**Queue-handling work already closed locally:**
+
+- `TN-2026-04-12-01` is complete on `g40` (`8b3c0bc`)
+- the old `Rendering.Contracts` → `Pipeline` leak is gone; public render
+  services now depend on internal pipeline types only, and
+  `AcquiredRenderDocument` / `IDocumentRenderService` are no longer exposed as
+  public engine surface
+- the engine rename is now reflected in code, tests, and architecture docs;
+  the backend project/test assembly now read as `InSpectra.Gen.Engine` and
+  `InSpectra.Gen.Engine.Tests`
+- engine implementation types and submodule DI seams that became public during
+  the rename have been collapsed back to `internal`, and
+  `ArchitectureEnginePublicSurfaceTests` now guards the exported engine surface
+- internal layering coverage now includes shell `Output/` plus engine
+  `Execution/` and `Targets/` roots, so those checks are no longer grep-only
+- engine result and exception flows no longer embed shell-flag wording like
+  `--out-dir`, `--overwrite`, `--crawl-out`, or `--cli-framework`
+
+**Open HIGH/MEDIUM findings still pending the next fresh swarm:**
+
+- **HIGH: CI still does not run the Playwright E2E suite.**
+  `.github/workflows/ci.yml` still does not execute `npm run test:e2e`, so the
+  UI E2E coverage under `src/InSpectra.UI/e2e/` is not part of hosted CI.
+- **MEDIUM: viewer-build failures still lose stdout diagnostics.**
+  `src/InSpectra.Gen.Engine/Rendering/Html/Bundle/ViewerBundleProcessSupport.cs`
+  still reports only stderr on failure.
+- **MEDIUM: multi-TFM installed-dotnet-tool resolution is still nondeterministic.**
+  `src/InSpectra.Gen.Engine/Tooling/Process/InstalledDotnetToolCommandSupport.cs`
+  still returns the first matching `DotnetToolSettings.xml` under the install
+  tree, so enumeration order can pick the wrong entry point/runtimeconfig.
+- **MEDIUM: docs/UI still drift from the action and Pages behavior.**
+  `README.md` still advertises example bundles that the Pages jobs do not
+  publish, and `src/InSpectra.UI/src/components/CIGuidePage.tsx` still omits
+  multiple inputs present in `.github/actions/render/action.yml`.
+- **MEDIUM: app-shell architecture scanning is still regex-limited.**
+  `tests/InSpectra.Gen.Tests/Architecture/ArchitectureAppShellTests.cs` can
+  still miss fully-qualified, alias, or `global using static` dependency
+  edges, even though the new exported-surface guard now blocks many of the
+  worst regressions.
 
 ## Retrospective (executed 2026-04-11)
 

@@ -8,7 +8,7 @@ This folder replaces the old monolithic
 - Working branch: `feat/merge-tool`
 - Current follow-up docs live on the branch tip; verify `HEAD` before
   resuming work.
-- Latest fully validated code tip: `a3390bb`
+- Latest fully validated pushed tip: `a3390bb`
 - Seven outer iterations shipped phases `g1`–`g39` on `feat/merge-tool`.
 - The pushed tip `a3390bb` is locally and hosted validated:
   - `319 / 0 / 0` unit tests
@@ -16,19 +16,28 @@ This folder replaces the old monolithic
   - targeted live NuGet API slice `3 / 0 / 0`
   - green `pull_request` run `24296163756`
   - green `workflow_dispatch` run `24296167355`, including `live-tests`
+- The current local committed tip `8b3c0bc` (`g40`) was validated on
+  `2026-04-12` and currently passes:
+  - `325 / 0 / 0` unit tests
+  - `17` architecture policy tests
+  - targeted engine architecture slice `3 / 0 / 0`
+  - this tip is committed locally and not yet pushed / hosted validated
 - The original zero-BLOCKER/HIGH/MEDIUM stop condition was not reached.
   The final fresh swarm still left one HIGH and several MEDIUM findings open,
   and the outer loop stopped only because the user explicitly ended it after
   iteration 7.
 - Active todo-next queue:
-  - `TN-2026-04-12-01` `Ready`:
-    finalize the thin-shell architecture brief in
+  - none
+  - `TN-2026-04-12-01` completed locally on `g40`
+    (`8b3c0bc`); see
     [TodoNext/2026-04-12-thin-shell-architecture.md](TodoNext/2026-04-12-thin-shell-architecture.md)
+    and
+    [Logbook](Logbook.md#current-open-items-after-thin-shell-queue-handling-2026-04-12)
 
 ## Current Handoff State
 
 - Source of truth for current open work:
-  [Logbook](Logbook.md#still-open-items-after-iteration-7)
+  [Logbook](Logbook.md#current-open-items-after-thin-shell-queue-handling-2026-04-12)
 - Source of truth for how to resume the loop:
   [Runbook](Runbook.md)
 - Source of truth for mandatory queued work before the next swarm:

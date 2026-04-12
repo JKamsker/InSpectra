@@ -70,8 +70,8 @@ family is discovered and recorded in [Logbook](Logbook.md).
    useful gut check:
 
    ```text
-   grep -rn "using InSpectra\.Gen\.Acquisition\.Modes\.\(Help\|CliFx\|Hook\|Static\)" \
-     src/InSpectra.Gen.Acquisition/Modes/
+   grep -rn "using InSpectra\.Gen\.Engine\.Modes\.\(Help\|CliFx\|Hook\|Static\)" \
+     src/InSpectra.Gen.Engine/Modes/
    ```
 
 8. **Tooling → Modes**: enforced. Re-run the raw grep anyway.
@@ -79,33 +79,41 @@ family is discovered and recorded in [Logbook](Logbook.md).
 10. **Cycles inside Gen** between `Commands`, `UseCases`, `Rendering`,
     `OpenCli`, `Output`, and `Execution`. The F2 fix documents the pattern.
 
-    As of phase g3, this is partly test-enforced by
+    As of the current thin-shell queue handling, this is partly test-enforced by
     `ArchitectureGenInternalLayeringTests`:
 
-    - `OpenCli_does_not_depend_on_Rendering`
-    - `OpenCli_does_not_depend_on_UseCases_or_Commands`
-    - `Rendering_does_not_depend_on_UseCases_or_Commands`
-    - `UseCases_does_not_depend_on_Commands`
+    - `Shell_output_does_not_depend_on_commands`
+    - `Engine_opencli_does_not_depend_on_rendering_or_use_cases`
+    - `Engine_rendering_does_not_depend_on_use_cases`
+    - `Engine_execution_does_not_depend_on_modes_rendering_or_use_cases`
+    - `Engine_targets_does_not_depend_on_modes_or_rendering`
 
     The helper also asserts `filesScanned > 0` so an accidental folder rename
     cannot trip a vacuous green.
 
-    Raw grep:
+    Raw grep / gut checks:
 
     ```text
-    # A depending on B where B depends on A
-    for pair in OpenCli:Rendering Rendering:UseCases UseCases:Commands Rendering:OpenCli Commands:UseCases ; do
-      a=${pair%:*} ; b=${pair#*:}
-      grep -l "using InSpectra.Gen.$b" src/InSpectra.Gen/$a/**/*.cs 2>/dev/null | head -5
-    done
+    grep -rn "using InSpectra\.Gen\.Commands" src/InSpectra.Gen/Output/
+    grep -rn "using InSpectra\.Gen\.Engine\.\(Rendering\|UseCases\)" src/InSpectra.Gen.Engine/OpenCli/
+    grep -rn "using InSpectra\.Gen\.Engine\.UseCases" src/InSpectra.Gen.Engine/Rendering/
+    grep -rn "using InSpectra\.Gen\.Engine\.\(Modes\|Rendering\|UseCases\)" src/InSpectra.Gen.Engine/Execution/
+    grep -rn "using InSpectra\.Gen\.Engine\.\(Modes\|Rendering\)" src/InSpectra.Gen.Engine/Targets/
     ```
 
-    Additional pairs not covered by the 4 facts, such as `Output ⊄ UseCases`
-    and `Execution ⊄ Rendering`, are still grep-only unless promoted.
+    Additional roots not covered by the 5 facts, such as `Composition/`, are
+    still grep-only unless promoted.
 11. **App-shell → deep internals**: active tests enforce that `InSpectra.Gen`
-    may only import from `InSpectra.Gen.Acquisition.Composition` and
-    `Contracts`. Also check `InSpectra.Gen` → `InSpectra.Gen.StartupHook`
-    edges, which do not have the same coverage.
+    may only import from `InSpectra.Gen.Engine.Composition`,
+    `InSpectra.Gen.Engine.Contracts`,
+    `InSpectra.Gen.Engine.UseCases.Generate`, and
+    `InSpectra.Gen.Engine.Rendering.Contracts`, and the new
+    `ArchitectureEnginePublicSurfaceTests` guard keeps engine implementation
+    types from leaking publicly outside those contract-oriented namespaces.
+    The shell-source scan is still regex-based, so fully-qualified, alias, or
+    `global using static` edges still merit manual audit. Also check
+    `InSpectra.Gen` → `InSpectra.Gen.StartupHook` edges, which do not have
+    the same coverage.
 12. **Dead `using` statements**: always a tell after a move. `dotnet build`
     will not fail, but a regex scan will surface stale paths.
 
@@ -117,7 +125,7 @@ family is discovered and recorded in [Logbook](Logbook.md).
     - `AddInSpectraOpenCli`
     - `AddInSpectraGenerateUseCases`
     - `AddInSpectraRendering`
-    - `AddInSpectraAcquisition`
+    - `AddInSpectraEngine`
     - `AddTargetServices`
 14. **Non-test `InternalsVisibleTo`**: enforced by a test. Also check each
     `AssemblyInfo.cs` for unexpected attributes.
@@ -149,8 +157,10 @@ family is discovered and recorded in [Logbook](Logbook.md).
 22. **Multiple unrelated top-level types per file**: split into one file per
     primary type unless a documented exception applies.
 23. **Public types that should be `internal`**: anything inside a module that
-    is not exposed through `Composition/` or `Contracts/` should usually be
-    `internal`. Cross-check with `InternalsVisibleTo`.
+    is not exposed through the engine's root `Composition/`, `Contracts/`,
+    `Rendering/Contracts/`, or public use-case seams should usually be
+    `internal`. Cross-check with `InternalsVisibleTo` and the
+    `ArchitectureEnginePublicSurfaceTests` exported-type guard.
 
 ## Documentation / Test Hygiene
 

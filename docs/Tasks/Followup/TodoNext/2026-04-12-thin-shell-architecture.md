@@ -1,7 +1,7 @@
 # Todo Next: Finalize the InSpectra.Gen Thin-Shell Architecture
 
 - ID: `TN-2026-04-12-01`
-- State: `Ready`
+- State: `Completed`
 - Added: `2026-04-12`
 - Source: user-injected task via `docs/Tasks/Followup/tmp.txt`
 - Queue entry: [Todo Next Queue](../TodoNext.md)
@@ -9,6 +9,14 @@
   swarm begins.
 - Exit rule: mark the queue item `Completed`, `Deferred`, or `Rejected` with
   dated rationale and update [Logbook](../Logbook.md) accordingly.
+- Completed locally on `2026-04-12` in phase `g40`
+  (`8b3c0bc7e3e20a4df4897b253e9432fbdaf844cc`).
+- Validation on that local tip:
+  - `dotnet test InSpectra.Gen.sln` ✅ (`325 / 0 / 0`)
+  - architecture filter ✅ (`17 / 0 / 0`)
+  - targeted engine architecture slice ✅ (`3 / 0 / 0`)
+- Resume point after completion: continue with the next fresh investigation
+  swarm from `8b3c0bc7e3e20a4df4897b253e9432fbdaf844cc` after push / hosted CI.
 
 ## Normalized Brief
 
