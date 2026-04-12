@@ -1,20 +1,19 @@
-import { ArrowDownToLine, ArrowLeft, Clock3, Layers3, LoaderCircle, Search, Terminal } from "lucide-react";
-import { SyntheticEvent, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { LoaderCircle, Search } from "lucide-react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
-  DEFAULT_PACKAGE_ICON_URL,
   DiscoveryPackageDetail,
-  DiscoveryPackageSummary,
   DiscoverySummaryIndex,
   fetchDiscoveryIndex,
   fetchDiscoveryIndexPreview,
   fetchDiscoveryPackage,
   findPackageSummaryById,
-  getPackageStatus,
   searchPackages,
 } from "../data/nugetDiscovery";
 import { buildBrowseHash } from "../data/navigation";
 import { BrowsePalette } from "./BrowsePalette";
-import { PackageDetail, StatusBadge } from "./PackageDetail";
+import { PackageDetail } from "./PackageDetail";
+import { PackageCard } from "./NugetPackageCard";
+import { BrowseOrder, FULL_INDEX_HYDRATION_DELAY_MS, sortPackages, splitFrameworks } from "./NugetBrowserSupport";
 
 interface NugetBrowserProps {
   packageId?: string;
@@ -29,18 +28,6 @@ interface NugetBrowserProps {
   ) => void;
   onBack: () => void;
 }
-
-type BrowseOrder =
-  | "index"
-  | "updated"
-  | "created"
-  | "downloads"
-  | "name"
-  | "commands"
-  | "groups"
-  | "versions";
-
-const FULL_INDEX_HYDRATION_DELAY_MS = 3000;
 
 export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: NugetBrowserProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -272,12 +259,6 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
                 Browse {index.packageCount} indexed .NET tool packages. Select one to inspect its command structure.
               </p>
             </div>
-            {packageId && (
-              <button type="button" className="secondary-button" onClick={onBack}>
-                <ArrowLeft aria-hidden="true" size={14} />
-                Back
-              </button>
-            )}
           </div>
 
           <div className="browse-search">
@@ -343,195 +324,4 @@ export function NugetBrowser({ packageId, version, onLoadPackage, onBack }: Nuge
       {browsePalette}
     </>
   );
-}
-
-function PackageCard({ pkg }: { pkg: DiscoveryPackageSummary }) {
-  const iconUrl = pkg.packageIconUrl || DEFAULT_PACKAGE_ICON_URL;
-
-  return (
-    <a className="browse-card panel" href={buildBrowseHash(pkg.packageId)}>
-      <div className="browse-card-header">
-        <div className="browse-card-title-group">
-          <img
-            className="browse-package-icon"
-            src={iconUrl}
-            alt=""
-            loading="lazy"
-            onError={handlePackageIconError}
-          />
-          <div className="browse-card-title">{pkg.packageId}</div>
-        </div>
-        <StatusBadge status={getPackageStatus(pkg)} />
-      </div>
-
-      <div className="browse-card-body">
-        {pkg.commandName && (
-          <div className="browse-card-command" aria-label={`Command alias ${pkg.commandName}`}>
-            <span className="browse-card-command-prefix">&gt;</span>
-            <code>{pkg.commandName}</code>
-          </div>
-        )}
-      </div>
-
-      <div className="browse-card-footer">
-        <div className="browse-card-meta">
-          <span className="browse-card-version">v{pkg.latestVersion}</span>
-          {pkg.versionCount > 1 && (
-            <>
-              <span className="browse-card-meta-separator" aria-hidden="true">•</span>
-              <span className="browse-card-versions">{pkg.versionCount} versions</span>
-            </>
-          )}
-        </div>
-
-        <div className="browse-card-stats">
-          <span
-            className="browse-card-stat"
-            aria-label={`Last updated ${formatRelativeAgeLong(pkg.updatedAt)} ago`}
-            data-tooltip={buildUpdatedTooltip(pkg.updatedAt)}
-            title={buildUpdatedTooltip(pkg.updatedAt)}
-          >
-            <Clock3 aria-hidden="true" size={13} />
-            <span>{formatRelativeAgeShort(pkg.updatedAt)}</span>
-          </span>
-          <span
-            className="browse-card-stat"
-            aria-label={`${pkg.totalDownloads} total downloads`}
-            data-tooltip={`Downloads: ${formatNumber(pkg.totalDownloads)}`}
-            title={`Downloads: ${formatNumber(pkg.totalDownloads)}`}
-          >
-            <ArrowDownToLine aria-hidden="true" size={13} />
-            <span>{formatCount(pkg.totalDownloads)}</span>
-          </span>
-          <span
-            className="browse-card-stat"
-            aria-label={`${pkg.commandCount} commands`}
-            data-tooltip={`Commands: ${formatNumber(pkg.commandCount)}`}
-            title={`Commands: ${formatNumber(pkg.commandCount)}`}
-          >
-            <Terminal aria-hidden="true" size={13} />
-            <span>{pkg.commandCount}</span>
-          </span>
-          <span
-            className="browse-card-stat"
-            aria-label={`${pkg.commandGroupCount} command groups`}
-            data-tooltip={`Groups: ${formatNumber(pkg.commandGroupCount)}`}
-            title={`Groups: ${formatNumber(pkg.commandGroupCount)}`}
-          >
-            <Layers3 aria-hidden="true" size={13} />
-            <span>{pkg.commandGroupCount}</span>
-          </span>
-        </div>
-      </div>
-    </a>
-  );
-}
-
-function handlePackageIconError(event: SyntheticEvent<HTMLImageElement>) {
-  const img = event.currentTarget;
-  if (img.src === DEFAULT_PACKAGE_ICON_URL) return;
-  img.src = DEFAULT_PACKAGE_ICON_URL;
-}
-
-function formatCount(value: number): string {
-  return new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
-}
-
-function formatNumber(value: number): string {
-  return new Intl.NumberFormat().format(value);
-}
-
-function formatRelativeAgeShort(iso: string): string {
-  const diffMs = Date.now() - Date.parse(iso);
-  if (!Number.isFinite(diffMs) || diffMs < 0) return "?";
-
-  const hourMs = 60 * 60 * 1000;
-  const dayMs = 24 * hourMs;
-  const monthMs = 30 * dayMs;
-  const yearMs = 365 * dayMs;
-
-  if (diffMs >= yearMs) return `${Math.floor(diffMs / yearMs)}yr`;
-  if (diffMs >= monthMs) return `${Math.floor(diffMs / monthMs)}mo`;
-  if (diffMs >= dayMs) return `${Math.floor(diffMs / dayMs)}d`;
-  if (diffMs >= hourMs) return `${Math.floor(diffMs / hourMs)}h`;
-  return "<1h";
-}
-
-function formatRelativeAgeLong(iso: string): string {
-  const diffMs = Date.now() - Date.parse(iso);
-  if (!Number.isFinite(diffMs) || diffMs < 0) return "unknown";
-
-  const hourMs = 60 * 60 * 1000;
-  const dayMs = 24 * hourMs;
-  const monthMs = 30 * dayMs;
-  const yearMs = 365 * dayMs;
-
-  if (diffMs >= yearMs) return `${Math.floor(diffMs / yearMs)} year${diffMs >= 2 * yearMs ? "s" : ""}`;
-  if (diffMs >= monthMs) return `${Math.floor(diffMs / monthMs)} month${diffMs >= 2 * monthMs ? "s" : ""}`;
-  if (diffMs >= dayMs) return `${Math.floor(diffMs / dayMs)} day${diffMs >= 2 * dayMs ? "s" : ""}`;
-  if (diffMs >= hourMs) return `${Math.floor(diffMs / hourMs)} hour${diffMs >= 2 * hourMs ? "s" : ""}`;
-  return "less than 1 hour";
-}
-
-function buildUpdatedTooltip(iso: string): string {
-  return `Updated: ${formatRelativeAgeLong(iso)} ago (${formatAbsoluteDate(iso)})`;
-}
-
-function formatAbsoluteDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  } catch {
-    return iso;
-  }
-}
-
-function sortPackages(packages: DiscoveryPackageSummary[], orderBy: BrowseOrder): DiscoveryPackageSummary[] {
-  const sorted = [...packages];
-
-  switch (orderBy) {
-    case "updated":
-      return sorted.sort((left, right) =>
-        compareIsoDatesDesc(left.updatedAt, right.updatedAt) || left.packageId.localeCompare(right.packageId),
-      );
-    case "created":
-      return sorted.sort((left, right) =>
-        compareIsoDatesDesc(left.createdAt, right.createdAt) || left.packageId.localeCompare(right.packageId),
-      );
-    case "downloads":
-      return sorted.sort((left, right) =>
-        right.totalDownloads - left.totalDownloads || left.packageId.localeCompare(right.packageId),
-      );
-    case "name":
-      return sorted.sort((left, right) => left.packageId.localeCompare(right.packageId));
-    case "commands":
-      return sorted.sort((left, right) =>
-        right.commandCount - left.commandCount || left.packageId.localeCompare(right.packageId),
-      );
-    case "groups":
-      return sorted.sort((left, right) =>
-        right.commandGroupCount - left.commandGroupCount || left.packageId.localeCompare(right.packageId),
-      );
-    case "versions":
-      return sorted.sort((left, right) =>
-        right.versionCount - left.versionCount || left.packageId.localeCompare(right.packageId),
-      );
-    case "index":
-    default:
-      return sorted;
-  }
-}
-
-function compareIsoDatesDesc(left: string, right: string): number {
-  return Date.parse(right) - Date.parse(left);
-}
-
-function splitFrameworks(value: string | undefined): string[] {
-  if (!value) return [];
-  return value.split("+").map((s) => s.trim()).filter(Boolean);
 }

@@ -1,22 +1,25 @@
 # Follow-up Logbook
 
-> **Status (2026-04-12): 44 PHASES PUSHED WITH GREEN HOSTED CI, WITH OUTER
-> ITERATION 10 FRESH-SWARM WAVE 1 CONVERGED ON `99a2c5a` AND LOCAL PHASE `g45`
-> NOW IN PROGRESS.**
+> **Status (2026-04-12): 45 PHASES PUSHED WITH GREEN HOSTED CI, WITH OUTER
+> ITERATION 11 FRESH-SWARM WAVE 1 CONVERGED ON `8d83ebc` AND LOCAL PHASE
+> `g46` NOW IN PROGRESS.**
 > Seven outer iterations shipped phases `g1`–`g39` on `feat/merge-tool`, the
 > queue-driven thin-shell phase `g40`, the installed-tool process-safety phase
 > `g41`, the packaged-tool verification phase `g42`, the hosted follow-up
-> fix `g43`, and the Playwright hosted-CI phase `g44` are now pushed, and
-> `99a2c5a` is the current hosted-validated code tip.
+> fix `g43`, the Playwright hosted-CI phase `g44`, and the docs/UI
+> truthfulness phase `g45` are now pushed, and `8d83ebc` is the current
+> hosted-validated code tip.
 > The original zero-BLOCKER/HIGH/MEDIUM stop condition is still **not** met:
-> `g44` closed the hosted Playwright CI HIGH plus its adjacent local E2E
-> mediums, but multiple other ranked HIGH/MEDIUM clusters remain open after
-> the fresh post-`99a2c5a` wave-1 ranking.
+> `g45` closed the stale `AboutPage` / `CIGuidePage` truthfulness HIGH, but
+> the fresh post-`8d83ebc` wave-1 ranking converged on the surviving static
+> HTML contract HIGH, the frontend code-size-policy HIGH, and the same
+> established MEDIUM clusters. Local phase `g46` now closes the narrower
+> frontend code-size slice and is ready to commit/push.
 >
-> Current validated pushed tip: `99a2c5a` with **30 frontend unit tests**,
+> Current validated pushed tip: `8d83ebc` with **30 frontend unit tests**,
 > **12 Playwright E2E tests**, **354 backend unit tests / 0 failed / 0
 > skipped**, **17 architecture policy tests**, and green `pull_request` run
-> `24301203450`.
+> `24301601858`.
 >
 > The latest green `workflow_dispatch` run is still `24296167355` on pushed tip
 > `a3390bb`, including `live-tests`.
@@ -40,6 +43,11 @@
 
 - Queue source of truth: [Todo Next Queue](TodoNext.md)
 - No non-completed queued items remain.
+- Latest hosted-validated phase: `g45` (`8d83ebc`) with green
+  `pull_request` run `24301601858`.
+- Current local implementation pick: `g46` for frontend code-size
+  enforcement plus the `CIGuidePage` / `NugetBrowser` hard-cap splits
+  (locally complete; hosted validation pending).
 - `TN-2026-04-12-04` completed on `g44` (`99a2c5a`):
   [TN-2026-04-12-04](TodoNext/2026-04-12-playwright-ci-and-e2e-hygiene.md)
   (green `pull_request` run `24301203450`)
@@ -49,6 +57,144 @@
   [Close the installed-tool process-safety cluster](TodoNext/2026-04-12-installed-tool-process-safety.md)
 - `TN-2026-04-12-01` completed locally in `g40` (`8b3c0bc`):
   [Finalize the InSpectra.Gen thin-shell architecture](TodoNext/2026-04-12-thin-shell-architecture.md)
+
+## Current Open Items After `g45` Fresh-Swarm Wave 1 (2026-04-12)
+
+This section supersedes the older post-`g45` hosted-validation snapshot below
+for current execution state.
+
+**Current validated pushed tip and CI surface:**
+
+- pushed branch tip: `8d83ebc`
+- green `pull_request` run `24301601858`
+- latest green `workflow_dispatch` remains `24296167355` on `a3390bb`
+
+**Wave summary and ranking outcome:**
+
+- wave 1 converged immediately on the already-ranked survivor families rather
+  than surfacing a materially new smell family
+- the repeated HIGHs were: generated static-HTML public-contract drift and
+  frontend code-size policy enforcement
+- the repeated MEDIUMs were: diagnostics preservation, installed-tool/action
+  determinism, static-analysis degradation handling, and
+  architecture-scanner / boundary-assertion gaps
+- active implementation pick:
+  local phase `g46` targets the frontend code-size-policy HIGH first because
+  it is the narrower non-feature slice: hard-cap enforcement plus the
+  mechanical `CIGuidePage` / `NugetBrowser` splits
+- local implementation progress:
+  `g46` is now complete on the local tree. `RepositoryCodeFilePolicyTests`
+  keeps the practical `300`-line gate on C# only, extends the hard `500`-line
+  gate to frontend `*.ts` / `*.tsx`, unions tracked files with current
+  working-tree files so new local splits are covered before commit, and falls
+  back cleanly when `git` is unavailable. `CIGuidePage.tsx` is down to `151`
+  lines, `NugetBrowser.tsx` is down to `327`, the CI-guide local copy button
+  now reuses the shared `CopyButton`, and the extracted helper files all stay
+  below the repo hard cap. Local validation passed:
+  - `npm run build` in `src/InSpectra.UI` ✅
+  - `npm test` in `src/InSpectra.UI` ✅ (`30 / 30`)
+  - `dotnet test tests/InSpectra.Gen.Tests/InSpectra.Gen.Tests.csproj --no-restore --filter "FullyQualifiedName~RepositoryCodeFilePolicyTests"` ✅ (`2 / 2`)
+  - 6-verifier swarm plus focused policy-fallback reruns converged clean after one in-scope fix to the policy-test enumerator
+- no new smell category was discovered in wave 1
+
+**Still-open ranked clusters after wave 1:**
+
+- **HIGH: generated static HTML still overstates several public viewer
+  features.**
+  The public contract still advertises `--show-home`,
+  `--enable-package-upload`, `--enable-nuget-browser`, and `--enable-url`,
+  but the shipped `static.html` entry still routes through `StaticViewerApp`,
+  which does not wire the real browser/import flows and still prefers the
+  injected bootstrap over query-param loading.
+- **HIGH: frontend code-size policy is unenforced for TypeScript and already
+  violated.**
+  `RepositoryCodeFilePolicyTests.cs` still only enforces `*.cs`, while the
+  current pushed tip still carries `818` lines in `CIGuidePage.tsx` and `537`
+  in `NugetBrowser.tsx`. Local phase `g46` closes this slice on the current
+  local tree; hosted validation is still pending.
+- **MEDIUM: process and viewer failure diagnostics still discard useful
+  stdout/timeout evidence.**
+  `ProcessRunner.cs` and
+  `Rendering/Html/Bundle/ViewerBundleProcessSupport.cs` still collapse many
+  non-zero or timed-out failures to exit codes or short timeout messages even
+  when stdout contains the actionable error text.
+- **MEDIUM: installed-tool selection and action versioning remain
+  nondeterministic.**
+  Installed-tool analysis still picks the first matching
+  `DotnetToolSettings.xml`, and the composite action still lets ambient
+  `inspectra` on `PATH` override `inspectra-version`.
+- **MEDIUM: static-analysis mode still drops help-crawl degradation signals.**
+  `StaticAnalysisInstalledToolAnalysisSupport.cs` still bypasses the
+  output-limit / guardrail terminal checks that the help and CliFx analyzers
+  already honor.
+- **MEDIUM: architecture enforcement is still bypassable in several places.**
+  The shell/engine scanners still rely on plain `using` detection in multiple
+  suites, and the `Rendering.Markdown` / `Rendering.Html` separation is still
+  chartered but not executable.
+- **LOW: frontend practical-limit drift remains aggregated but non-blocking.**
+  Current wave-1 examples include `src/InSpectra.UI/src/test/app.test.tsx`
+  (`410` lines), `src/InSpectra.UI/src/components/CliViewer.tsx` (`366`
+  lines), `src/InSpectra.UI/src/components/ComposerPanel.tsx` (`330` lines),
+  and the duplicate local `CopyButton` in `CIGuidePage.tsx`. Keep these
+  aggregated as LOW unless a later contained cleanup phase picks them up.
+
+## Current Open Items After `g45` Hosted Validation (2026-04-12)
+
+This section supersedes the older post-`g44` wave-1 snapshot below for
+current execution state.
+
+**Current validated pushed tip and CI surface:**
+
+- pushed branch tip: `8d83ebc`
+- green `pull_request` run `24301601858`
+- latest green `workflow_dispatch` remains `24296167355` on `a3390bb`
+
+**Work closed on `g45`:**
+
+- `g45` (`8d83ebc`) narrowed the public website truthfulness slice to the
+  actual product contract on the pushed tip
+- `AboutPage` no longer teaches removed `render exec` / `render dotnet`
+  flows and now shows the supported export-then-render quickstart instead
+- `CIGuidePage` now describes a common subset of action inputs, the real
+  `opencli-mode` / auto-added package-reference behavior, accurate timeout
+  defaults, and the current Pages artifact flow
+- hosted rerun `24301601858` completed green with the same `30` frontend unit
+  tests, `12` Playwright E2E tests, `354 / 0 / 0` backend unit tests, and
+  `17` architecture policy tests already covered on `g44`
+
+**Still-open ranked clusters pending the fresh post-`8d83ebc` swarm:**
+
+- **HIGH: generated static HTML still overstates several public viewer
+  features.**
+  The pushed static viewer still advertises `--show-home`,
+  `--enable-package-upload`, `--enable-nuget-browser`, and `--enable-url`,
+  but the generated app remains overview/command-only and still prefers
+  injected bootstrap over query params.
+- **HIGH: frontend code-size policy is unenforced and already violated.**
+  `RepositoryCodeFilePolicyTests.cs` still ignores tracked `*.ts` / `*.tsx`,
+  while `NugetBrowser.tsx` and the just-shrunk `CIGuidePage.tsx` remain part
+  of an unenforced frontend slice on the current pushed tip.
+- **MEDIUM: process and viewer failure diagnostics still discard useful
+  stdout/timeout evidence.**
+  `ProcessRunner.cs` and
+  `Rendering/Html/Bundle/ViewerBundleProcessSupport.cs` still collapse many
+  non-zero or timed-out failures to exit codes or short timeout messages even
+  when stdout contains the actionable error text.
+- **MEDIUM: installed-tool selection and action versioning remain
+  nondeterministic.**
+  Installed-tool analysis still picks the first matching
+  `DotnetToolSettings.xml`, and the composite action still lets ambient
+  `inspectra` on `PATH` override `inspectra-version`.
+- **MEDIUM: static-analysis mode still drops help-crawl degradation signals.**
+  `StaticAnalysisInstalledToolAnalysisSupport.cs` does not fail on help-crawl
+  output-limit or guardrail failures the way the sibling help/CliFx analyzers
+  do.
+- **MEDIUM: architecture enforcement is still bypassable in several places.**
+  The shell/engine scanners still rely on plain `using` detection in multiple
+  suites, leaving fully qualified or alias-based forbidden edges invisible.
+- **LOW: the previously logged LOW-only ledger remains open but non-blocking.**
+  None of the recorded LOW exceptions or hygiene items were re-raised by `g45`;
+  keep aggregating them rather than treating them as a new blocking cluster.
 
 ## Current Open Items After `g44` Fresh-Swarm Wave 1 (2026-04-12)
 
