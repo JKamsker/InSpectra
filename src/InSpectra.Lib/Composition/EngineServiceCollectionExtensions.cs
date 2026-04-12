@@ -6,6 +6,7 @@ using InSpectra.Lib.Modes.CliFx.Projection;
 using InSpectra.Lib.Modes.Help.Crawling;
 using InSpectra.Lib.Modes.Help.Projection;
 using InSpectra.Lib.Modes.Hook.Execution;
+using InSpectra.Lib.Modes.Native.Execution;
 using InSpectra.Lib.Modes.Static.Inspection;
 using InSpectra.Lib.Modes.Static.Projection;
 using InSpectra.Lib.OpenCli.Composition;
@@ -58,6 +59,7 @@ public static class EngineServiceCollectionExtensions
         services.AddSingleton<CliFxInstalledToolAnalysisSupport>();
         services.AddSingleton<StaticInstalledToolAnalysisSupport>();
         services.AddSingleton<HookInstalledToolAnalysisSupport>();
+        services.AddSingleton<NativeInstalledToolAnalysisSupport>();
         services.AddSingleton<AcquisitionAnalysisDispatcher>();
 
         // Public composition seams for the app shell. These adapters let

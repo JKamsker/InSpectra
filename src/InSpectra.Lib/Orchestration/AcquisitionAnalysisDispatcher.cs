@@ -5,6 +5,7 @@ using InSpectra.Lib.Contracts.Providers;
 using InSpectra.Lib.Modes.CliFx.Execution;
 using InSpectra.Lib.Modes.Help.Crawling;
 using InSpectra.Lib.Modes.Hook.Execution;
+using InSpectra.Lib.Modes.Native.Execution;
 using InSpectra.Lib.Modes.Static.Inspection;
 using InSpectra.Lib.Tooling.Process;
 using InSpectra.Lib.Tooling.Results;
@@ -24,17 +25,20 @@ internal sealed class AcquisitionAnalysisDispatcher
     private readonly CliFxInstalledToolAnalysisSupport _cliFxAnalyzer;
     private readonly StaticInstalledToolAnalysisSupport _staticAnalyzer;
     private readonly HookInstalledToolAnalysisSupport _hookAnalyzer;
+    private readonly NativeInstalledToolAnalysisSupport _nativeAnalyzer;
 
     public AcquisitionAnalysisDispatcher(
         InstalledToolAnalyzer helpAnalyzer,
         CliFxInstalledToolAnalysisSupport cliFxAnalyzer,
         StaticInstalledToolAnalysisSupport staticAnalyzer,
-        HookInstalledToolAnalysisSupport hookAnalyzer)
+        HookInstalledToolAnalysisSupport hookAnalyzer,
+        NativeInstalledToolAnalysisSupport nativeAnalyzer)
     {
         _helpAnalyzer = helpAnalyzer;
         _cliFxAnalyzer = cliFxAnalyzer;
         _staticAnalyzer = staticAnalyzer;
         _hookAnalyzer = hookAnalyzer;
+        _nativeAnalyzer = nativeAnalyzer;
     }
 
     public async Task<AcquisitionAnalysisOutcome> TryAnalyzeAsync(
@@ -147,8 +151,11 @@ internal sealed class AcquisitionAnalysisDispatcher
             case AnalysisMode.Hook:
                 await _hookAnalyzer.AnalyzeInstalledAsync(request, cancellationToken);
                 return;
+            case AnalysisMode.Native:
+                await _nativeAnalyzer.AnalyzeInstalledAsync(request, cancellationToken);
+                return;
             default:
-                throw new InvalidOperationException($"Mode `{mode}` is not supported by the discovery analyzer bridge.");
+                throw new InvalidOperationException($"Mode `{mode}` is not supported by the acquisition analysis dispatcher.");
         }
     }
 
