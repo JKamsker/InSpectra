@@ -6,6 +6,7 @@ using InSpectra.Gen.Engine.Tooling.Results;
 
 using InSpectra.Gen.Engine.Contracts;
 using System.Text.Json.Nodes;
+using System.Text;
 
 internal static class CommandInstallationSupport
 {
@@ -24,7 +25,7 @@ internal static class CommandInstallationSupport
 
         var installDirectory = Path.Combine(tempRoot, "tool");
         var installResult = await runtime.InvokeProcessCaptureAsync(
-            "dotnet",
+            DotnetHostPathResolutionSupport.ResolveDotnetHostPath(),
             ["tool", "install", packageId, "--version", version, "--tool-path", installDirectory],
             tempRoot,
             sandbox.Values,
@@ -41,9 +42,7 @@ internal static class CommandInstallationSupport
                 result,
                 phase: "install",
                 classification: installResult.TimedOut ? "install-timeout" : "install-failed",
-                CommandRuntime.NormalizeConsoleText(installResult.Stdout)
-                ?? CommandRuntime.NormalizeConsoleText(installResult.Stderr)
-                ?? "Tool installation failed.");
+                BuildInstallFailureMessage(installResult));
             return null;
         }
 
@@ -72,5 +71,33 @@ internal static class CommandInstallationSupport
         {
             Directory.CreateDirectory(directory);
         }
+    }
+
+    private static string BuildInstallFailureMessage(CommandRuntime.ProcessResult installResult)
+    {
+        var stdout = CommandRuntime.NormalizeConsoleText(installResult.Stdout);
+        var stderr = CommandRuntime.NormalizeConsoleText(installResult.Stderr);
+        if (string.IsNullOrWhiteSpace(stdout) && string.IsNullOrWhiteSpace(stderr))
+        {
+            return "Tool installation failed.";
+        }
+
+        var builder = new StringBuilder("Tool installation failed.");
+        AppendDiagnostic(builder, "stdout", stdout);
+        AppendDiagnostic(builder, "stderr", stderr);
+        return builder.ToString();
+    }
+
+    private static void AppendDiagnostic(StringBuilder builder, string label, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        builder.Append(' ');
+        builder.Append(label);
+        builder.Append(": ");
+        builder.Append(value);
     }
 }

@@ -34,7 +34,7 @@ internal sealed class PackageCliToolInstaller(
 
         var installDirectory = Path.Combine(tempRoot, "tool");
         var installResult = await runtime.InvokeProcessCaptureAsync(
-            "dotnet",
+            DotnetHostPathResolutionSupport.ResolveDotnetHostPath(),
             ["tool", "install", packageId, "--version", version, "--tool-path", installDirectory],
             tempRoot,
             sandbox.Values,
