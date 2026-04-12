@@ -12,50 +12,57 @@ internal static class OpenCliArtifactWriter
         string? crawlJson,
         CancellationToken cancellationToken)
     {
-        var openCliArtifact = PrepareArtifact(requested.OpenCliOutputPath, openCliJson, requested.Overwrite);
-        var crawlArtifact = PrepareArtifact(requested.CrawlOutputPath, crawlJson, requested.Overwrite);
+        var publishedArtifacts = await PublishArtifactsAsync(
+            [
+                PrepareArtifact("opencli", requested.OpenCliOutputPath, openCliJson, requested.Overwrite),
+                PrepareArtifact("crawl", requested.CrawlOutputPath, crawlJson, requested.Overwrite),
+            ],
+            cancellationToken);
 
-        StagedArtifact? stagedOpenCli = null;
-        StagedArtifact? stagedCrawl = null;
-        CommittedArtifact? committedOpenCli = null;
-        CommittedArtifact? committedCrawl = null;
-        var commitCompleted = false;
-        try
+        return new OpenCliArtifactOptions(
+            GetPublishedPath(publishedArtifacts, "opencli"),
+            GetPublishedPath(publishedArtifacts, "crawl"));
+    }
+
+    public static async Task<GenerateArtifactPublicationResult> WriteGenerateArtifactsAsync(
+        string? outputFile,
+        bool outputOverwrite,
+        OpenCliArtifactOptions requestedArtifacts,
+        string outputJson,
+        string openCliArtifactJson,
+        string? crawlJson,
+        CancellationToken cancellationToken)
+    {
+        var outputArtifact = PrepareArtifact("output", outputFile, outputJson, outputOverwrite);
+        var openCliArtifact = PrepareArtifact("opencli", requestedArtifacts.OpenCliOutputPath, openCliArtifactJson, requestedArtifacts.Overwrite);
+        var crawlArtifact = PrepareArtifact("crawl", requestedArtifacts.CrawlOutputPath, crawlJson, requestedArtifacts.Overwrite);
+
+        var openCliSharesOutput = outputArtifact is not null
+            && openCliArtifact is not null
+            && string.Equals(outputArtifact.Path, openCliArtifact.Path, StringComparison.OrdinalIgnoreCase);
+        if (openCliSharesOutput)
         {
-            stagedOpenCli = await StageArtifactAsync(openCliArtifact, cancellationToken);
-            stagedCrawl = await StageArtifactAsync(crawlArtifact, cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested();
-
-            committedOpenCli = CommitStagedArtifact(stagedOpenCli);
-            stagedOpenCli = null;
-            committedCrawl = CommitStagedArtifact(stagedCrawl);
-            stagedCrawl = null;
-
-            var openCliPath = committedOpenCli?.Path;
-            var crawlPath = committedCrawl?.Path;
-            commitCompleted = true;
-            return new OpenCliArtifactOptions(openCliPath, crawlPath);
+            OutputPathHelper.EnsureFileWritable(outputArtifact!.Path, requestedArtifacts.Overwrite);
+            openCliArtifact = null;
         }
-        catch
-        {
-            if (!commitCompleted)
-            {
-                RollBackCommittedArtifact(committedCrawl);
-                RollBackCommittedArtifact(committedOpenCli);
-            }
 
-            throw;
-        }
-        finally
-        {
-            DeleteStagedArtifact(stagedOpenCli);
-            DeleteStagedArtifact(stagedCrawl);
-            TryDeleteBackupArtifact(committedOpenCli);
-            TryDeleteBackupArtifact(committedCrawl);
-        }
+        var publishedArtifacts = await PublishArtifactsAsync(
+            [
+                outputArtifact,
+                openCliArtifact,
+                crawlArtifact,
+            ],
+            cancellationToken);
+
+        var publishedOutputPath = GetPublishedPath(publishedArtifacts, "output");
+        return new GenerateArtifactPublicationResult(
+            publishedOutputPath,
+            openCliSharesOutput ? publishedOutputPath : GetPublishedPath(publishedArtifacts, "opencli"),
+            GetPublishedPath(publishedArtifacts, "crawl"));
     }
 
     private static PreparedArtifact? PrepareArtifact(
+        string key,
         string? path,
         string? content,
         bool overwrite)
@@ -78,17 +85,75 @@ internal static class OpenCliArtifactWriter
             Directory.CreateDirectory(directory);
         }
 
-        return new PreparedArtifact(fullPath, content, overwrite);
+        return new PreparedArtifact(key, fullPath, content, overwrite);
     }
 
-    private static async Task<StagedArtifact?> StageArtifactAsync(PreparedArtifact? artifact, CancellationToken cancellationToken)
+    private static async Task<IReadOnlyDictionary<string, string>> PublishArtifactsAsync(
+        IEnumerable<PreparedArtifact?> artifacts,
+        CancellationToken cancellationToken)
     {
-        if (artifact is null)
+        var preparedArtifacts = artifacts
+            .Where(artifact => artifact is not null)
+            .Cast<PreparedArtifact>()
+            .ToList();
+        var stagedArtifacts = new List<StagedArtifact>(preparedArtifacts.Count);
+        var committedArtifacts = new List<CommittedArtifact>(preparedArtifacts.Count);
+        var commitCompleted = false;
+        try
         {
-            return null;
-        }
+            foreach (var artifact in preparedArtifacts)
+            {
+                stagedArtifacts.Add(await StageArtifactAsync(artifact, cancellationToken));
+            }
 
-        var stagedArtifact = new StagedArtifact(artifact.Path, artifact.Path + $".{Guid.NewGuid():N}.tmp", artifact.Overwrite);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            foreach (var stagedArtifact in stagedArtifacts)
+            {
+                committedArtifacts.Add(CommitStagedArtifact(stagedArtifact));
+            }
+
+            commitCompleted = true;
+            return committedArtifacts.ToDictionary(artifact => artifact.Key, artifact => artifact.Path, StringComparer.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            if (!commitCompleted)
+            {
+                for (var i = committedArtifacts.Count - 1; i >= 0; i--)
+                {
+                    RollBackCommittedArtifact(committedArtifacts[i]);
+                }
+            }
+
+            throw;
+        }
+        finally
+        {
+            foreach (var stagedArtifact in stagedArtifacts)
+            {
+                DeleteStagedArtifact(stagedArtifact);
+            }
+
+            foreach (var committedArtifact in committedArtifacts)
+            {
+                TryDeleteBackupArtifact(committedArtifact);
+            }
+        }
+    }
+
+    private static string? GetPublishedPath(
+        IReadOnlyDictionary<string, string> publishedArtifacts,
+        string key)
+    {
+        return publishedArtifacts.TryGetValue(key, out var path)
+            ? path
+            : null;
+    }
+
+    private static async Task<StagedArtifact> StageArtifactAsync(PreparedArtifact artifact, CancellationToken cancellationToken)
+    {
+        var stagedArtifact = new StagedArtifact(artifact.Key, artifact.Path, artifact.Path + $".{Guid.NewGuid():N}.tmp", artifact.Overwrite);
         try
         {
             await File.WriteAllTextAsync(stagedArtifact.TempPath, artifact.Content, cancellationToken);
@@ -101,15 +166,10 @@ internal static class OpenCliArtifactWriter
         }
     }
 
-    private sealed record PreparedArtifact(string Path, string Content, bool Overwrite);
+    private sealed record PreparedArtifact(string Key, string Path, string Content, bool Overwrite);
 
-    private static CommittedArtifact? CommitStagedArtifact(StagedArtifact? artifact)
+    private static CommittedArtifact CommitStagedArtifact(StagedArtifact artifact)
     {
-        if (artifact is null)
-        {
-            return null;
-        }
-
         string? backupPath = null;
         if (artifact.Overwrite && File.Exists(artifact.Path))
         {
@@ -120,7 +180,7 @@ internal static class OpenCliArtifactWriter
         try
         {
             File.Move(artifact.TempPath, artifact.Path, overwrite: false);
-            return new CommittedArtifact(artifact.Path, backupPath);
+            return new CommittedArtifact(artifact.Key, artifact.Path, backupPath);
         }
         catch
         {
@@ -183,7 +243,12 @@ internal static class OpenCliArtifactWriter
         File.Move(backupPath, path, overwrite: false);
     }
 
-    private sealed record StagedArtifact(string Path, string TempPath, bool Overwrite);
+    private sealed record StagedArtifact(string Key, string Path, string TempPath, bool Overwrite);
 
-    private sealed record CommittedArtifact(string Path, string? BackupPath);
+    private sealed record CommittedArtifact(string Key, string Path, string? BackupPath);
 }
+
+internal sealed record GenerateArtifactPublicationResult(
+    string? OutputFile,
+    string? OpenCliOutputPath,
+    string? CrawlOutputPath);

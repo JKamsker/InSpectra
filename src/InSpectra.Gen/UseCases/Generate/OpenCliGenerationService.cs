@@ -14,7 +14,7 @@ public sealed class OpenCliGenerationService(
 {
     public Task<GenerateExecutionResult> GenerateFromExecAsync(ExecAcquisitionRequest request, string? outputFile, bool overwrite, CancellationToken cancellationToken)
         => GenerateAsync(
-            () => acquisitionService.AcquireFromExecAsync(request, cancellationToken),
+            () => acquisitionService.AcquireFromExecAsync(WithoutArtifactPublication(request), cancellationToken),
             outputFile,
             request.Options.Artifacts,
             overwrite,
@@ -22,7 +22,7 @@ public sealed class OpenCliGenerationService(
 
     public Task<GenerateExecutionResult> GenerateFromDotnetAsync(DotnetAcquisitionRequest request, string? outputFile, bool overwrite, CancellationToken cancellationToken)
         => GenerateAsync(
-            () => acquisitionService.AcquireFromDotnetAsync(request, cancellationToken),
+            () => acquisitionService.AcquireFromDotnetAsync(WithoutArtifactPublication(request), cancellationToken),
             outputFile,
             request.Options.Artifacts,
             overwrite,
@@ -30,7 +30,7 @@ public sealed class OpenCliGenerationService(
 
     public Task<GenerateExecutionResult> GenerateFromPackageAsync(PackageAcquisitionRequest request, string? outputFile, bool overwrite, CancellationToken cancellationToken)
         => GenerateAsync(
-            () => acquisitionService.AcquireFromPackageAsync(request, cancellationToken),
+            () => acquisitionService.AcquireFromPackageAsync(WithoutArtifactPublication(request), cancellationToken),
             outputFile,
             request.Options.Artifacts,
             overwrite,
@@ -46,27 +46,30 @@ public sealed class OpenCliGenerationService(
         EnsureDistinctArtifactPaths(outputFile, artifacts.CrawlOutputPath);
         var acquisition = await action();
         var openCliJson = PrepareOpenCliJson(acquisition, out var warnings);
-
-        string? resolvedOutputFile = null;
-        if (!string.IsNullOrWhiteSpace(outputFile))
+        var publishedArtifacts = await OpenCliArtifactWriter.WriteGenerateArtifactsAsync(
+            outputFile,
+            overwrite,
+            artifacts,
+            openCliJson,
+            acquisition.OpenCliJson,
+            acquisition.CrawlJson,
+            cancellationToken);
+        var allWarnings = warnings.ToList();
+        if (!string.IsNullOrWhiteSpace(artifacts.CrawlOutputPath) && string.IsNullOrWhiteSpace(acquisition.CrawlJson))
         {
-            resolvedOutputFile = Path.GetFullPath(outputFile);
-            OutputPathHelper.EnsureFileWritable(resolvedOutputFile, overwrite);
-            var directory = Path.GetDirectoryName(resolvedOutputFile);
-            if (!string.IsNullOrWhiteSpace(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            await File.WriteAllTextAsync(resolvedOutputFile, openCliJson, cancellationToken);
+            allWarnings.Add("`--crawl-out` was requested, but the selected acquisition mode did not produce crawl data.");
         }
 
         return new GenerateExecutionResult(
             acquisition.Source,
-            acquisition.Metadata,
-            warnings,
+            acquisition.Metadata with
+            {
+                OpenCliOutputPath = publishedArtifacts.OpenCliOutputPath,
+                CrawlOutputPath = publishedArtifacts.CrawlOutputPath,
+            },
+            allWarnings,
             openCliJson,
-            resolvedOutputFile);
+            publishedArtifacts.OutputFile);
     }
 
     private static void EnsureDistinctArtifactPaths(string? outputFile, string? crawlOutputPath)
@@ -103,4 +106,28 @@ public sealed class OpenCliGenerationService(
         warnings = collectedWarnings;
         return documentSerializer.Serialize(document);
     }
+
+    private static ExecAcquisitionRequest WithoutArtifactPublication(ExecAcquisitionRequest request)
+        => request with
+        {
+            Options = WithoutArtifactPublication(request.Options),
+        };
+
+    private static DotnetAcquisitionRequest WithoutArtifactPublication(DotnetAcquisitionRequest request)
+        => request with
+        {
+            Options = WithoutArtifactPublication(request.Options),
+        };
+
+    private static PackageAcquisitionRequest WithoutArtifactPublication(PackageAcquisitionRequest request)
+        => request with
+        {
+            Options = WithoutArtifactPublication(request.Options),
+        };
+
+    private static AcquisitionOptions WithoutArtifactPublication(AcquisitionOptions options)
+        => options with
+        {
+            Artifacts = new OpenCliArtifactOptions(null, null, options.Artifacts.Overwrite),
+        };
 }

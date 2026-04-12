@@ -1,4 +1,5 @@
 using InSpectra.Gen.Core;
+using System.Text.Json.Nodes;
 using InSpectra.Gen.UseCases.Generate.Requests;
 using InSpectra.Gen.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
@@ -38,6 +39,84 @@ public class OpenCliGenerationServiceTests
         Assert.Equal(result.OpenCliJson, writtenJson);
         Assert.Contains("\"title\":", writtenJson, StringComparison.Ordinal);
         Assert.DoesNotContain("{}", writtenJson, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Generate_from_exec_publishes_output_and_artifacts_in_one_transaction()
+    {
+        using var temp = new TempDirectory();
+        var outputPath = Path.Combine(temp.Path, "generated.json");
+        var crawlPath = Path.Combine(temp.Path, "crawl.json");
+        var service = CreateService(new FakeAcquisitionService(xmlDocument: File.ReadAllText(FixturePaths.XmlDoc), crawlJson: "{\"commands\":[]}"));
+        var request = CreateExecRequest(temp.Path) with
+        {
+            Options = CreateExecRequest(temp.Path).Options with
+            {
+                Artifacts = new OpenCliArtifactOptions(outputPath, crawlPath, Overwrite: false),
+            },
+        };
+
+        var result = await service.GenerateFromExecAsync(request, outputPath, overwrite: false, CancellationToken.None);
+        var outputJson = await File.ReadAllTextAsync(outputPath);
+        var crawlJson = await File.ReadAllTextAsync(crawlPath);
+
+        Assert.Equal(Path.GetFullPath(outputPath), result.OutputFile);
+        Assert.Equal(Path.GetFullPath(outputPath), result.Acquisition.OpenCliOutputPath);
+        Assert.Equal(Path.GetFullPath(crawlPath), result.Acquisition.CrawlOutputPath);
+        Assert.Equal(JsonNode.Parse(result.OpenCliJson)?.ToJsonString(), JsonNode.Parse(outputJson)?.ToJsonString());
+        Assert.Equal("{\"commands\":[]}", crawlJson);
+        Assert.NotEqual(
+            JsonNode.Parse(FakeAcquisitionService.DefaultOpenCliJson)?.ToJsonString(),
+            JsonNode.Parse(outputJson)?.ToJsonString());
+    }
+
+    [Fact]
+    public async Task Generate_from_exec_does_not_publish_crawl_when_output_validation_fails()
+    {
+        using var temp = new TempDirectory();
+        var outputPath = Path.Combine(temp.Path, "generated.json");
+        var crawlPath = Path.Combine(temp.Path, "crawl.json");
+        await File.WriteAllTextAsync(outputPath, "{}");
+        var acquisitionService = new FakeAcquisitionService(crawlJson: "{\"commands\":[]}");
+        var service = CreateService(acquisitionService);
+        var request = CreateExecRequest(temp.Path) with
+        {
+            Options = CreateExecRequest(temp.Path).Options with
+            {
+                Artifacts = new OpenCliArtifactOptions(null, crawlPath, Overwrite: false),
+            },
+        };
+
+        await Assert.ThrowsAsync<CliUsageException>(() =>
+            service.GenerateFromExecAsync(request, outputPath, overwrite: false, CancellationToken.None));
+
+        Assert.Equal(1, acquisitionService.ExecCalls);
+        Assert.False(File.Exists(crawlPath));
+        Assert.Equal("{}", await File.ReadAllTextAsync(outputPath));
+    }
+
+    [Fact]
+    public async Task Generate_from_exec_rolls_back_all_publications_when_cancelled()
+    {
+        using var temp = new TempDirectory();
+        var outputPath = Path.Combine(temp.Path, "generated.json");
+        var crawlPath = Path.Combine(temp.Path, "crawl.json");
+        var service = CreateService(new FakeAcquisitionService(crawlJson: "{\"commands\":[]}"));
+        var request = CreateExecRequest(temp.Path) with
+        {
+            Options = CreateExecRequest(temp.Path).Options with
+            {
+                Artifacts = new OpenCliArtifactOptions(null, crawlPath, Overwrite: false),
+            },
+        };
+        using var cancellationSource = new CancellationTokenSource();
+        await cancellationSource.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            service.GenerateFromExecAsync(request, outputPath, overwrite: false, cancellationSource.Token));
+
+        Assert.False(File.Exists(outputPath));
+        Assert.False(File.Exists(crawlPath));
     }
 
     [Fact]
@@ -90,9 +169,23 @@ public class OpenCliGenerationServiceTests
 
     private sealed class FakeAcquisitionService : IOpenCliAcquisitionService
     {
-        private readonly string _openCliJson = File.ReadAllText(FixturePaths.OpenCliJson);
+        public static string DefaultOpenCliJson { get; } = File.ReadAllText(FixturePaths.OpenCliJson);
+
+        private readonly string _openCliJson;
+        private readonly string? _xmlDocument;
+        private readonly string? _crawlJson;
 
         public int ExecCalls { get; private set; }
+
+        public FakeAcquisitionService(
+            string? openCliJson = null,
+            string? xmlDocument = null,
+            string? crawlJson = null)
+        {
+            _openCliJson = openCliJson ?? DefaultOpenCliJson;
+            _xmlDocument = xmlDocument;
+            _crawlJson = crawlJson;
+        }
 
         public Task<OpenCliAcquisitionResult> AcquireFromExecAsync(ExecAcquisitionRequest request, CancellationToken cancellationToken)
         {
@@ -110,8 +203,8 @@ public class OpenCliGenerationServiceTests
         {
             return new OpenCliAcquisitionResult(
                 _openCliJson,
-                XmlDocument: null,
-                CrawlJson: null,
+                XmlDocument: _xmlDocument,
+                CrawlJson: _crawlJson,
                 new RenderSourceInfo("exec", "fake", null, "demo"),
                 new OpenCliAcquisitionMetadata(
                     "auto",
