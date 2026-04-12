@@ -18,8 +18,6 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
         File.SetLastWriteTimeUtc(Path.Combine(frontendRoot, "dist", "static.html"), DateTime.UtcNow.AddMinutes(1));
 
         var locator = new ViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
@@ -46,8 +44,6 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
         File.SetLastWriteTimeUtc(sourcePath, freshTime);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
@@ -71,8 +67,6 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
         File.WriteAllText(Path.Combine(frontendRoot, "package-lock.json"), "{}");
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
@@ -101,8 +95,6 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
         File.SetLastWriteTimeUtc(sourcePath, DateTime.UtcNow);
 
         var locator = new FailingViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -132,8 +124,6 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
         File.SetLastWriteTimeUtc(sourcePath, DateTime.UtcNow);
 
         var locator = new FailingViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -164,8 +154,6 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
         File.SetLastWriteTimeUtc(sourcePath, DateTime.UtcNow);
 
         var locator = new FailingViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -186,8 +174,6 @@ public sealed class ViewerBundleLocatorRepositoryResolutionTests
         Directory.CreateDirectory(repositoryRoot);
 
         var locator = new ViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),

@@ -118,8 +118,6 @@ public class HtmlRenderServiceTests
         File.SetLastWriteTimeUtc(staleSourcePath, DateTime.UtcNow);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = Path.Combine(temp.Path, "missing"),
@@ -207,7 +205,7 @@ public class HtmlRenderServiceTests
         return new HtmlRenderService(
             RendererFactory.CreateDocumentRenderService(),
             new OpenCliNormalizer(),
-            new ViewerBundleLocator(new ExecutableResolver(), new ProcessRunner(), Options.Create(options)),
+            new ViewerBundleLocator(Options.Create(options)),
             new RenderStatsFactory());
     }
 
@@ -241,10 +239,8 @@ public class HtmlRenderServiceTests
     }
 
     private sealed class TestViewerBundleLocator(
-        ExecutableResolver executableResolver,
-        IProcessRunner processRunner,
         IOptions<ViewerBundleLocatorOptions> options)
-        : ViewerBundleLocator(executableResolver, processRunner, options)
+        : ViewerBundleLocator(options)
     {
         public bool BuildInvoked { get; private set; }
 

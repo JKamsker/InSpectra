@@ -45,10 +45,8 @@ internal static class ViewerBundleLocatorTestSupport
 }
 
 internal sealed class TestViewerBundleLocator(
-    ExecutableResolver executableResolver,
-    IProcessRunner processRunner,
     IOptions<ViewerBundleLocatorOptions> options)
-    : ViewerBundleLocator(executableResolver, processRunner, options)
+    : ViewerBundleLocator(options)
 {
     public bool BuildInvoked { get; private set; }
 
@@ -63,10 +61,8 @@ internal sealed class TestViewerBundleLocator(
 }
 
 internal sealed class FailingViewerBundleLocator(
-    ExecutableResolver executableResolver,
-    IProcessRunner processRunner,
     IOptions<ViewerBundleLocatorOptions> options)
-    : ViewerBundleLocator(executableResolver, processRunner, options)
+    : ViewerBundleLocator(options)
 {
     public bool BuildInvoked { get; private set; }
 

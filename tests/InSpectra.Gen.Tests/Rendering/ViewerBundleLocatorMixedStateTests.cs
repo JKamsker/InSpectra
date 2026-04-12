@@ -19,8 +19,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(Path.Combine(packagedRoot, "static.html"), freshTime);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -51,8 +49,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(sourcePath, freshTime);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -80,8 +76,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(sourcePath, DateTime.UtcNow);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -109,8 +103,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(sourcePath, DateTime.UtcNow);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -142,8 +134,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(sourcePath, sourceTime);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -175,8 +165,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(sourcePath, sourceTime);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -208,8 +196,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(sourcePath, freshTime);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
@@ -241,8 +227,6 @@ public sealed class ViewerBundleLocatorMixedStateTests
         File.SetLastWriteTimeUtc(sourcePath, freshTime);
 
         var locator = new TestViewerBundleLocator(
-            new ExecutableResolver(),
-            new ProcessRunner(),
             Options.Create(new ViewerBundleLocatorOptions
             {
                 PackagedRootPath = packagedRoot,
