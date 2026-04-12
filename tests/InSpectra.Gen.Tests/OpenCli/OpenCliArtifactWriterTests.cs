@@ -1,10 +1,10 @@
 using System.Text.Json.Nodes;
 
 using InSpectra.Gen.Core;
-using InSpectra.Gen.Execution.Process;
-using InSpectra.Gen.Targets.Sources;
-using InSpectra.Gen.UseCases.Generate;
-using InSpectra.Gen.UseCases.Generate.Requests;
+using InSpectra.Gen.Engine.Execution.Process;
+using InSpectra.Gen.Engine.Targets.Sources;
+using InSpectra.Gen.Engine.UseCases.Generate;
+using InSpectra.Gen.Engine.UseCases.Generate.Requests;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.OpenCli;

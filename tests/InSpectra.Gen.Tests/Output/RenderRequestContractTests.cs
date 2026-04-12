@@ -1,9 +1,10 @@
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Commands.Generate;
 using InSpectra.Gen.Commands.Render;
-using InSpectra.Gen.UseCases.Generate.Requests;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.UseCases.Generate.Requests;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
+using InSpectra.Gen.Output;
 
 namespace InSpectra.Gen.Tests.Output;
 
@@ -18,8 +19,7 @@ public class RenderRequestContractTests
         };
 
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestFactory.CreateMarkdownOptions(settings, "single", null, null, timeoutSeconds: null, hasTimeoutSupport: false));
-
+            RenderRequestFactory.CreateMarkdownOptions(settings, ResolvedOutputMode.Json, "single", null, null, timeoutSeconds: null, hasTimeoutSupport: false));
         Assert.Contains("requires `--out`", exception.Message);
     }
 
@@ -29,8 +29,7 @@ public class RenderRequestContractTests
         var settings = new TestMarkdownSettings();
 
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, null, timeoutSeconds: null, hasTimeoutSupport: false));
-
+            RenderRequestFactory.CreateMarkdownOptions(settings, ResolvedOutputMode.Human, "hybrid", null, null, timeoutSeconds: null, hasTimeoutSupport: false));
         Assert.Contains("`--layout hybrid` requires `--out-dir`", exception.Message);
     }
 
@@ -40,8 +39,7 @@ public class RenderRequestContractTests
         var settings = new TestMarkdownSettings();
 
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", "docs.md", null, timeoutSeconds: null, hasTimeoutSupport: false));
-
+            RenderRequestFactory.CreateMarkdownOptions(settings, ResolvedOutputMode.Human, "hybrid", "docs.md", null, timeoutSeconds: null, hasTimeoutSupport: false));
         Assert.Contains("`--out` is only valid with `--layout single`", exception.Message);
     }
 
@@ -51,8 +49,7 @@ public class RenderRequestContractTests
         var settings = new TestMarkdownSettings();
 
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestFactory.CreateMarkdownOptions(settings, "single", "docs.md", null, timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 2));
-
+            RenderRequestFactory.CreateMarkdownOptions(settings, ResolvedOutputMode.Human, "single", "docs.md", null, timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 2));
         Assert.Contains("`--split-depth` is only valid with `--layout hybrid`", exception.Message);
     }
 
@@ -62,8 +59,7 @@ public class RenderRequestContractTests
         var settings = new TestMarkdownSettings();
 
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 0));
-
+            RenderRequestFactory.CreateMarkdownOptions(settings, ResolvedOutputMode.Human, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 0));
         Assert.Contains("`--split-depth` must be at least 1", exception.Message);
     }
 
@@ -72,7 +68,7 @@ public class RenderRequestContractTests
     {
         var settings = new TestMarkdownSettings();
 
-        var options = RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 2);
+        var options = RenderRequestFactory.CreateMarkdownOptions(settings, ResolvedOutputMode.Human, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false, splitDepth: 2);
         var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(settings, options.Layout, 2);
 
         Assert.Equal(RenderLayout.Hybrid, options.Layout);
@@ -85,7 +81,7 @@ public class RenderRequestContractTests
     {
         var settings = new TestMarkdownSettings();
 
-        var options = RenderRequestFactory.CreateMarkdownOptions(settings, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false);
+        var options = RenderRequestFactory.CreateMarkdownOptions(settings, ResolvedOutputMode.Human, "hybrid", null, "out", timeoutSeconds: null, hasTimeoutSupport: false);
         var markdownOptions = RenderRequestFactory.CreateMarkdownRenderOptions(settings, options.Layout, splitDepth: null);
 
         Assert.NotNull(markdownOptions);
@@ -199,7 +195,7 @@ public class RenderRequestContractTests
     [InlineData("hook", OpenCliMode.Hook)]
     public void OpenCli_mode_parsing_supports_all_public_values(string value, OpenCliMode expected)
     {
-        var mode = RenderRequestFactory.ResolveOpenCliMode(value, OpenCliMode.Native);
+        var mode = CommandValueResolver.ResolveOpenCliMode(value, OpenCliMode.Native);
         Assert.Equal(expected, mode);
     }
 
@@ -230,13 +226,24 @@ public class RenderRequestContractTests
         Assert.DoesNotContain(nameof(CommonCommandSettings.NoColor), execProperties);
     }
 
+    [Fact]
+    public void Render_execution_options_do_not_expose_shell_only_flags()
+    {
+        var renderProperties = typeof(RenderExecutionOptions).GetProperties().Select(property => property.Name).ToArray();
+
+        Assert.DoesNotContain("OutputMode", renderProperties);
+        Assert.DoesNotContain("Quiet", renderProperties);
+        Assert.DoesNotContain("Verbose", renderProperties);
+        Assert.DoesNotContain("NoColor", renderProperties);
+    }
+
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
     public void Explicit_timeout_must_be_positive(int timeoutSeconds)
     {
         var exception = Assert.Throws<CliUsageException>(() =>
-            RenderRequestValueResolver.ResolveTimeoutSeconds(timeoutSeconds));
+            CommandValueResolver.ResolveTimeoutSeconds(timeoutSeconds));
 
         Assert.Contains("`--timeout` must be a positive integer.", exception.Message);
     }
@@ -250,7 +257,7 @@ public class RenderRequestContractTests
         {
             Environment.SetEnvironmentVariable(environmentVariableName, "broken");
 
-            var mode = RenderRequestValueResolver.ResolveOutputMode(json: false, output: "human");
+            var mode = CommandValueResolver.ResolveOutputMode(json: false, output: "human");
 
             Assert.Equal(ResolvedOutputMode.Human, mode);
         }

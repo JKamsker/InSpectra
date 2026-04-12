@@ -1,5 +1,5 @@
 using InSpectra.Gen.Core;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 using Microsoft.Extensions.Options;
 
@@ -34,11 +34,7 @@ public class HtmlRenderServiceTests
             FixturePaths.XmlDoc,
             new RenderExecutionOptions(
                 RenderLayout.App,
-                ResolvedOutputMode.Human,
                 DryRun: false,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: true,
                 Overwrite: false,
@@ -81,11 +77,7 @@ public class HtmlRenderServiceTests
             FixturePaths.XmlDoc,
             new RenderExecutionOptions(
                 RenderLayout.App,
-                ResolvedOutputMode.Human,
                 DryRun: true,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
@@ -100,7 +92,6 @@ public class HtmlRenderServiceTests
         Assert.Equal(3, result.Files.Count);
         Assert.DoesNotContain(result.Files, file => file.Content is not null);
         Assert.False(Directory.Exists(outputDirectory));
-        Assert.Contains("3 files planned", result.Summary);
     }
 
     [Fact]
@@ -136,11 +127,7 @@ public class HtmlRenderServiceTests
             FixturePaths.XmlDoc,
             new RenderExecutionOptions(
                 RenderLayout.App,
-                ResolvedOutputMode.Human,
                 DryRun: true,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
@@ -173,11 +160,7 @@ public class HtmlRenderServiceTests
             FixturePaths.XmlDoc,
             new RenderExecutionOptions(
                 RenderLayout.App,
-                ResolvedOutputMode.Human,
                 DryRun: false,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
@@ -218,11 +201,7 @@ public class HtmlRenderServiceTests
             FixturePaths.XmlDoc,
             new RenderExecutionOptions(
                 RenderLayout.App,
-                ResolvedOutputMode.Human,
                 DryRun: false,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,

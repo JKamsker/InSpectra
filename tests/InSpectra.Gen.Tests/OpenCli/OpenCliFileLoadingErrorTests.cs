@@ -1,6 +1,6 @@
 using InSpectra.Gen.Core;
-using InSpectra.Gen.Rendering.Contracts;
-using InSpectra.Gen.Rendering.Pipeline;
+using InSpectra.Gen.Engine.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Pipeline;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.OpenCli;
@@ -81,11 +81,7 @@ public class OpenCliFileLoadingErrorTests
                     directoryPath,
                     new RenderExecutionOptions(
                         RenderLayout.Single,
-                        ResolvedOutputMode.Human,
                         DryRun: true,
-                        Quiet: false,
-                        Verbose: false,
-                        NoColor: false,
                         IncludeHidden: false,
                         IncludeMetadata: false,
                         Overwrite: false,

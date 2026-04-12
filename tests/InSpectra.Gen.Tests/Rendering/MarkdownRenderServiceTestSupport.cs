@@ -1,4 +1,5 @@
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Contracts;
+using InSpectra.Gen.Output;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Rendering;
@@ -24,11 +25,7 @@ internal static class MarkdownRenderServiceTestSupport
             null,
             new RenderExecutionOptions(
                 RenderLayout.Hybrid,
-                ResolvedOutputMode.Human,
                 DryRun: false,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: true,

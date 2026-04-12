@@ -3,39 +3,40 @@ using System.Text.RegularExpressions;
 namespace InSpectra.Gen.Tests.Architecture;
 
 /// <summary>
-/// Charter rule: "The app shell must stay thin... <c>InSpectra.Gen</c> must not depend on
-/// concrete acquisition internals" and "For the initial acquisition-namespace rule,
-/// <c>InSpectra.Gen</c> may reference only <c>InSpectra.Gen.Acquisition.Composition</c>,
-/// <c>InSpectra.Gen.Acquisition.Contracts</c>, and intentionally exposed public service
-/// interfaces" (docs/architecture/ARCHITECTURE.md). Internal app-shell global usings
-/// are also forbidden because they hide cross-module imports from the regex-based
-/// architecture scanners that enforce those same layering rules.
+/// Charter rule: the app shell must stay thin. <c>InSpectra.Gen</c> may depend only on
+/// the engine composition root plus intentionally exposed engine contracts and service
+/// interfaces; it must not reach into engine implementation namespaces directly
+/// (docs/architecture/ARCHITECTURE.md). Internal app-shell global usings are also
+/// forbidden because they hide cross-module imports from the regex-based architecture
+/// scanners that enforce those same layering rules.
 ///
 /// The four <c>Cli*Exception</c> types live in <c>InSpectra.Gen.Core</c> so both the app
-/// shell and Acquisition can reference them without widening the Acquisition surface.
+/// shell and engine can reference them without widening the engine surface.
 /// </summary>
 public sealed class ArchitectureAppShellTests
 {
     /// <summary>
-    /// Only these Acquisition namespaces may appear in <c>using</c> directives inside
+    /// Only these engine namespaces may appear in <c>using</c> directives inside
     /// the <c>InSpectra.Gen</c> project. The rule uses prefix match so that
-    /// <c>InSpectra.Gen.Acquisition.Contracts.Foo</c> is allowed when
-    /// <c>InSpectra.Gen.Acquisition.Contracts</c> is in this set.
+    /// <c>InSpectra.Gen.Engine.UseCases.Generate.Requests</c> is allowed when
+    /// <c>InSpectra.Gen.Engine.UseCases.Generate</c> is in this set.
     /// </summary>
-    private static readonly IReadOnlyList<string> AllowedAcquisitionNamespacePrefixes = new[]
+    private static readonly IReadOnlyList<string> AllowedEngineNamespacePrefixes = new[]
     {
-        "InSpectra.Gen.Acquisition.Composition",
-        "InSpectra.Gen.Acquisition.Contracts",
+        "InSpectra.Gen.Engine.Composition",
+        "InSpectra.Gen.Engine.Contracts",
+        "InSpectra.Gen.Engine.Rendering.Contracts",
+        "InSpectra.Gen.Engine.UseCases.Generate",
     };
 
-    /// <summary>Matches <c>using InSpectra.Gen.Acquisition.X.Y;</c> at the top of a file.</summary>
-    private static readonly Regex AcquisitionUsingDirective = new(
-        @"^\s*using\s+(?<ns>InSpectra\.Gen\.Acquisition(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*;",
+    /// <summary>Matches <c>using InSpectra.Gen.Engine.X.Y;</c> at the top of a file.</summary>
+    private static readonly Regex EngineUsingDirective = new(
+        @"^\s*using\s+(?<ns>InSpectra\.Gen\.Engine(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*;",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     /// <summary>
     /// Matches project-wide internal global usings like
-    /// <c>global using InSpectra.Gen.Rendering.Contracts;</c>. Those make the
+    /// <c>global using InSpectra.Gen.Engine.Rendering.Contracts;</c>. Those make the
     /// downstream layering tests look only at the consumer file body while the real
     /// dependency is smuggled in through a project-root import surface.
     /// </summary>
@@ -44,7 +45,7 @@ public sealed class ArchitectureAppShellTests
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     [Fact]
-    public void App_shell_does_not_reference_deep_acquisition_internals()
+    public void App_shell_does_not_reference_deep_engine_internals()
     {
         var projects = ArchitecturePolicyScanner.EnumerateBackendProjects();
         Assert.NotEmpty(projects);
@@ -59,14 +60,14 @@ public sealed class ArchitectureAppShellTests
         {
             filesScanned++;
             var text = File.ReadAllText(filePath);
-            foreach (Match match in AcquisitionUsingDirective.Matches(text))
+            foreach (Match match in EngineUsingDirective.Matches(text))
             {
                 var ns = match.Groups["ns"].Value;
                 if (!IsAllowedNamespace(ns))
                 {
                     violations.Add(
                         $"- {ArchitecturePolicyScanner.GetRelativeRepoPath(filePath)} imports '{ns}'"
-                        + $" (allowed prefixes: {string.Join(", ", AllowedAcquisitionNamespacePrefixes)})");
+                        + $" (allowed prefixes: {string.Join(", ", AllowedEngineNamespacePrefixes)})");
                 }
             }
         }
@@ -79,7 +80,7 @@ public sealed class ArchitectureAppShellTests
             violations.Count == 0,
             violations.Count == 0
                 ? null
-                : "App shell must not reach into deep Acquisition internals, but found:"
+                : "App shell must not reach into deep engine internals, but found:"
                   + Environment.NewLine
                   + string.Join(Environment.NewLine, violations));
     }
@@ -123,11 +124,11 @@ public sealed class ArchitectureAppShellTests
     /// <summary>
     /// Returns true when <paramref name="ns"/> equals or starts-with-dot one of the
     /// allowed namespace prefixes. The dot check avoids false positives like
-    /// <c>InSpectra.Gen.Acquisition.ContractsShadow</c> matching <c>Contracts</c>.
+    /// <c>InSpectra.Gen.Engine.ContractsShadow</c> matching <c>Contracts</c>.
     /// </summary>
     private static bool IsAllowedNamespace(string ns)
     {
-        foreach (var prefix in AllowedAcquisitionNamespacePrefixes)
+        foreach (var prefix in AllowedEngineNamespacePrefixes)
         {
             if (ns.Equals(prefix, StringComparison.Ordinal))
             {

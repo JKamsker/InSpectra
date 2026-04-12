@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
-using InSpectra.Gen.Rendering.Pipeline.Model;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Pipeline.Model;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.OpenCli;

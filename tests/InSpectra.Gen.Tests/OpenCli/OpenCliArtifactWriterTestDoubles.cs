@@ -1,6 +1,6 @@
-using InSpectra.Gen.Acquisition.Contracts;
-using InSpectra.Gen.Acquisition.Contracts.Providers;
-using InSpectra.Gen.Execution.Process;
+using InSpectra.Gen.Engine.Contracts;
+using InSpectra.Gen.Engine.Contracts.Providers;
+using InSpectra.Gen.Engine.Execution.Process;
 
 namespace InSpectra.Gen.Tests.OpenCli;
 

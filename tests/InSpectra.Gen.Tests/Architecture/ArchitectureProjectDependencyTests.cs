@@ -7,9 +7,9 @@ namespace InSpectra.Gen.Tests.Architecture;
 ///
 /// Active rule set:
 /// <list type="bullet">
-///   <item><c>InSpectra.Gen</c> may reference <c>InSpectra.Gen.Acquisition</c>,
+///   <item><c>InSpectra.Gen</c> may reference <c>InSpectra.Gen.Engine</c>,
 ///         <c>InSpectra.Gen.StartupHook</c>, and <c>InSpectra.Gen.Core</c>.</item>
-///   <item><c>InSpectra.Gen.Acquisition</c> may reference <c>InSpectra.Gen.Core</c>.</item>
+///   <item><c>InSpectra.Gen.Engine</c> may reference <c>InSpectra.Gen.Core</c>.</item>
 ///   <item><c>InSpectra.Gen.StartupHook</c> must have zero project references.</item>
 ///   <item><c>InSpectra.Gen.Core</c> must have zero project references.</item>
 /// </list>
@@ -25,11 +25,11 @@ public sealed class ArchitectureProjectDependencyTests
         {
             [ArchitecturePolicyScanner.AppShellProjectName] = new HashSet<string>(StringComparer.Ordinal)
             {
-                ArchitecturePolicyScanner.AcquisitionProjectName,
+                ArchitecturePolicyScanner.EngineProjectName,
                 ArchitecturePolicyScanner.StartupHookProjectName,
                 ArchitecturePolicyScanner.CoreProjectName,
             },
-            [ArchitecturePolicyScanner.AcquisitionProjectName] = new HashSet<string>(StringComparer.Ordinal)
+            [ArchitecturePolicyScanner.EngineProjectName] = new HashSet<string>(StringComparer.Ordinal)
             {
                 ArchitecturePolicyScanner.CoreProjectName,
             },

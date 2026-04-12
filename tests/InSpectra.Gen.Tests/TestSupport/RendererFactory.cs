@@ -1,9 +1,9 @@
 
 namespace InSpectra.Gen.Tests.TestSupport;
 
-public static class RendererFactory
+internal static class RendererFactory
 {
-    public static DocumentRenderService CreateDocumentRenderService()
+    internal static DocumentRenderService CreateDocumentRenderService()
     {
         var schemaProvider = new OpenCliSchemaProvider();
         var documentLoader = new OpenCliDocumentLoader(schemaProvider);

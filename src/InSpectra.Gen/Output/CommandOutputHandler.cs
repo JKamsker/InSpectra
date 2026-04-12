@@ -2,7 +2,7 @@ using System.Text.Json;
 
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Output.Json;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 
 namespace InSpectra.Gen.Output;
 
@@ -10,13 +10,14 @@ public static class CommandOutputHandler
 {
     public static async Task<int> ExecuteAsync(
         ResolvedOutputMode outputMode,
+        bool quiet,
         bool verbose,
         Func<Task<RenderExecutionResult>> action)
     {
         try
         {
             var result = await action();
-            await WriteSuccessAsync(outputMode, result);
+            await WriteSuccessAsync(outputMode, quiet, result);
             return 0;
         }
         catch (OperationCanceledException)
@@ -43,7 +44,7 @@ public static class CommandOutputHandler
         }
     }
 
-    private static async Task WriteSuccessAsync(ResolvedOutputMode outputMode, RenderExecutionResult result)
+    private static async Task WriteSuccessAsync(ResolvedOutputMode outputMode, bool quiet, RenderExecutionResult result)
     {
         if (outputMode == ResolvedOutputMode.Json)
         {
@@ -128,9 +129,15 @@ public static class CommandOutputHandler
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(result.Summary))
+        if (quiet)
         {
-            await Console.Out.WriteLineAsync(result.Summary);
+            return;
+        }
+
+        var summary = BuildSummary(result);
+        if (!string.IsNullOrWhiteSpace(summary))
+        {
+            await Console.Out.WriteLineAsync(summary);
         }
     }
 
@@ -168,5 +175,111 @@ public static class CommandOutputHandler
         {
             await Console.Error.WriteLineAsync($"Warning: {warning}");
         }
+    }
+
+    private static string? BuildSummary(RenderExecutionResult result)
+    {
+        return result.Format switch
+        {
+            DocumentFormat.Markdown => BuildMarkdownSummary(result),
+            DocumentFormat.Html => BuildHtmlSummary(result),
+            _ => null,
+        };
+    }
+
+    private static string? BuildMarkdownSummary(RenderExecutionResult result)
+    {
+        return result.Layout switch
+        {
+            RenderLayout.Single => BuildSingleMarkdownSummary(result),
+            RenderLayout.Tree => BuildMultiFileMarkdownSummary(result, "Markdown", "a Markdown tree"),
+            RenderLayout.Hybrid => BuildMultiFileMarkdownSummary(result, "hybrid Markdown", "hybrid Markdown"),
+            _ => null,
+        };
+    }
+
+    private static string? BuildSingleMarkdownSummary(RenderExecutionResult result)
+    {
+        if (result.IsDryRun)
+        {
+            return result.Files.Count == 0
+                ? $"Dry run: render `{result.Source.OpenCliOrigin}` as single Markdown to stdout."
+                : $"Dry run: render `{result.Source.OpenCliOrigin}` as single Markdown to `{result.Files[0].FullPath}`.";
+        }
+
+        return result.Files.Count == 0
+            ? null
+            : $"Wrote Markdown to `{result.Files[0].FullPath}`.";
+    }
+
+    private static string? BuildMultiFileMarkdownSummary(
+        RenderExecutionResult result,
+        string completedDescription,
+        string plannedDescription)
+    {
+        var outputDirectory = ResolveOutputDirectory(result.Files);
+        if (string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            return null;
+        }
+
+        return result.IsDryRun
+            ? $"Dry run: render `{result.Source.OpenCliOrigin}` as {plannedDescription} in `{outputDirectory}` ({result.Files.Count} files planned)."
+            : $"Wrote {result.Files.Count} {completedDescription} files to `{outputDirectory}`.";
+    }
+
+    private static string? BuildHtmlSummary(RenderExecutionResult result)
+    {
+        var outputDirectory = ResolveOutputDirectory(result.Files);
+        if (string.IsNullOrWhiteSpace(outputDirectory))
+        {
+            return null;
+        }
+
+        return result.IsDryRun
+            ? $"Dry run: render `{result.Source.OpenCliOrigin}` as an HTML app bundle in `{outputDirectory}` ({result.Files.Count} files planned)."
+            : $"Wrote HTML app bundle ({result.Files.Count} files) to `{outputDirectory}`.";
+    }
+
+    private static string? ResolveOutputDirectory(IReadOnlyList<RenderedFile> files)
+    {
+        if (files.Count == 0)
+        {
+            return null;
+        }
+
+        var root = Path.GetDirectoryName(Path.GetFullPath(files[0].FullPath));
+        if (string.IsNullOrWhiteSpace(root))
+        {
+            return null;
+        }
+
+        while (!AllFilesShareDirectory(files, root))
+        {
+            root = Path.GetDirectoryName(root);
+            if (string.IsNullOrWhiteSpace(root))
+            {
+                return null;
+            }
+        }
+
+        return root;
+    }
+
+    private static bool AllFilesShareDirectory(IReadOnlyList<RenderedFile> files, string directoryPath)
+    {
+        var fullDirectory = Path.GetFullPath(directoryPath);
+        var directoryPrefix = Path.EndsInDirectorySeparator(fullDirectory)
+            ? fullDirectory
+            : fullDirectory + Path.DirectorySeparatorChar;
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        return files.All(file =>
+        {
+            var fullPath = Path.GetFullPath(file.FullPath);
+            return fullPath.StartsWith(directoryPrefix, comparison);
+        });
     }
 }

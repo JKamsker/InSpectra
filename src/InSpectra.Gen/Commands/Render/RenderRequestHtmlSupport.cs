@@ -1,5 +1,5 @@
 using InSpectra.Gen.Core;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
 
 namespace InSpectra.Gen.Commands.Render;
@@ -14,8 +14,6 @@ internal static class RenderRequestHtmlSupport
         int? timeoutSeconds,
         bool hasTimeoutSupport)
     {
-        var outputMode = RenderRequestValueResolver.ResolveOutputMode(settings.Json, settings.Output);
-
         ValidateOutputCombination(layoutValue, outputFile, outputDirectory);
 
         if (hasTimeoutSupport && timeoutSeconds is <= 0)
@@ -28,18 +26,14 @@ internal static class RenderRequestHtmlSupport
 
         return new RenderExecutionOptions(
             RenderLayout.App,
-            outputMode,
             settings.DryRun,
-            RenderRequestValueResolver.ResolveFlag(settings.Quiet, "INSPECTRA_GEN_QUIET"),
-            RenderRequestValueResolver.ResolveFlag(settings.Verbose, "INSPECTRA_GEN_VERBOSE"),
-            RenderRequestValueResolver.ResolveNoColor(settings.NoColor),
             settings.IncludeHidden,
             settings.IncludeMetadata,
             settings.Overwrite,
             singleFile,
             compressLevel,
             OutputFile: null,
-            RenderRequestValueResolver.NormalizePath(outputDirectory));
+            CommandValueResolver.NormalizePath(outputDirectory));
     }
 
     public static HtmlFeatureFlags CreateFeatureFlags(HtmlCommandSettingsBase settings)

@@ -1,11 +1,12 @@
 using System.Text.Json.Nodes;
-using InSpectra.Gen.UseCases.Generate;
-using InSpectra.Gen.UseCases.Generate.Requests;
+using InSpectra.Gen.Engine.UseCases.Generate;
+using InSpectra.Gen.Engine.UseCases.Generate.Requests;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Output;
-using InSpectra.Gen.Rendering.Contracts;
 
 namespace InSpectra.Gen.Tests.Output;
 
+[Collection(OutputConsoleCollection.Name)]
 public class OutputContractTests
 {
     [Fact]
@@ -33,11 +34,11 @@ public class OutputContractTests
                 Warnings = [],
                 IsDryRun = false,
                 Files = [new RenderedFile("index.html", "C:\\temp\\index.html", null)],
-                Summary = null,
             };
 
             var exitCode = await CommandOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Json,
+                quiet: false,
                 verbose: false,
                 () => Task.FromResult(result));
 
@@ -79,11 +80,11 @@ public class OutputContractTests
                 Warnings = [],
                 IsDryRun = true,
                 Files = [new RenderedFile("README.md", "C:\\temp\\README.md", null), new RenderedFile("tree/index.md", "C:\\temp\\tree\\index.md", null)],
-                Summary = null,
             };
 
             var exitCode = await CommandOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Json,
+                quiet: false,
                 verbose: false,
                 () => Task.FromResult(result));
 
@@ -109,6 +110,7 @@ public class OutputContractTests
         {
             var exitCode = await CommandOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Json,
+                quiet: false,
                 verbose: false,
                 () => throw new OperationCanceledException());
 
@@ -194,7 +196,6 @@ public class OutputContractTests
                 IsDryRun = false,
                 StdoutDocument = "content",
                 Files = [],
-                Summary = null,
             };
 
             var generateResult = new GenerateExecutionResult(
@@ -212,6 +213,7 @@ public class OutputContractTests
 
             await CommandOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Human,
+                quiet: false,
                 verbose: false,
                 () => Task.FromResult(renderResult));
             await GenerateOutputHandler.ExecuteAsync(
@@ -229,4 +231,5 @@ public class OutputContractTests
             Console.SetError(originalError);
         }
     }
+
 }

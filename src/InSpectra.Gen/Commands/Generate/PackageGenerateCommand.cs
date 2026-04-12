@@ -1,7 +1,7 @@
-using InSpectra.Gen.Commands.Render;
-using InSpectra.Gen.UseCases.Generate.Requests;
+using InSpectra.Gen.Commands.Common;
+using InSpectra.Gen.Engine.UseCases.Generate.Requests;
 using InSpectra.Gen.Output;
-using InSpectra.Gen.UseCases.Generate;
+using InSpectra.Gen.Engine.UseCases.Generate;
 using Spectre.Console.Cli;
 
 namespace InSpectra.Gen.Commands.Generate;
@@ -10,18 +10,18 @@ public sealed class PackageGenerateCommand(IOpenCliGenerationService generationS
 {
     public override Task<int> ExecuteAsync(CommandContext context, PackageGenerateSettings settings, CancellationToken cancellationToken)
     {
-        var outputMode = RenderRequestFactory.ResolveOutputMode(settings);
+        var outputMode = CommandValueResolver.ResolveOutputMode(settings.Json, settings.Output);
         var request = new PackageAcquisitionRequest(
             settings.PackageId,
             settings.Version,
             new AcquisitionOptions(
-                RenderRequestFactory.ResolveOpenCliMode(settings.OpenCliMode, OpenCliMode.Auto),
+                CommandValueResolver.ResolveOpenCliMode(settings.OpenCliMode, OpenCliMode.Auto),
                 settings.CommandName,
                 settings.CliFramework,
                 settings.OpenCliArguments.Length > 0 ? settings.OpenCliArguments : ["cli", "opencli"],
                 settings.WithXmlDoc,
                 settings.XmlDocArguments.Length > 0 ? settings.XmlDocArguments : ["cli", "xmldoc"],
-                RenderRequestFactory.ResolveTimeoutSeconds(settings.TimeoutSeconds, defaultSeconds: 120),
+                CommandValueResolver.ResolveTimeoutSeconds(settings.TimeoutSeconds, defaultSeconds: 120),
                 new OpenCliArtifactOptions(null, settings.CrawlOutputPath, settings.Overwrite)));
 
         return GenerateOutputHandler.ExecuteAsync(

@@ -3,57 +3,83 @@ using System.Text.RegularExpressions;
 namespace InSpectra.Gen.Tests.Architecture;
 
 /// <summary>
-/// Charter rule (docs/architecture/ARCHITECTURE.md, "Intra-module dependency rules"):
-/// the capability layers inside <c>InSpectra.Gen</c> flow in one direction:
-/// <c>Commands -&gt; UseCases -&gt; Rendering -&gt; OpenCli -&gt; Core</c>.
-/// Backward edges form cycles and invert the architecture, so they must not exist.
-/// The 4 invariants below codify the cycles that phase f2 (commit c9fc3b6) broke
-/// by hand via ad-hoc greps. Keeping them as tests prevents silent regression the
-/// next time files move between subtrees.
+/// Charter rules for the thin shell and engine layering:
 ///
-/// The tests scan <c>using</c> directives (not <c>global::</c> qualifiers, not doc
-/// comments) — the same shape as <see cref="ArchitectureAppShellTests"/> and
-/// <see cref="ArchitectureModeTests"/>.
+/// <list type="bullet">
+///   <item>The shell keeps command parsing and output policy separate.</item>
+///   <item><c>OpenCli/</c> stays independent from rendering and use-case orchestration.</item>
+///   <item><c>Rendering/</c> stays independent from use-case orchestration.</item>
+///   <item><c>Execution/</c> and <c>Targets/</c> stay below modes/rendering rather than
+///         growing back upward dependencies.</item>
+/// </list>
+///
+/// The checks below intentionally cover both the shell project and the engine project
+/// so the post-rename tree cannot go green by deleting or moving the old roots.
 /// </summary>
 public sealed class ArchitectureGenInternalLayeringTests
 {
-    private static readonly string GenProjectRoot = Path.Combine(
+    private static readonly string ShellProjectRoot = Path.Combine(
         ArchitecturePolicyScanner.SrcRoot,
         ArchitecturePolicyScanner.AppShellProjectName);
 
-    [Fact]
-    public void OpenCli_does_not_depend_on_Rendering()
-        => AssertNoUpstreamImport(
-            "OpenCli",
-            forbiddenPrefixes: new[] { "InSpectra.Gen.Rendering" });
+    private static readonly string EngineProjectRoot = Path.Combine(
+        ArchitecturePolicyScanner.SrcRoot,
+        ArchitecturePolicyScanner.EngineProjectName);
 
     [Fact]
-    public void OpenCli_does_not_depend_on_UseCases_or_Commands()
+    public void Shell_output_does_not_depend_on_commands()
         => AssertNoUpstreamImport(
-            "OpenCli",
-            forbiddenPrefixes: new[] { "InSpectra.Gen.UseCases", "InSpectra.Gen.Commands" });
+            ShellProjectRoot,
+            "Output",
+            forbiddenPrefixes: ["InSpectra.Gen.Commands"]);
 
     [Fact]
-    public void Rendering_does_not_depend_on_UseCases_or_Commands()
+    public void Engine_opencli_does_not_depend_on_rendering_or_use_cases()
         => AssertNoUpstreamImport(
+            EngineProjectRoot,
+            "OpenCli",
+            forbiddenPrefixes:
+            [
+                "InSpectra.Gen.Engine.Rendering",
+                "InSpectra.Gen.Engine.UseCases",
+            ]);
+
+    [Fact]
+    public void Engine_rendering_does_not_depend_on_use_cases()
+        => AssertNoUpstreamImport(
+            EngineProjectRoot,
             "Rendering",
-            forbiddenPrefixes: new[] { "InSpectra.Gen.UseCases", "InSpectra.Gen.Commands" });
+            forbiddenPrefixes: ["InSpectra.Gen.Engine.UseCases"]);
 
     [Fact]
-    public void UseCases_does_not_depend_on_Commands()
+    public void Engine_execution_does_not_depend_on_modes_rendering_or_use_cases()
         => AssertNoUpstreamImport(
-            "UseCases",
-            forbiddenPrefixes: new[] { "InSpectra.Gen.Commands" });
+            EngineProjectRoot,
+            "Execution",
+            forbiddenPrefixes:
+            [
+                "InSpectra.Gen.Engine.Modes",
+                "InSpectra.Gen.Engine.Rendering",
+                "InSpectra.Gen.Engine.UseCases",
+            ]);
 
-    /// <summary>
-    /// Scans every non-generated <c>*.cs</c> file under
-    /// <c>src/InSpectra.Gen/&lt;subtree&gt;/</c> for any <c>using</c> directive whose
-    /// namespace starts with one of <paramref name="forbiddenPrefixes"/>. A hit is
-    /// an upstream import and a charter violation.
-    /// </summary>
-    private static void AssertNoUpstreamImport(string subtree, IReadOnlyList<string> forbiddenPrefixes)
+    [Fact]
+    public void Engine_targets_does_not_depend_on_modes_or_rendering()
+        => AssertNoUpstreamImport(
+            EngineProjectRoot,
+            "Targets",
+            forbiddenPrefixes:
+            [
+                "InSpectra.Gen.Engine.Modes",
+                "InSpectra.Gen.Engine.Rendering",
+            ]);
+
+    private static void AssertNoUpstreamImport(
+        string projectRoot,
+        string subtree,
+        IReadOnlyList<string> forbiddenPrefixes)
     {
-        var subtreeRoot = Path.Combine(GenProjectRoot, subtree);
+        var subtreeRoot = Path.Combine(projectRoot, subtree);
         Assert.True(
             Directory.Exists(subtreeRoot),
             $"Expected subtree '{subtree}' at '{subtreeRoot}' to exist.");
@@ -87,8 +113,6 @@ public sealed class ArchitectureGenInternalLayeringTests
             }
         }
 
-        // Guard against a vacuous green. If the directory was empty or got deleted,
-        // the test must fail loudly instead of silently passing on zero iterations.
         Assert.True(
             filesScanned > 0,
             $"Expected '{subtreeRoot}' to contain at least one *.cs file but found none.");
@@ -102,7 +126,6 @@ public sealed class ArchitectureGenInternalLayeringTests
                   + string.Join(Environment.NewLine, violations));
     }
 
-    /// <summary>Matches <c>using InSpectra.Gen.&lt;namespace&gt;;</c> on its own line.</summary>
     private static readonly Regex UsingDirective = new(
         @"^\s*using\s+(?<ns>InSpectra\.Gen(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*;",
         RegexOptions.Multiline | RegexOptions.Compiled);

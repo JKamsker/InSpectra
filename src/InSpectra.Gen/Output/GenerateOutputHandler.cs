@@ -2,8 +2,8 @@ using System.Text.Json;
 
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Output.Json;
-using InSpectra.Gen.Rendering.Contracts;
-using InSpectra.Gen.UseCases.Generate;
+using InSpectra.Gen.Engine.Rendering.Contracts;
+using InSpectra.Gen.Engine.UseCases.Generate;
 
 namespace InSpectra.Gen.Output;
 

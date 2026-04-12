@@ -1,4 +1,4 @@
-using InSpectra.Gen.Rendering.Pipeline.Model;
+using InSpectra.Gen.Engine.Rendering.Pipeline.Model;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Rendering;

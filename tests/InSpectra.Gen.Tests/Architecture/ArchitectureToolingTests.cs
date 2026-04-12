@@ -3,26 +3,26 @@ using System.Text.RegularExpressions;
 namespace InSpectra.Gen.Tests.Architecture;
 
 /// <summary>
-/// Charter rule: the <c>Tooling/</c> layer of the Acquisition module must not depend
-/// on any acquisition mode implementation. Tooling is a shared infrastructure layer
+/// Charter rule: the <c>Tooling/</c> layer of the engine must not depend
+/// on any mode implementation. Tooling is a shared infrastructure layer
 /// used by every mode, and depending on a specific mode from Tooling creates an
 /// implicit bidirectional coupling (see docs/architecture/ARCHITECTURE.md, section
 /// "Intra-module dependency rules").
 /// </summary>
 public sealed class ArchitectureToolingTests
 {
-    /// <summary>Absolute path to <c>src/InSpectra.Gen.Acquisition/Tooling</c>.</summary>
+    /// <summary>Absolute path to <c>src/InSpectra.Gen.Engine/Tooling</c>.</summary>
     private static readonly string ToolingRoot = Path.Combine(
         ArchitecturePolicyScanner.SrcRoot,
-        ArchitecturePolicyScanner.AcquisitionProjectName,
+        ArchitecturePolicyScanner.EngineProjectName,
         "Tooling");
 
     /// <summary>
-    /// Matches <c>using InSpectra.Gen.Acquisition.Modes.&lt;ModeName&gt;</c> at any depth.
+    /// Matches <c>using InSpectra.Gen.Engine.Modes.&lt;ModeName&gt;</c> at any depth.
     /// Captures the first segment after <c>Modes.</c> so failure messages name the target.
     /// </summary>
     private static readonly Regex ModeUsingDirective = new(
-        @"^\s*using\s+InSpectra\.Gen\.Acquisition\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)",
+        @"^\s*using\s+InSpectra\.Gen\.Engine\.Modes\.(?<mode>[A-Za-z_][A-Za-z0-9_]*)",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     /// <summary>
@@ -31,7 +31,7 @@ public sealed class ArchitectureToolingTests
     /// surface and would pass vacuously.
     /// </summary>
     private static readonly Regex ToolingNamespaceDeclaration = new(
-        @"^\s*namespace\s+InSpectra\.Gen\.Acquisition\.Tooling(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
+        @"^\s*namespace\s+InSpectra\.Gen\.Engine\.Tooling(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     [Fact]
@@ -62,7 +62,7 @@ public sealed class ArchitectureToolingTests
                 var referencedMode = match.Groups["mode"].Value;
                 violations.Add(
                     $"- {ArchitecturePolicyScanner.GetRelativeRepoPath(filePath)}"
-                    + $" imports 'InSpectra.Gen.Acquisition.Modes.{referencedMode}'");
+                    + $" imports 'InSpectra.Gen.Engine.Modes.{referencedMode}'");
             }
         }
 
@@ -72,7 +72,7 @@ public sealed class ArchitectureToolingTests
 
         Assert.True(
             toolingNamespacesSeen > 0,
-            $"Expected Tooling scan under '{ToolingRoot}' to encounter at least one InSpectra.Gen.Acquisition.Tooling namespace declaration but found none.");
+            $"Expected Tooling scan under '{ToolingRoot}' to encounter at least one InSpectra.Gen.Engine.Tooling namespace declaration but found none.");
 
         Assert.True(
             violations.Count == 0,

@@ -1,7 +1,7 @@
 using InSpectra.Gen.Core;
 using System.Text.Json.Nodes;
-using InSpectra.Gen.UseCases.Generate.Requests;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.UseCases.Generate.Requests;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.OpenCli;
@@ -137,7 +137,7 @@ public class OpenCliGenerationServiceTests
         var exception = await Assert.ThrowsAsync<CliUsageException>(() =>
             service.GenerateFromExecAsync(request, outputPath, overwrite: true, CancellationToken.None));
 
-        Assert.Equal("`--out` and `--crawl-out` must point to different files.", exception.Message);
+        Assert.Equal("OpenCLI output and crawl output must point to different files.", exception.Message);
         Assert.Equal(0, acquisitionService.ExecCalls);
     }
 

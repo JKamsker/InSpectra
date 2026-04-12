@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\InSpectra.Gen\InSpectra.Gen.csproj" />
+    <ProjectReference Include="..\..\src\InSpectra.Gen.Engine\InSpectra.Gen.Engine.csproj" />
   </ItemGroup>
 
 </Project>

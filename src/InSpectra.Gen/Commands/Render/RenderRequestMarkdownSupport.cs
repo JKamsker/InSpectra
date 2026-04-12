@@ -1,6 +1,7 @@
 using InSpectra.Gen.Core;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
+using InSpectra.Gen.Output;
 
 namespace InSpectra.Gen.Commands.Render;
 
@@ -8,6 +9,7 @@ internal static class RenderRequestMarkdownSupport
 {
     public static RenderExecutionOptions CreateOptions(
         CommonCommandSettings settings,
+        ResolvedOutputMode outputMode,
         string? layoutValue,
         string? outputFile,
         string? outputDirectory,
@@ -15,7 +17,6 @@ internal static class RenderRequestMarkdownSupport
         bool hasTimeoutSupport,
         int? splitDepth)
     {
-        var outputMode = RenderRequestValueResolver.ResolveOutputMode(settings.Json, settings.Output);
         var layout = ResolveLayout(layoutValue);
 
         ValidateLayoutOutputCombination(layout, outputMode, outputFile, outputDirectory, splitDepth);
@@ -27,18 +28,14 @@ internal static class RenderRequestMarkdownSupport
 
         return new RenderExecutionOptions(
             layout,
-            outputMode,
             settings.DryRun,
-            RenderRequestValueResolver.ResolveFlag(settings.Quiet, "INSPECTRA_GEN_QUIET"),
-            RenderRequestValueResolver.ResolveFlag(settings.Verbose, "INSPECTRA_GEN_VERBOSE"),
-            RenderRequestValueResolver.ResolveNoColor(settings.NoColor),
             settings.IncludeHidden,
             settings.IncludeMetadata,
             settings.Overwrite,
             SingleFile: false,
             CompressLevel: 0,
-            RenderRequestValueResolver.NormalizePath(outputFile),
-            RenderRequestValueResolver.NormalizePath(outputDirectory));
+            CommandValueResolver.NormalizePath(outputFile),
+            CommandValueResolver.NormalizePath(outputDirectory));
     }
 
     public static MarkdownRenderOptions? CreateRenderOptions(
@@ -46,8 +43,8 @@ internal static class RenderRequestMarkdownSupport
         RenderLayout layout,
         int? splitDepth)
     {
-        var title = RenderRequestValueResolver.NormalizeText(settings.Title);
-        var commandPrefix = RenderRequestValueResolver.NormalizeText(settings.CommandPrefix);
+        var title = CommandValueResolver.NormalizeText(settings.Title);
+        var commandPrefix = CommandValueResolver.NormalizeText(settings.CommandPrefix);
         if (layout != RenderLayout.Hybrid && title is null && commandPrefix is null)
         {
             return null;

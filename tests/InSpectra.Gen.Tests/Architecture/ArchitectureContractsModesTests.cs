@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace InSpectra.Gen.Tests.Architecture;
 
 /// <summary>
-/// Charter rule: the <c>Contracts/</c> layer of the Acquisition module must not depend
+/// Charter rule: the <c>Contracts/</c> layer of the engine must not depend
 /// on any <c>Modes/</c> namespace. <c>Contracts/</c> is the foundational layer shared
 /// by every mode and the app shell; a reverse dependency onto a specific mode would
 /// invert the dependency graph and drag mode-owned types (including dnlib-backed
@@ -20,20 +20,20 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// </summary>
 public sealed class ArchitectureContractsModesTests
 {
-    /// <summary>Absolute path to <c>src/InSpectra.Gen.Acquisition/Contracts</c>.</summary>
+    /// <summary>Absolute path to <c>src/InSpectra.Gen.Engine/Contracts</c>.</summary>
     private static readonly string ContractsRoot = Path.Combine(
         ArchitecturePolicyScanner.SrcRoot,
-        ArchitecturePolicyScanner.AcquisitionProjectName,
+        ArchitecturePolicyScanner.EngineProjectName,
         "Contracts");
 
     /// <summary>
-    /// Matches any textual reference to the <c>InSpectra.Gen.Acquisition.Modes</c>
+    /// Matches any textual reference to the <c>InSpectra.Gen.Engine.Modes</c>
     /// namespace anywhere in the file, including <c>using</c> directives,
     /// fully-qualified <c>global::</c> identifiers, and XML doc comments. Word
     /// boundaries on both sides prevent false positives on longer namespace suffixes.
     /// </summary>
     private static readonly Regex ModesNamespaceReference = new(
-        @"\bInSpectra\.Gen\.Acquisition\.Modes\b",
+        @"\bInSpectra\.Gen\.Engine\.Modes\b",
         RegexOptions.Compiled);
 
     /// <summary>
@@ -42,7 +42,7 @@ public sealed class ArchitectureContractsModesTests
     /// surface and would pass vacuously.
     /// </summary>
     private static readonly Regex ContractsNamespaceDeclaration = new(
-        @"^\s*namespace\s+InSpectra\.Gen\.Acquisition\.Contracts(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
+        @"^\s*namespace\s+InSpectra\.Gen\.Engine\.Contracts(?:\.[A-Za-z_][A-Za-z0-9_]*)*\s*[;{]",
         RegexOptions.Multiline | RegexOptions.Compiled);
 
     [Fact]
@@ -81,7 +81,7 @@ public sealed class ArchitectureContractsModesTests
                 {
                     violations.Add(
                         $"- {relativePath}:{lineIndex + 1} references "
-                        + $"'InSpectra.Gen.Acquisition.Modes' (any reference is forbidden: "
+                        + $"'InSpectra.Gen.Engine.Modes' (any reference is forbidden: "
                         + $"using directives, global:: qualifiers, and doc comments all count)");
                 }
             }
@@ -93,7 +93,7 @@ public sealed class ArchitectureContractsModesTests
 
         Assert.True(
             contractsNamespacesSeen > 0,
-            $"Expected Contracts scan under '{ContractsRoot}' to encounter at least one InSpectra.Gen.Acquisition.Contracts namespace declaration but found none.");
+            $"Expected Contracts scan under '{ContractsRoot}' to encounter at least one InSpectra.Gen.Engine.Contracts namespace declaration but found none.");
 
         Assert.True(
             violations.Count == 0,

@@ -1,5 +1,6 @@
 using InSpectra.Gen.Core;
 using InSpectra.Gen.Tests.TestSupport;
+using InSpectra.Gen.Targets.Inputs;
 
 namespace InSpectra.Gen.Tests.Targets;
 

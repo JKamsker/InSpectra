@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -17,20 +17,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonSchema.Net" Version="9.1.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
     <PackageReference Include="Spectre.Console" Version="0.54.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.53.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\InSpectra.Gen.Core\InSpectra.Gen.Core.csproj" />
-    <ProjectReference Include="..\InSpectra.Gen.Acquisition\InSpectra.Gen.Acquisition.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="OpenCli\Schema\OpenCli.draft.json" />
+    <ProjectReference Include="..\InSpectra.Gen.Engine\InSpectra.Gen.Engine.csproj" />
   </ItemGroup>
 
   <ItemGroup>

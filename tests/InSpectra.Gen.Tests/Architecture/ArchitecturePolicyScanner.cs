@@ -14,8 +14,8 @@ internal static class ArchitecturePolicyScanner
     /// <summary>Name of the backend C# project that hosts the app shell.</summary>
     public const string AppShellProjectName = "InSpectra.Gen";
 
-    /// <summary>Name of the acquisition module project.</summary>
-    public const string AcquisitionProjectName = "InSpectra.Gen.Acquisition";
+    /// <summary>Name of the engine module project.</summary>
+    public const string EngineProjectName = "InSpectra.Gen.Engine";
 
     /// <summary>Name of the startup-hook project.</summary>
     public const string StartupHookProjectName = "InSpectra.Gen.StartupHook";
@@ -28,7 +28,7 @@ internal static class ArchitecturePolicyScanner
 
     /// <summary>
     /// Returns all backend C# projects that own the architecture charter:
-    /// <c>InSpectra.Gen</c>, <c>InSpectra.Gen.Acquisition</c>, <c>InSpectra.Gen.StartupHook</c>,
+    /// <c>InSpectra.Gen</c>, <c>InSpectra.Gen.Engine</c>, <c>InSpectra.Gen.StartupHook</c>,
     /// <c>InSpectra.Gen.Core</c>. <c>InSpectra.UI</c> is a Vite/TypeScript frontend and is
     /// intentionally excluded.
     /// </summary>
@@ -55,8 +55,8 @@ internal static class ArchitecturePolicyScanner
     /// <summary>
     /// Returns the set of <c>&lt;ProjectReference Include="..."/&gt;</c> target project names
     /// for the given .csproj. Project names are the file name without extension,
-    /// so references like <c>..\InSpectra.Gen.Acquisition\InSpectra.Gen.Acquisition.csproj</c>
-    /// produce <c>InSpectra.Gen.Acquisition</c>. Missing files throw.
+    /// so references like <c>..\InSpectra.Gen.Engine\InSpectra.Gen.Engine.csproj</c>
+    /// produce <c>InSpectra.Gen.Engine</c>. Missing files throw.
     /// </summary>
     public static IReadOnlyList<string> GetProjectReferences(CsProject project)
     {

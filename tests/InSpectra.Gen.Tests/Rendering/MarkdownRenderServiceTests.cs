@@ -1,5 +1,5 @@
 using InSpectra.Gen.Core;
-using InSpectra.Gen.Rendering.Contracts;
+using InSpectra.Gen.Engine.Rendering.Contracts;
 using InSpectra.Gen.Tests.TestSupport;
 
 namespace InSpectra.Gen.Tests.Rendering;
@@ -18,11 +18,7 @@ public class MarkdownRenderServiceTests
             null,
             new RenderExecutionOptions(
                 RenderLayout.Single,
-                ResolvedOutputMode.Human,
                 DryRun: true,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
@@ -50,11 +46,7 @@ public class MarkdownRenderServiceTests
             null,
             new RenderExecutionOptions(
                 RenderLayout.Single,
-                ResolvedOutputMode.Human,
                 DryRun: false,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
@@ -82,11 +74,7 @@ public class MarkdownRenderServiceTests
             null,
             new RenderExecutionOptions(
                 RenderLayout.Tree,
-                ResolvedOutputMode.Human,
                 DryRun: false,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
@@ -249,11 +237,7 @@ public class MarkdownRenderServiceTests
             null,
             new RenderExecutionOptions(
                 RenderLayout.Hybrid,
-                ResolvedOutputMode.Human,
                 DryRun: true,
-                Quiet: false,
-                Verbose: false,
-                NoColor: false,
                 IncludeHidden: false,
                 IncludeMetadata: false,
                 Overwrite: false,
