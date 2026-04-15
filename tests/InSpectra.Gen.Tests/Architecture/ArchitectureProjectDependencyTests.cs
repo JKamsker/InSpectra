@@ -9,6 +9,8 @@ namespace InSpectra.Gen.Tests.Architecture;
 /// <list type="bullet">
 ///   <item><c>InSpectra.Gen</c> may reference <c>InSpectra.Lib</c> and
 ///         <c>InSpectra.Gen.StartupHook</c>.</item>
+///   <item><c>InSpectra.Discovery.Tool</c> may reference <c>InSpectra.Lib</c> and
+///         <c>InSpectra.Gen.StartupHook</c>.</item>
 ///   <item><c>InSpectra.Lib</c> may reference <c>InSpectra.Gen.StartupHook</c>
 ///         (build-order only, for NuGet DLL embedding).</item>
 ///   <item><c>InSpectra.Gen.StartupHook</c> must have zero project references.</item>
@@ -28,6 +30,11 @@ public sealed class ArchitectureProjectDependencyTests
                 ArchitecturePolicyScanner.EngineProjectName,
                 ArchitecturePolicyScanner.StartupHookProjectName,
                 ArchitecturePolicyScanner.CoreProjectName,
+            },
+            [ArchitecturePolicyScanner.DiscoveryToolProjectName] = new HashSet<string>(StringComparer.Ordinal)
+            {
+                ArchitecturePolicyScanner.EngineProjectName,
+                ArchitecturePolicyScanner.StartupHookProjectName,
             },
             [ArchitecturePolicyScanner.EngineProjectName] = new HashSet<string>(StringComparer.Ordinal)
             {

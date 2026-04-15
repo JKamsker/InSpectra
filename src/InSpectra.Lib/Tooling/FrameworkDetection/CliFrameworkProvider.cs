@@ -10,6 +10,8 @@ internal sealed record CliFrameworkProvider(
     bool SupportsHookAnalysis,
     StaticAnalysisFrameworkAdapter? StaticAnalysisAdapter)
 {
+    public bool SupportsStaticAnalysis => StaticAnalysisAdapter is not null;
+
     public bool Matches(IReadOnlySet<string> dependencyIds, IReadOnlySet<string> assemblyNames)
         => DependencyIds.Any(dependencyIds.Contains) || PackageAssemblyNames.Any(assemblyNames.Contains);
 

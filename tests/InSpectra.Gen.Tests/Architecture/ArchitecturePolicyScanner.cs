@@ -4,7 +4,7 @@ using InSpectra.Gen.Tests.TestSupport;
 namespace InSpectra.Gen.Tests.Architecture;
 
 /// <summary>
-/// Shared helpers for architecture policy tests: locate the four backend C# projects,
+/// Shared helpers for architecture policy tests: locate the backend C# projects,
 /// enumerate their non-generated source files, and parse <c>ProjectReference</c> elements.
 /// Mirrors the xUnit + <see cref="FixturePaths"/> pattern used by
 /// <c>RepositoryCodeFilePolicyTests</c>.
@@ -17,6 +17,9 @@ internal static class ArchitecturePolicyScanner
     /// <summary>Name of the engine module project.</summary>
     public const string EngineProjectName = "InSpectra.Lib";
 
+    /// <summary>Name of the discovery orchestration tool project.</summary>
+    public const string DiscoveryToolProjectName = "InSpectra.Discovery.Tool";
+
     /// <summary>Name of the startup-hook project.</summary>
     public const string StartupHookProjectName = "InSpectra.Gen.StartupHook";
 
@@ -28,9 +31,9 @@ internal static class ArchitecturePolicyScanner
 
     /// <summary>
     /// Returns all backend C# projects that own the architecture charter:
-    /// <c>InSpectra.Gen</c>, <c>InSpectra.Lib</c>, <c>InSpectra.Gen.StartupHook</c>,
-    /// <c>InSpectra.Lib</c>. <c>InSpectra.UI</c> is a Vite/TypeScript frontend and is
-    /// intentionally excluded.
+    /// <c>InSpectra.Gen</c>, <c>InSpectra.Lib</c>, <c>InSpectra.Discovery.Tool</c>,
+    /// and <c>InSpectra.Gen.StartupHook</c>. <c>InSpectra.UI</c> is a
+    /// Vite/TypeScript frontend and is intentionally excluded.
     /// </summary>
     public static IReadOnlyList<CsProject> EnumerateBackendProjects()
     {

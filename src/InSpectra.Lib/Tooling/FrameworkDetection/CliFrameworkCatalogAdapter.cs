@@ -11,9 +11,7 @@ namespace InSpectra.Lib.Tooling.FrameworkDetection;
 internal sealed class CliFrameworkCatalogAdapter : ICliFrameworkCatalog
 {
     public IReadOnlyList<CliFrameworkCatalogEntry> ResolveAnalysisProviders(string? cliFramework)
-        => CliFrameworkProviderRegistry.ResolveAnalysisProviders(cliFramework)
-            .Select(Map)
-            .ToArray();
+        => CliFrameworkProviderRegistry.ResolveAnalysisProviders(cliFramework);
 
     public IReadOnlyList<CliFrameworkCatalogEntry> GetAllFrameworks()
         => CliFrameworkProviderRegistry.ResolveRuntimeReferenceProbes()
@@ -30,12 +28,4 @@ internal sealed class CliFrameworkCatalogAdapter : ICliFrameworkCatalog
 
     public string? CombineFrameworkNames(IEnumerable<string> frameworkNames)
         => CliFrameworkProviderRegistry.CombineFrameworkNames(frameworkNames);
-
-    private static CliFrameworkCatalogEntry Map(CliFrameworkProvider provider)
-        => new(
-            Name: provider.Name,
-            SupportsCliFxAnalysis: provider.SupportsCliFxAnalysis,
-            SupportsHookAnalysis: provider.SupportsHookAnalysis,
-            SupportsStaticAnalysis: provider.StaticAnalysisAdapter is not null,
-            RuntimeAssemblyNames: provider.RuntimeAssemblyNames);
 }

@@ -6,4 +6,3 @@ internal enum ItemKind
     Command,
     Option,
 }
-

@@ -49,4 +49,3 @@ internal static class OpenCliValidationSupport
             ? text
             : null;
 }
-

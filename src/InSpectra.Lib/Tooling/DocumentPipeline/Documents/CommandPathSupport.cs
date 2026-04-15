@@ -158,4 +158,3 @@ internal static class CommandPathSupport
         }
     }
 }
-

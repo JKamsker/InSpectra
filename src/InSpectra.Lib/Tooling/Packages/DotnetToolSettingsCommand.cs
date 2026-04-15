@@ -1,6 +1,6 @@
 namespace InSpectra.Lib.Tooling.Packages;
 
 
-internal sealed record DotnetToolSettingsCommand(
+public sealed record DotnetToolSettingsCommand(
     string? CommandName,
     string? EntryPointPath);

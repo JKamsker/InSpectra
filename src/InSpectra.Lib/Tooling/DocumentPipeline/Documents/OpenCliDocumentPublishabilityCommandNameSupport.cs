@@ -56,4 +56,3 @@ internal static partial class OpenCliDocumentPublishabilityInspector
     [GeneratedRegex(@"^[|/\\]{1,2}$|\.cs:line\s+\d+|^at\s+\S+\.\S+\(", RegexOptions.Compiled)]
     private static partial Regex GarbageCommandNameRegex();
 }
-

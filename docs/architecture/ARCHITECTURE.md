@@ -45,6 +45,22 @@ src/InSpectra.Gen/
   Composition/
 ```
 
+### `InSpectra.Discovery.Tool` — discovery backend shell
+
+Owns discovery-specific orchestration and CLI workflows that sit on top of the
+shared backend:
+
+- queue planning and backfill workflows
+- discovery analysis orchestration
+- promotion flows and notes generation
+- repository docs/index generation
+- discovery-specific machine output and summaries
+
+It may depend on `InSpectra.Lib` for shared contracts, composition, and
+intentionally exposed `Tooling/*` helpers, plus `InSpectra.Gen.StartupHook` for
+startup-hook asset packaging. It does not own duplicated copies of shared lib
+tooling.
+
 ### `InSpectra.Gen.Engine` — normalized backend
 
 Owns the product logic behind the shell:
@@ -122,6 +138,7 @@ Allowed production direction:
 
 ```text
 InSpectra.Gen             -> Core, Engine, StartupHook
+InSpectra.Discovery.Tool  -> InSpectra.Lib, InSpectra.Gen.StartupHook
 InSpectra.Gen.Engine      -> Core
 InSpectra.Gen.StartupHook -> none
 InSpectra.Gen.Core        -> none
@@ -132,6 +149,7 @@ Key constraints:
 
 - `InSpectra.Gen.Engine` must not depend on the app shell or startup-hook internals.
 - The app shell may depend on `StartupHook` for packaging and startup-hook integration, but not on hook internals.
+- `InSpectra.Discovery.Tool` may depend on `InSpectra.Lib` public surfaces and startup-hook packaging assets, but not on startup-hook internals.
 - The app shell must stay thin: it maps raw command values into normalized requests and adapts normalized results back into shell output.
 - `InSpectra.Gen` may depend only on the engine composition root plus intentionally exposed engine contracts and service interfaces. It must not reach into engine implementation namespaces.
 - Non-test `InternalsVisibleTo` is not part of the target architecture.

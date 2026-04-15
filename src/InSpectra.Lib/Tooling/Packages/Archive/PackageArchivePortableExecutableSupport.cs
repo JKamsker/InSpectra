@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
-internal static class PackageArchivePortableExecutableSupport
+public static class PackageArchivePortableExecutableSupport
 {
     public static PackageArchiveAssemblyInspection ReadAssemblyInspection(ZipArchiveEntry entry)
     {

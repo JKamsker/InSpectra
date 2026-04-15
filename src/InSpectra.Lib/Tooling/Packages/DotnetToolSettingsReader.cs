@@ -4,7 +4,7 @@ using InSpectra.Lib.Tooling.Packages.Archive;
 
 using System.Xml.Linq;
 
-internal static class DotnetToolSettingsReader
+public static class DotnetToolSettingsReader
 {
     public static DotnetToolSettingsDocument Read(Stream stream, string settingsPath)
     {

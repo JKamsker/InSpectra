@@ -4,7 +4,7 @@ namespace InSpectra.Lib.Tooling.NuGet;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-internal sealed record NuGetServiceIndex(
+public sealed record NuGetServiceIndex(
     IReadOnlyList<NuGetServiceResource> Resources)
 {
     public string GetRequiredResource(params string[] preferredTypes)
@@ -24,59 +24,59 @@ internal sealed record NuGetServiceIndex(
     }
 }
 
-internal sealed record NuGetServiceResource(
+public sealed record NuGetServiceResource(
     string Id,
     string Type);
 
-internal sealed record CatalogIndex(
+public sealed record CatalogIndex(
     IReadOnlyList<CatalogPageReference> Items);
 
-internal sealed record CatalogPageReference(
+public sealed record CatalogPageReference(
     string Id,
     DateTimeOffset CommitTimeStamp);
 
-internal sealed record CatalogPage(
+public sealed record CatalogPage(
     IReadOnlyList<CatalogPageItem> Items);
 
-internal sealed record CatalogPageItem(
+public sealed record CatalogPageItem(
     string Id,
     string Type,
     DateTimeOffset CommitTimeStamp,
     string PackageId,
     string PackageVersion);
 
-internal sealed record SearchResponse(
+public sealed record SearchResponse(
     int TotalHits,
     IReadOnlyList<SearchPackage> Data);
 
-internal sealed record SearchPackage(
+public sealed record SearchPackage(
     string Id,
     long TotalDownloads);
 
-internal sealed record AutocompleteResponse(
+public sealed record AutocompleteResponse(
     int TotalHits,
     IReadOnlyList<string> Data);
 
-internal sealed record RegistrationIndex(
+public sealed record RegistrationIndex(
     string Id,
     IReadOnlyList<RegistrationPageReference> Items);
 
-internal sealed record RegistrationPageReference(
+public sealed record RegistrationPageReference(
     string Id,
     int Count,
     IReadOnlyList<RegistrationPageLeaf>? Items);
 
-internal sealed record RegistrationPage(
+public sealed record RegistrationPage(
     IReadOnlyList<RegistrationPageLeaf> Items);
 
-internal sealed record RegistrationPageLeaf(
+public sealed record RegistrationPageLeaf(
     string? Id,
     DateTimeOffset CommitTimeStamp,
     CatalogEntry CatalogEntry,
     string PackageContent,
     bool HasEmbeddedCatalogEntry);
 
-internal sealed record RegistrationLeafDocument(
+public sealed record RegistrationLeafDocument(
     string? Id,
     string CatalogEntryUrl,
     bool? Listed,
@@ -84,12 +84,12 @@ internal sealed record RegistrationLeafDocument(
     DateTimeOffset? Published);
 
 [JsonConverter(typeof(CatalogRepositoryJsonConverter))]
-internal sealed record CatalogRepository(
+public sealed record CatalogRepository(
     string? Type,
     string? Url,
     string? Commit);
 
-internal sealed record CatalogEntry(
+public sealed record CatalogEntry(
     string Id,
     string? Authors,
     string? Description,
@@ -102,7 +102,7 @@ internal sealed record CatalogEntry(
     string? ReadmeUrl,
     string Version);
 
-internal sealed record CatalogLeaf(
+public sealed record CatalogLeaf(
     string Id,
     string? Title,
     string? Description,
@@ -112,17 +112,17 @@ internal sealed record CatalogLeaf(
     IReadOnlyList<CatalogDependencyGroup>? DependencyGroups,
     JsonElement? PackageTypes);
 
-internal sealed record CatalogPackageEntry(
+public sealed record CatalogPackageEntry(
     string FullName,
     string Name);
 
-internal sealed record CatalogPackageType(
+public sealed record CatalogPackageType(
     string Name,
     string? Version);
 
-internal sealed record CatalogDependencyGroup(
+public sealed record CatalogDependencyGroup(
     IReadOnlyList<CatalogDependency>? Dependencies);
 
-internal sealed record CatalogDependency(
+public sealed record CatalogDependency(
     string Id);
 

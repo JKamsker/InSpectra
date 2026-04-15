@@ -3,7 +3,7 @@ namespace InSpectra.Lib.Tooling.Packages;
 using InSpectra.Lib.Tooling.NuGet;
 using InSpectra.Lib.Tooling.Packages.Archive;
 
-internal sealed class PackageToolCommandInspector
+public sealed class PackageToolCommandInspector
 {
     private readonly NuGetApiClient _apiClient;
 

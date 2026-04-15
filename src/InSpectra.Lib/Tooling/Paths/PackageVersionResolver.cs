@@ -2,7 +2,7 @@ namespace InSpectra.Lib.Tooling.Paths;
 
 using InSpectra.Lib.Tooling.NuGet;
 
-internal static class PackageVersionResolver
+public static class PackageVersionResolver
 {
     public static async Task<(RegistrationLeafDocument Leaf, CatalogLeaf CatalogLeaf)> ResolveAsync(
         NuGetApiClient apiClient,

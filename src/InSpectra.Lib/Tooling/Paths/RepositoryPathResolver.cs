@@ -5,7 +5,7 @@ using InSpectra.Lib.Tooling.Json;
 
 using System.Text;
 
-internal static class RepositoryPathResolver
+public static class RepositoryPathResolver
 {
     public static string ResolveRepositoryRoot(string? explicitRoot = null)
     {

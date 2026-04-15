@@ -1,8 +1,7 @@
+using InSpectra.Gen.Cli;
 using InSpectra.Lib;
 using InSpectra.Lib.Contracts;
 using InSpectra.Lib.UseCases.Generate.Requests;
-using InSpectra.Gen.Output;
-
 namespace InSpectra.Gen.Commands.Common;
 
 internal static class CommandValueResolver

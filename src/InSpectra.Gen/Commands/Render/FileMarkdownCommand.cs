@@ -1,5 +1,5 @@
 using InSpectra.Gen.Commands.Common;
-using InSpectra.Gen.Output;
+using InSpectra.Gen.Cli.Output;
 using InSpectra.Lib.Rendering.Contracts;
 using Spectre.Console.Cli;
 
@@ -20,7 +20,7 @@ public sealed class FileMarkdownCommand(IMarkdownRenderService renderService) : 
             options,
             markdownOptions);
 
-        return CommandOutputHandler.ExecuteAsync(
+        return RenderOutputHandler.ExecuteAsync(
             outputMode,
             quiet,
             verbose,

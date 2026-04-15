@@ -92,4 +92,3 @@ internal sealed class NuGetRepositoryJsonConverter : JsonConverter<CatalogReposi
         return new CatalogRepositorySpec(payload.Type, payload.Url, payload.Commit);
     }
 }
-

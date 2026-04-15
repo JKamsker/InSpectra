@@ -11,7 +11,7 @@ using InSpectra.Lib.Tooling.Paths;
 using InSpectra.Lib.Tooling.NuGet;
 using InSpectra.Lib;
 
-internal sealed class ToolDescriptorResolver : IToolDescriptorResolver
+public sealed class ToolDescriptorResolver : IToolDescriptorResolver
 {
     public async Task<ToolDescriptorResolution> ResolveAsync(
         string packageId,
@@ -35,7 +35,7 @@ internal sealed class ToolDescriptorResolver : IToolDescriptorResolver
         return new ToolDescriptorResolution(descriptor, packageInspection);
     }
 
-    internal static ToolDescriptor ResolveFromCatalogLeaf(
+    public static ToolDescriptor ResolveFromCatalogLeaf(
         string packageId,
         string version,
         CatalogLeaf catalogLeaf,
@@ -92,7 +92,7 @@ internal sealed class ToolDescriptorResolver : IToolDescriptorResolver
 
     private static bool HasConfirmedStaticFramework(string? cliFramework, SpectrePackageInspection? packageInspection)
         => packageInspection is not null
-            && CliFrameworkProviderRegistry.ResolveAnalysisProviders(cliFramework)
+            && CliFrameworkProviderRegistry.ResolveAnalysisProviderDetails(cliFramework)
                 .Any(provider =>
                     provider.StaticAnalysisAdapter is not null
                     && packageInspection.HasToolAssemblyReferencingCliFramework(provider.Name));
@@ -104,14 +104,11 @@ internal sealed class ToolDescriptorResolver : IToolDescriptorResolver
             return null;
         }
 
-        // Accept a hook-capable framework when either (a) the tool assembly has a PE-level
-        // reference to the framework, OR (b) the framework's runtime assembly ships in the
-        // package (detected at catalog level). Condition (b) covers tools like Clio where the
-        // framework assembly (e.g. CommandLine.dll) is present but the tool references it only
-        // transitively, so no direct PE reference exists.
         return CliFrameworkProviderRegistry.CombineFrameworkNames(
-            CliFrameworkProviderRegistry.ResolveAnalysisProviders(cliFramework)
-                .Where(provider => provider.SupportsHookAnalysis)
+            CliFrameworkProviderRegistry.ResolveAnalysisProviderDetails(cliFramework)
+                .Where(provider =>
+                    provider.SupportsHookAnalysis
+                    && packageInspection.HasToolAssemblyReferencingCliFramework(provider.Name))
                 .Select(static provider => provider.Name));
     }
 

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json.Nodes;
 
-internal class CommandRuntime
+public class CommandRuntime
 {
     public SandboxEnvironment CreateSandboxEnvironment(string tempRoot)
         => CommandSandboxEnvironmentSupport.CreateSandboxEnvironment(tempRoot);

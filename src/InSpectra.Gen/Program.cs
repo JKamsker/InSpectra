@@ -2,7 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using InSpectra.Gen.Commands.Generate;
 using InSpectra.Gen.Commands.Render;
-using InSpectra.Gen.Composition;
+using InSpectra.Gen.Hosting;
 using Spectre.Console.Cli;
 
 var services = new ServiceCollection();

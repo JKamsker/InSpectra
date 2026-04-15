@@ -1,6 +1,6 @@
 namespace InSpectra.Lib.Tooling.Packages;
 
-internal sealed class DotnetToolPackageLayoutBuilder
+public sealed class DotnetToolPackageLayoutBuilder
 {
     private readonly SortedSet<string> _toolSettingsPaths = new(StringComparer.OrdinalIgnoreCase);
     private readonly SortedSet<string> _toolCommandNames = new(StringComparer.OrdinalIgnoreCase);

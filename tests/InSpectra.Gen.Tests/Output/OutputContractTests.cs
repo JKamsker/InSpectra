@@ -1,8 +1,9 @@
 using System.Text.Json.Nodes;
+using InSpectra.Gen.Cli;
+using InSpectra.Gen.Cli.Output;
 using InSpectra.Lib.UseCases.Generate;
 using InSpectra.Lib.UseCases.Generate.Requests;
 using InSpectra.Lib.Rendering.Contracts;
-using InSpectra.Gen.Output;
 
 namespace InSpectra.Gen.Tests.Output;
 
@@ -36,7 +37,7 @@ public class OutputContractTests
                 Files = [new RenderedFile("index.html", "C:\\temp\\index.html", null)],
             };
 
-            var exitCode = await CommandOutputHandler.ExecuteAsync(
+            var exitCode = await RenderOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Json,
                 quiet: false,
                 verbose: false,
@@ -82,7 +83,7 @@ public class OutputContractTests
                 Files = [new RenderedFile("README.md", "C:\\temp\\README.md", null), new RenderedFile("tree/index.md", "C:\\temp\\tree\\index.md", null)],
             };
 
-            var exitCode = await CommandOutputHandler.ExecuteAsync(
+            var exitCode = await RenderOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Json,
                 quiet: false,
                 verbose: false,
@@ -108,7 +109,7 @@ public class OutputContractTests
 
         try
         {
-            var exitCode = await CommandOutputHandler.ExecuteAsync(
+            var exitCode = await RenderOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Json,
                 quiet: false,
                 verbose: false,
@@ -211,7 +212,7 @@ public class OutputContractTests
                 "{}",
                 null);
 
-            await CommandOutputHandler.ExecuteAsync(
+            await RenderOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Human,
                 quiet: false,
                 verbose: false,

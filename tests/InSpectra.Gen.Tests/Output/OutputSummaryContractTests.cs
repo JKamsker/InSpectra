@@ -1,5 +1,6 @@
+using InSpectra.Gen.Cli;
+using InSpectra.Gen.Cli.Output;
 using InSpectra.Lib.Rendering.Contracts;
-using InSpectra.Gen.Output;
 
 namespace InSpectra.Gen.Tests.Output;
 
@@ -28,7 +29,7 @@ public class OutputSummaryContractTests
                 Files = [new RenderedFile("index.html", outputFile, null)],
             };
 
-            await CommandOutputHandler.ExecuteAsync(
+            await RenderOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Human,
                 quiet: false,
                 verbose: false,
@@ -67,7 +68,7 @@ public class OutputSummaryContractTests
                 ],
             };
 
-            await CommandOutputHandler.ExecuteAsync(
+            await RenderOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Human,
                 quiet: true,
                 verbose: false,
@@ -104,7 +105,7 @@ public class OutputSummaryContractTests
                 Files = [new RenderedFile("index.html", outputFile, null)],
             };
 
-            await CommandOutputHandler.ExecuteAsync(
+            await RenderOutputHandler.ExecuteAsync(
                 ResolvedOutputMode.Human,
                 quiet: false,
                 verbose: false,

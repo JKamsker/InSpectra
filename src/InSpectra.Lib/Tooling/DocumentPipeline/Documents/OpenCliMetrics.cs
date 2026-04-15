@@ -229,4 +229,3 @@ internal sealed record OpenCliMetricsResult(
 {
     public static OpenCliMetricsResult Empty { get; } = new(0, 0, 0.0, 0, 0);
 }
-

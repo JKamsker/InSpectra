@@ -4,7 +4,7 @@ using InSpectra.Lib.Tooling.NuGet;
 
 using System.IO.Compression;
 
-internal static class PackageArchiveInspectionSupport
+public static class PackageArchiveInspectionSupport
 {
     public static async Task<TResult> InspectAsync<TResult>(
         NuGetApiClient apiClient,

@@ -1,7 +1,7 @@
+using InSpectra.Gen.Cli;
 using InSpectra.Lib;
 using InSpectra.Lib.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
-using InSpectra.Gen.Output;
 
 namespace InSpectra.Gen.Commands.Render;
 
@@ -112,4 +112,3 @@ internal static class RenderRequestMarkdownSupport
         }
     }
 }
-

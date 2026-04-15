@@ -7,7 +7,7 @@ using InSpectra.Lib.Tooling.Packages;
 using System.IO.Compression;
 using System.Text.Json;
 
-internal sealed class PackageArchiveInspector
+public sealed class PackageArchiveInspector
 {
     private readonly NuGetApiClient _apiClient;
 

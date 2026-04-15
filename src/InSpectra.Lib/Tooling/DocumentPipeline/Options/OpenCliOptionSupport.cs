@@ -105,4 +105,3 @@ internal static class OpenCliOptionSupport
                         .Select(ch => char.IsLetterOrDigit(ch) ? char.ToUpperInvariant(ch) : '_'))
                 .Trim('_');
 }
-

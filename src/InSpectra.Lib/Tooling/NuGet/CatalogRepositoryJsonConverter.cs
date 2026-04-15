@@ -58,4 +58,3 @@ internal sealed class CatalogRepositoryJsonConverter : JsonConverter<CatalogRepo
         writer.WriteEndObject();
     }
 }
-

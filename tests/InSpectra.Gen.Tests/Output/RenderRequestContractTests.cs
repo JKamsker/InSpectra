@@ -1,10 +1,10 @@
 using InSpectra.Lib;
+using InSpectra.Gen.Cli;
 using InSpectra.Gen.Commands.Generate;
 using InSpectra.Gen.Commands.Render;
 using InSpectra.Lib.UseCases.Generate.Requests;
 using InSpectra.Lib.Rendering.Contracts;
 using InSpectra.Gen.Commands.Common;
-using InSpectra.Gen.Output;
 
 namespace InSpectra.Gen.Tests.Output;
 

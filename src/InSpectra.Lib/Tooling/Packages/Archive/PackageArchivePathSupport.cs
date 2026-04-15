@@ -2,7 +2,7 @@ namespace InSpectra.Lib.Tooling.Packages.Archive;
 
 using System.IO.Compression;
 
-internal static class PackageArchivePathSupport
+public static class PackageArchivePathSupport
 {
     public static string GetArchiveDirectory(string path)
     {

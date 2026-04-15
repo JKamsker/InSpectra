@@ -1,4 +1,4 @@
-using InSpectra.Gen.Composition;
+using InSpectra.Gen.Hosting;
 using InSpectra.Lib.UseCases.Generate;
 using InSpectra.Lib.Targets.Sources;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,6 @@
 namespace InSpectra.Lib.Tooling.Packages;
 
-internal sealed record SpectreAssemblyVersionInfo(
+public sealed record SpectreAssemblyVersionInfo(
     string Path,
     string? AssemblyVersion,
     string? FileVersion,

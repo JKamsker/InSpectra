@@ -122,4 +122,3 @@ internal sealed class OpenCliCommandTreeBuilder
             .ToArray();
     }
 }
-

@@ -115,4 +115,3 @@ internal sealed record CatalogRepositoryObjectSpec(
     [property: JsonPropertyName("type")] string? Type,
     [property: JsonPropertyName("url")] string? Url,
     [property: JsonPropertyName("commit")] string? Commit);
-

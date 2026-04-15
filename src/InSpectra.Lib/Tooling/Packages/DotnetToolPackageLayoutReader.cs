@@ -2,7 +2,7 @@ namespace InSpectra.Lib.Tooling.Packages;
 
 using System.IO.Compression;
 
-internal static class DotnetToolPackageLayoutReader
+public static class DotnetToolPackageLayoutReader
 {
     public static DotnetToolPackageLayout Read(ZipArchive archive)
     {

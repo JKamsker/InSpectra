@@ -1,7 +1,7 @@
 namespace InSpectra.Lib.Tooling.Tools;
 
 
-internal interface IToolDescriptorResolver
+public interface IToolDescriptorResolver
 {
     Task<ToolDescriptorResolution> ResolveAsync(
         string packageId,

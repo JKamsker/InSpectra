@@ -1,6 +1,6 @@
 namespace InSpectra.Lib.Tooling.Packages;
 
-internal sealed record SpectrePackageInspection(
+public sealed record SpectrePackageInspection(
     IReadOnlyList<string> DepsFilePaths,
     IReadOnlyList<string> SpectreConsoleDependencyVersions,
     IReadOnlyList<string> SpectreConsoleCliDependencyVersions,

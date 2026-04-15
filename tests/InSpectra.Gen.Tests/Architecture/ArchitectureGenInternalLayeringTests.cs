@@ -30,7 +30,7 @@ public sealed class ArchitectureGenInternalLayeringTests
     public void Shell_output_does_not_depend_on_commands()
         => AssertNoUpstreamImport(
             ShellProjectRoot,
-            "Output",
+            Path.Combine("Cli", "Output"),
             forbiddenPrefixes: ["InSpectra.Gen.Commands"]);
 
     [Fact]

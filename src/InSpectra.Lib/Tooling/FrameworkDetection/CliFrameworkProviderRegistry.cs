@@ -1,5 +1,6 @@
 namespace InSpectra.Lib.Tooling.FrameworkDetection;
 
+using InSpectra.Lib.Contracts.Providers;
 using InSpectra.Lib.Tooling.NuGet;
 
 /// <summary>
@@ -26,7 +27,7 @@ using InSpectra.Lib.Tooling.NuGet;
 /// </list>
 /// </para>
 /// </summary>
-internal static class CliFrameworkProviderRegistry
+public static class CliFrameworkProviderRegistry
 {
     private static readonly List<CliFrameworkProvider> MutableProviders = CreateBaseProviders();
     private static readonly Dictionary<string, CliFrameworkProvider> ProvidersByLabel =
@@ -42,7 +43,7 @@ internal static class CliFrameworkProviderRegistry
     /// a module initializer so that the concrete reader instances live next to the
     /// mode that owns them.
     /// </summary>
-    public static void RegisterStaticAnalysisProvider(
+    internal static void RegisterStaticAnalysisProvider(
         string name,
         IReadOnlyList<string> dependencyIds,
         IReadOnlyList<string> packageAssemblyNames,
@@ -90,7 +91,7 @@ internal static class CliFrameworkProviderRegistry
             : string.Join(" + ", matches);
     }
 
-    public static IReadOnlyList<CliFrameworkReferenceProbe> ResolveRuntimeReferenceProbes()
+    internal static IReadOnlyList<CliFrameworkReferenceProbe> ResolveRuntimeReferenceProbes()
         => MutableProviders
             .Select(static provider => new CliFrameworkReferenceProbe(
                 provider.Name,
@@ -113,9 +114,9 @@ internal static class CliFrameworkProviderRegistry
             .Select(static provider => provider.Name)
             .FirstOrDefault();
 
-    public static StaticAnalysisFrameworkAdapter? ResolveStaticAnalysisAdapter(string? cliFramework)
+    internal static StaticAnalysisFrameworkAdapter? ResolveStaticAnalysisAdapter(string? cliFramework)
     {
-        foreach (var provider in ResolveAnalysisProviders(cliFramework))
+        foreach (var provider in ResolveAnalysisProviderDetails(cliFramework))
         {
             if (provider.StaticAnalysisAdapter is not null)
             {
@@ -152,7 +153,17 @@ internal static class CliFrameworkProviderRegistry
             || string.Equals(existingCliFramework, "CliFx", StringComparison.OrdinalIgnoreCase);
     }
 
-    public static IReadOnlyList<CliFrameworkProvider> ResolveAnalysisProviders(string? cliFramework)
+    public static IReadOnlyList<CliFrameworkCatalogEntry> ResolveAnalysisProviders(string? cliFramework)
+        => ResolveAnalysisProviderDetails(cliFramework)
+            .Select(static provider => new CliFrameworkCatalogEntry(
+                Name: provider.Name,
+                SupportsCliFxAnalysis: provider.SupportsCliFxAnalysis,
+                SupportsHookAnalysis: provider.SupportsHookAnalysis,
+                SupportsStaticAnalysis: provider.SupportsStaticAnalysis,
+                RuntimeAssemblyNames: provider.RuntimeAssemblyNames))
+            .ToArray();
+
+    internal static IReadOnlyList<CliFrameworkProvider> ResolveAnalysisProviderDetails(string? cliFramework)
     {
         if (string.IsNullOrWhiteSpace(cliFramework))
         {

@@ -97,4 +97,3 @@ internal static class NonSpectreResultSupport
         }
     }
 }
-

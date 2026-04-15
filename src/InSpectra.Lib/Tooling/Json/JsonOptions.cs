@@ -4,7 +4,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-internal static class JsonOptions
+public static class JsonOptions
 {
     public static readonly JsonSerializerOptions Default = new()
     {
@@ -20,5 +20,8 @@ internal static class JsonOptions
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
+    public static readonly JsonSerializerOptions MinifiedRepositoryFiles = new(RepositoryFiles)
+    {
+        WriteIndented = false,
+    };
 }
-

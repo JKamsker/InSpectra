@@ -1,6 +1,6 @@
 namespace InSpectra.Lib.Tooling.Packages.Archive;
 
-internal sealed record PackageArchiveAssemblyInspection(
+public sealed record PackageArchiveAssemblyInspection(
     string Path,
     string? AssemblyVersion,
     string? FileVersion,

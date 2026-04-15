@@ -7,7 +7,7 @@ using System.Text.Json;
 
 using InSpectra.Lib;
 
-internal sealed class NuGetApiClient
+public sealed class NuGetApiClient
 {
     private readonly HttpClient _httpClient;
 

@@ -1,7 +1,7 @@
 namespace InSpectra.Lib.Tooling.Tools;
 
 
-internal sealed record ToolDescriptor(
+public sealed record ToolDescriptor(
     string PackageId,
     string Version,
     string? CommandName,
