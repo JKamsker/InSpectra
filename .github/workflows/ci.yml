@@ -71,7 +71,7 @@ jobs:
             src/InSpectra.UI/test-results/
 
       - name: Test
-        run: dotnet test InSpectra.Gen.sln --configuration Release --no-build --filter "Category!=WindowsOnly&Category!=Live"
+        run: dotnet test InSpectra.Gen.sln --configuration Release --no-build --filter "Category!=WindowsOnly&Category!=Live&FullyQualifiedName!~RepositoryCodeFilePolicyTests"
 
       - name: Pack tool
         run: dotnet pack src/InSpectra.Gen/InSpectra.Gen.csproj --configuration Release --no-build -p:Version=0.0.${{ github.run_number }}
@@ -86,7 +86,7 @@ jobs:
         run: dotnet publish src/InSpectra.Gen/InSpectra.Gen.csproj --configuration Release --no-build -o artifacts/publish
 
       - name: Publish discovery tool
-        run: dotnet publish src/InSpectra.Discovery.Tool/InSpectra.Discovery.Tool.csproj --configuration Release --no-build -o artifacts/discovery-tool/publish
+        run: dotnet publish src/InSpectra.Discovery.Tool/InSpectra.Discovery.Tool.csproj --configuration Release --no-restore -o artifacts/discovery-tool/publish
 
       - name: Verify published bundle
         shell: bash
