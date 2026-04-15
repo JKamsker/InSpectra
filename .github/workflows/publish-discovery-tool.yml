@@ -1,0 +1,164 @@
+name: Publish Discovery Tool
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/InSpectra.Discovery.Tool/**
+      - src/InSpectra.Lib/**
+      - src/InSpectra.Gen.StartupHook/**
+      - README.md
+      - .github/workflows/publish-discovery-tool.yml
+      - eng/Get-DiscoveryToolVersion.ps1
+  workflow_dispatch:
+    inputs:
+      tool_version:
+        description: Optional explicit package version to publish.
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-discovery-tool-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup ORAS
+        uses: oras-project/setup-oras@v1
+
+      - name: Restore
+        run: dotnet restore InSpectra.Gen.sln
+
+      - name: Build
+        run: dotnet build InSpectra.Gen.sln --configuration Release --no-restore
+
+      - name: Test library
+        run: dotnet test tests/InSpectra.Lib.Tests/InSpectra.Lib.Tests.csproj --configuration Release --no-build
+
+      - name: Test discovery tool
+        run: dotnet test tests/InSpectra.Discovery.Tool.Tests/InSpectra.Discovery.Tool.Tests.csproj --configuration Release --no-build
+
+      - name: Test architecture and integration guards
+        run: >
+          dotnet test tests/InSpectra.Gen.Tests/InSpectra.Gen.Tests.csproj
+          --configuration Release
+          --no-build
+          --filter "Category!=WindowsOnly&Category!=Live&FullyQualifiedName!~RepositoryCodeFilePolicyTests"
+
+      - name: Resolve package version
+        id: version
+        shell: pwsh
+        run: |
+          $toolVersion = if ([string]::IsNullOrWhiteSpace('${{ inputs.tool_version }}')) {
+            & "$PWD/eng/Get-DiscoveryToolVersion.ps1"
+          }
+          else {
+            '${{ inputs.tool_version }}'
+          }
+
+          "tool_version=$toolVersion" >> $env:GITHUB_OUTPUT
+          Write-Host "Publishing InSpectra.Discovery.Tool $toolVersion"
+
+      - name: Pack discovery tool
+        shell: pwsh
+        run: |
+          dotnet pack src/InSpectra.Discovery.Tool/InSpectra.Discovery.Tool.csproj `
+            --configuration Release `
+            --no-build `
+            -p:Version='${{ steps.version.outputs.tool_version }}'
+
+      - name: Validate local tool install
+        shell: bash
+        run: |
+          set -euo pipefail
+          version='${{ steps.version.outputs.tool_version }}'
+          nupkg="$(find artifacts/tool -maxdepth 1 -name 'InSpectra.Discovery.Tool*.nupkg' | head -1)"
+          test -n "$nupkg"
+
+          tool_dir="$(mktemp -d)"
+          dotnet tool install InSpectra.Discovery.Tool \
+            --tool-path "$tool_dir" \
+            --add-source "$(cd artifacts/tool && pwd -P)" \
+            --version "$version"
+
+          "$tool_dir/inspectra-discovery" --version
+
+      - name: Login to GHCR
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '${{ github.token }}' | oras login ghcr.io -u '${{ github.actor }}' --password-stdin
+
+      - name: Publish package to GHCR
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          owner="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          package="ghcr.io/${owner}/inspectra-discovery-tool"
+          version='${{ steps.version.outputs.tool_version }}'
+          nupkg="$(find artifacts/tool -maxdepth 1 -name 'InSpectra.Discovery.Tool*.nupkg' | head -1)"
+          test -n "$nupkg"
+
+          oras push \
+            --artifact-type application/vnd.inspectra.discovery.tool.package.v1+json \
+            "${package}:${version},${package}:latest" \
+            "${nupkg}:application/vnd.nuget.package"
+
+          echo "package=${package}" >> "$GITHUB_OUTPUT"
+          echo "nupkg_path=${nupkg}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify GHCR install path
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          pull_dir="$(mktemp -d)"
+          tool_dir="$(mktemp -d)"
+          version='${{ steps.version.outputs.tool_version }}'
+
+          oras pull "${{ steps.publish.outputs.package }}:${version}" -o "$pull_dir"
+
+          pulled_nupkg="$(find "$pull_dir" -name 'InSpectra.Discovery.Tool*.nupkg' | head -1)"
+          test -n "$pulled_nupkg"
+
+          dotnet tool install InSpectra.Discovery.Tool \
+            --tool-path "$tool_dir" \
+            --add-source "$(dirname "$pulled_nupkg")" \
+            --version "$version"
+
+          "$tool_dir/inspectra-discovery" --version
+
+      - name: Summarize package details
+        shell: bash
+        run: |
+          {
+            echo "## Discovery Tool Package"
+            echo
+            echo "- Package: \`${{ steps.publish.outputs.package }}\`"
+            echo "- Version tag: \`${{ steps.version.outputs.tool_version }}\`"
+            echo "- Floating tag: \`latest\`"
+            echo "- Install command in CI: pull from GHCR, then install the contained \`.nupkg\` via \`dotnet tool install --add-source\`."
+            echo "- For private-package access from other repositories, grant that repository GitHub Actions access to the package or use a token with package read access."
+          } >> "$GITHUB_STEP_SUMMARY"
