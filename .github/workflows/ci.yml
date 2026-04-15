@@ -208,7 +208,7 @@ jobs:
         run: |
           mkdir -p artifacts/nupkg
           cp src/InSpectra.Gen/bin/Release/*.nupkg artifacts/nupkg/
-          cp src/InSpectra.Discovery.Tool/bin/Release/*.nupkg artifacts/nupkg/
+          cp artifacts/tool/InSpectra.Discovery.Tool*.nupkg artifacts/nupkg/
           cp src/InSpectra.Lib/bin/Release/*.nupkg artifacts/nupkg/
 
       - name: Upload nupkg
