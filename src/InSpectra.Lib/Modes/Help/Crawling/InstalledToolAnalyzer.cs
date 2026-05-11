@@ -91,6 +91,20 @@ internal sealed class InstalledToolAnalyzer
         var outputLimitExceededMessage = outputLimitExceededCommands.Length == 0
             ? null
             : $"{ProcessOutputCaptureSupport.BuildOutputLimitExceededMessage()} Affected commands: {string.Join(", ", outputLimitExceededCommands)}.";
+        if (outputLimitExceededMessage is not null)
+        {
+            if (request.PersistCrawlCaptures)
+            {
+                WriteCrawlArtifact(request.OutputDirectory, crawl.Captures);
+            }
+
+            NonSpectreResultSupport.ApplyTerminalFailure(
+                request.Result,
+                phase: "crawl",
+                classification: "help-crawl-output-too-large",
+                outputLimitExceededMessage);
+            return;
+        }
 
         if (crawl.Documents.Count == 0)
         {
@@ -136,9 +150,11 @@ internal sealed class InstalledToolAnalyzer
                 WriteCrawlArtifact(request.OutputDirectory, crawl.Captures);
             }
 
-            WriteMetadataOnlyArtifact(
-                request,
-                outputLimitExceededMessage ?? "No help documents could be captured from the installed tool.");
+            NonSpectreResultSupport.ApplyTerminalFailure(
+                request.Result,
+                phase: "crawl",
+                classification: "help-crawl-empty",
+                "No parseable help documents could be captured from the installed tool.");
             return;
         }
 
@@ -148,12 +164,9 @@ internal sealed class InstalledToolAnalyzer
         }
 
         var openCliDocument = _openCliBuilder.Build(request.CommandName, request.Version, crawl.Documents);
-        var truncationReasons = outputLimitExceededMessage is null
-            ? guardrailFailureMessages
-            : guardrailFailureMessages.Append(outputLimitExceededMessage).Distinct(StringComparer.Ordinal).ToArray();
-        if (truncationReasons.Length > 0)
+        if (guardrailFailureMessages.Length > 0)
         {
-            ApplyCrawlTruncationMetadata(openCliDocument, truncationReasons);
+            ApplyCrawlTruncationMetadata(openCliDocument, guardrailFailureMessages);
         }
 
         if (!string.IsNullOrWhiteSpace(request.Result["cliFramework"]?.GetValue<string>()))
@@ -170,73 +183,12 @@ internal sealed class InstalledToolAnalyzer
             request.Result,
             request.OutputDirectory,
             openCliDocument,
-            successClassification: truncationReasons.Length > 0 ? "help-crawl-partial" : "help-crawl",
+            successClassification: guardrailFailureMessages.Length > 0 ? "help-crawl-partial" : "help-crawl",
             artifactSource: "crawled-from-help",
-            out var validationError))
+            out _))
         {
             return;
         }
-
-        if (string.Equals(
-                validationError,
-                "OpenCLI artifact does not expose any commands, options, or arguments.",
-                StringComparison.Ordinal))
-        {
-            WriteMetadataOnlyArtifact(request, validationError ?? "Crawled help did not expose a publishable command surface.");
-        }
-    }
-
-    private static void WriteMetadataOnlyArtifact(InstalledToolAnalysisRequest request, string reason)
-    {
-        var metadataOnlyDocument = BuildMetadataOnlyDocument(
-            request.CommandName,
-            request.Version,
-            request.Result,
-            reason);
-        OpenCliAnalysisArtifactValidationSupport.TryWriteValidatedArtifact(
-            request.Result,
-            request.OutputDirectory,
-            metadataOnlyDocument,
-            successClassification: "metadata-only",
-            artifactSource: "metadata-only");
-    }
-
-    private static JsonObject BuildMetadataOnlyDocument(
-        string commandName,
-        string version,
-        JsonObject result,
-        string reason)
-    {
-        var document = new JsonObject
-        {
-            ["opencli"] = "0.1-draft",
-            ["info"] = new JsonObject
-            {
-                ["title"] = commandName,
-                ["version"] = version,
-            },
-            ["x-inspectra"] = new JsonObject
-            {
-                ["artifactSource"] = "metadata-only",
-                ["generator"] = InspectraProductInfo.GeneratorName,
-                ["helpDocumentCount"] = 0,
-                ["fallbackReason"] = reason,
-            },
-            ["commands"] = new JsonArray
-            {
-                new JsonObject
-                {
-                    ["name"] = commandName,
-                    ["description"] = "Installed .NET tool command.",
-                },
-            },
-        };
-
-        OpenCliDocumentSanitizer.ApplyNuGetMetadata(
-            document,
-            result["nugetTitle"]?.GetValue<string>(),
-            result["nugetDescription"]?.GetValue<string>());
-        return OpenCliDocumentSanitizer.Sanitize(document);
     }
 
     private static void ApplyCrawlTruncationMetadata(JsonObject document, IReadOnlyList<string> reasons)

@@ -12,7 +12,7 @@ using System.Text.Json.Nodes;
 public sealed class InstalledToolAnalyzerFallbackTests
 {
     [Fact]
-    public async Task AnalyzeInstalledAsync_Publishes_MetadataOnly_When_Help_Is_Not_Parseable()
+    public async Task AnalyzeInstalledAsync_Fails_When_Help_Is_Not_Parseable()
     {
         using var tempDirectory = new RepositoryRegressionTestSupport.TemporaryDirectory();
         var result = CreateResult();
@@ -20,11 +20,9 @@ public sealed class InstalledToolAnalyzerFallbackTests
 
         await analyzer.AnalyzeInstalledAsync(CreateRequest(result, tempDirectory.Path), CancellationToken.None);
 
-        Assert.Equal("success", result[ResultKey.Disposition]?.GetValue<string>());
-        Assert.Equal("metadata-only", result[ResultKey.Classification]?.GetValue<string>());
-        var document = LoadOpenCli(tempDirectory.Path);
-        Assert.Equal("metadata-only", document["x-inspectra"]?["artifactSource"]?.GetValue<string>());
-        Assert.Equal("Demo package", document["info"]?["title"]?.GetValue<string>());
+        Assert.Equal("terminal-failure", result[ResultKey.Disposition]?.GetValue<string>());
+        Assert.Equal("help-crawl-empty", result[ResultKey.Classification]?.GetValue<string>());
+        Assert.False(File.Exists(Path.Combine(tempDirectory.Path, "opencli.json")));
     }
 
     [Fact]
@@ -46,7 +44,7 @@ public sealed class InstalledToolAnalyzerFallbackTests
     }
 
     [Fact]
-    public async Task AnalyzeInstalledAsync_Publishes_MetadataOnly_When_Output_Is_Too_Large_Before_Parseable_Help()
+    public async Task AnalyzeInstalledAsync_Fails_When_Output_Is_Too_Large_Before_Parseable_Help()
     {
         using var tempDirectory = new RepositoryRegressionTestSupport.TemporaryDirectory();
         var result = CreateResult();
@@ -54,17 +52,15 @@ public sealed class InstalledToolAnalyzerFallbackTests
 
         await analyzer.AnalyzeInstalledAsync(CreateRequest(result, tempDirectory.Path), CancellationToken.None);
 
-        Assert.Equal("success", result[ResultKey.Disposition]?.GetValue<string>());
-        Assert.Equal("metadata-only", result[ResultKey.Classification]?.GetValue<string>());
-
-        var document = LoadOpenCli(tempDirectory.Path);
-        Assert.Equal("metadata-only", document["x-inspectra"]?["artifactSource"]?.GetValue<string>());
-        Assert.Contains("more than", document["x-inspectra"]?["fallbackReason"]?.GetValue<string>());
+        Assert.Equal("terminal-failure", result[ResultKey.Disposition]?.GetValue<string>());
+        Assert.Equal("help-crawl-output-too-large", result[ResultKey.Classification]?.GetValue<string>());
+        Assert.Contains("more than", result[ResultKey.FailureMessage]?.GetValue<string>());
+        Assert.False(File.Exists(Path.Combine(tempDirectory.Path, "opencli.json")));
         Assert.True(new FileInfo(Path.Combine(tempDirectory.Path, "crawl.json")).Length < 1_048_576);
     }
 
     [Fact]
-    public async Task AnalyzeInstalledAsync_Publishes_Partial_When_Child_Output_Is_Too_Large()
+    public async Task AnalyzeInstalledAsync_Fails_When_Child_Output_Is_Too_Large()
     {
         using var tempDirectory = new RepositoryRegressionTestSupport.TemporaryDirectory();
         var result = CreateResult();
@@ -72,12 +68,10 @@ public sealed class InstalledToolAnalyzerFallbackTests
 
         await analyzer.AnalyzeInstalledAsync(CreateRequest(result, tempDirectory.Path), CancellationToken.None);
 
-        Assert.Equal("success", result[ResultKey.Disposition]?.GetValue<string>());
-        Assert.Equal("help-crawl-partial", result[ResultKey.Classification]?.GetValue<string>());
-
-        var document = LoadOpenCli(tempDirectory.Path);
-        Assert.True(document["x-inspectra"]?["crawlTruncated"]?.GetValue<bool>());
-        Assert.Contains("more than", document["x-inspectra"]?["truncationReason"]?.GetValue<string>());
+        Assert.Equal("terminal-failure", result[ResultKey.Disposition]?.GetValue<string>());
+        Assert.Equal("help-crawl-output-too-large", result[ResultKey.Classification]?.GetValue<string>());
+        Assert.Contains("new", result[ResultKey.FailureMessage]?.GetValue<string>());
+        Assert.False(File.Exists(Path.Combine(tempDirectory.Path, "opencli.json")));
         Assert.True(new FileInfo(Path.Combine(tempDirectory.Path, "crawl.json")).Length < 1_048_576);
     }
 
