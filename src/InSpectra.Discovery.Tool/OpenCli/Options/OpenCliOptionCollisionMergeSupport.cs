@@ -50,14 +50,19 @@ internal static class OpenCliOptionCollisionMergeSupport
             {
                 return false;
             }
-
-            if (OpenCliOptionSupport.HasArguments(leftEntry.Option) || OpenCliOptionSupport.HasArguments(rightOption))
-            {
-                return false;
-            }
         }
 
         if (TryResolveAlternativeValueFormDuplicate(leftEntry.Option, rightOption, leftInformational, rightInformational, out resolvedEntry))
+        {
+            return true;
+        }
+
+        if (TryMergeDuplicatePrimaryToken(
+                leftEntry.Option,
+                rightOption,
+                leftInformational,
+                rightInformational,
+                out resolvedEntry))
         {
             return true;
         }
@@ -191,6 +196,48 @@ internal static class OpenCliOptionCollisionMergeSupport
 
         return ScoreOption(leftOption) >= ScoreOption(rightOption) ? leftOption : rightOption;
     }
+
+    private static bool TryMergeDuplicatePrimaryToken(
+        JsonObject leftOption,
+        JsonObject rightOption,
+        bool leftInformational,
+        bool rightInformational,
+        out OpenCliOptionCollisionEntry resolvedEntry)
+    {
+        resolvedEntry = new OpenCliOptionCollisionEntry(leftOption, OpenCliOptionSupport.GetOptionTokens(leftOption));
+        var leftName = leftOption["name"]?.GetValue<string>();
+        var rightName = rightOption["name"]?.GetValue<string>();
+        if (!string.Equals(leftName, rightName, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (IsWellKnownInformationalName(leftName))
+        {
+            return false;
+        }
+
+        if (!HaveCompatibleArgumentShapes(leftOption, rightOption))
+        {
+            return false;
+        }
+
+        var preferred = ChoosePreferredOption(leftOption, rightOption, leftInformational, rightInformational);
+        var other = ReferenceEquals(preferred, leftOption) ? rightOption : leftOption;
+        var merged = OpenCliOptionSupport.MergeOptions(preferred, other);
+        resolvedEntry = new OpenCliOptionCollisionEntry(merged, OpenCliOptionSupport.GetOptionTokens(merged));
+        return true;
+    }
+
+    private static bool HaveCompatibleArgumentShapes(JsonObject leftOption, JsonObject rightOption)
+    {
+        var leftArgumentCount = GetArgumentCount(leftOption);
+        var rightArgumentCount = GetArgumentCount(rightOption);
+        return leftArgumentCount == 0 || rightArgumentCount == 0;
+    }
+
+    private static int GetArgumentCount(JsonObject option)
+        => option["arguments"] is JsonArray arguments ? arguments.Count : 0;
 
     private static int ScoreOption(JsonObject option)
     {

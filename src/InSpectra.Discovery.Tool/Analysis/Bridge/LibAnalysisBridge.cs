@@ -108,7 +108,7 @@ internal sealed class LibAnalysisBridge
             NonSpectreResultSupport.ApplySuccess(
                 request.Result,
                 classification: outcome.FailureClassification ?? $"{mode}-crawl",
-                artifactSource: $"lib-{mode}");
+                artifactSource: ResolveArtifactSource(outcome.OpenCliJson) ?? $"lib-{mode}");
         }
         else
         {
@@ -125,5 +125,22 @@ internal sealed class LibAnalysisBridge
         }
 
         request.Result["analysisMode"] = outcome.Mode;
+    }
+
+    private static string? ResolveArtifactSource(string? openCliJson)
+    {
+        if (string.IsNullOrWhiteSpace(openCliJson))
+        {
+            return null;
+        }
+
+        try
+        {
+            return JsonNode.Parse(openCliJson)?["x-inspectra"]?["artifactSource"]?.GetValue<string>();
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

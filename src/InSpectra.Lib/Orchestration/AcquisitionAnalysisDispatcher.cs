@@ -134,7 +134,7 @@ internal sealed class AcquisitionAnalysisDispatcher
             effectiveFramework,
             await File.ReadAllTextAsync(openCliPath, cancellationToken),
             File.Exists(crawlPath) ? await File.ReadAllTextAsync(crawlPath, cancellationToken) : null,
-            null,
+            result["classification"]?.GetValue<string>(),
             null);
     }
 

@@ -95,16 +95,6 @@ internal sealed class InstalledToolAnalyzer
             return;
         }
 
-        if (guardrailFailureMessages.Length > 0)
-        {
-            NonSpectreResultSupport.ApplyTerminalFailure(
-                request.Result,
-                phase: "crawl",
-                classification: "help-crawl-budget-exceeded",
-                string.Join(" ", guardrailFailureMessages));
-            return;
-        }
-
         if (crawl.Documents.Count == 0)
         {
             var runtimeIssues = crawl.CaptureSummaries.Values
@@ -144,11 +134,22 @@ internal sealed class InstalledToolAnalyzer
                 return;
             }
 
-            NonSpectreResultSupport.ApplyTerminalFailure(
+            if (request.PersistCrawlCaptures)
+            {
+                WriteCrawlArtifact(request.OutputDirectory, crawl.Captures);
+            }
+
+            var metadataOnlyDocument = BuildMetadataOnlyDocument(
+                request.CommandName,
+                request.Version,
                 request.Result,
-                phase: "crawl",
-                classification: "help-crawl-empty",
                 "No help documents could be captured from the installed tool.");
+            OpenCliAnalysisArtifactValidationSupport.TryWriteValidatedArtifact(
+                request.Result,
+                request.OutputDirectory,
+                metadataOnlyDocument,
+                successClassification: "metadata-only",
+                artifactSource: "metadata-only");
             return;
         }
 
@@ -158,6 +159,11 @@ internal sealed class InstalledToolAnalyzer
         }
 
         var openCliDocument = _openCliBuilder.Build(request.CommandName, request.Version, crawl.Documents);
+        if (guardrailFailureMessages.Length > 0)
+        {
+            ApplyCrawlTruncationMetadata(openCliDocument, guardrailFailureMessages);
+        }
+
         if (!string.IsNullOrWhiteSpace(request.Result["cliFramework"]?.GetValue<string>()))
         {
             openCliDocument["x-inspectra"]!["cliFramework"] = request.Result["cliFramework"]!.GetValue<string>();
@@ -172,8 +178,58 @@ internal sealed class InstalledToolAnalyzer
             request.Result,
             request.OutputDirectory,
             openCliDocument,
-            successClassification: "help-crawl",
+            successClassification: guardrailFailureMessages.Length > 0 ? "help-crawl-partial" : "help-crawl",
             artifactSource: "crawled-from-help");
+    }
+
+    private static JsonObject BuildMetadataOnlyDocument(
+        string commandName,
+        string version,
+        JsonObject result,
+        string reason)
+    {
+        var document = new JsonObject
+        {
+            ["opencli"] = "0.1-draft",
+            ["info"] = new JsonObject
+            {
+                ["title"] = commandName,
+                ["version"] = version,
+            },
+            ["x-inspectra"] = new JsonObject
+            {
+                ["artifactSource"] = "metadata-only",
+                ["generator"] = InspectraProductInfo.GeneratorName,
+                ["helpDocumentCount"] = 0,
+                ["fallbackReason"] = reason,
+            },
+            ["commands"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["name"] = commandName,
+                    ["description"] = "Installed .NET tool command.",
+                },
+            },
+        };
+
+        OpenCliDocumentSanitizer.ApplyNuGetMetadata(
+            document,
+            result["nugetTitle"]?.GetValue<string>(),
+            result["nugetDescription"]?.GetValue<string>());
+        return OpenCliDocumentSanitizer.Sanitize(document);
+    }
+
+    private static void ApplyCrawlTruncationMetadata(JsonObject document, IReadOnlyList<string> reasons)
+    {
+        if (document["x-inspectra"] is not JsonObject inspectra)
+        {
+            inspectra = new JsonObject();
+            document["x-inspectra"] = inspectra;
+        }
+
+        inspectra["crawlTruncated"] = true;
+        inspectra["truncationReason"] = string.Join(" ", reasons);
     }
 
     private static void WriteCrawlArtifact(

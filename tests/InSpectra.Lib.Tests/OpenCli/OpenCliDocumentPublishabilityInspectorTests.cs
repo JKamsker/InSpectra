@@ -100,6 +100,14 @@ public sealed class OpenCliDocumentPublishabilityInspectorTests
     }
 
     [Fact]
+    public void TryValidateDocument_Allows_Large_Plausible_Command_Trees()
+    {
+        var document = CreateCommandTreeDocument(600);
+
+        Assert.True(OpenCliDocumentValidator.TryValidateDocument(document, out var reason), reason);
+    }
+
+    [Fact]
     public void LooksLikeNonPublishableDescription_Detects_Runtime_Noise()
     {
         const string description = "You must install or update .NET to run this application.";
@@ -114,4 +122,24 @@ public sealed class OpenCliDocumentPublishabilityInspectorTests
 
         Assert.False(OpenCliDocumentPublishabilityInspector.LooksLikeNonPublishableDescription(description));
     }
+
+    private static JsonObject CreateCommandTreeDocument(int commandCount)
+        => new()
+        {
+            ["opencli"] = "0.1-draft",
+            ["info"] = new JsonObject
+            {
+                ["title"] = "demo",
+                ["version"] = "1.0.0",
+            },
+            ["commands"] = new JsonArray(
+                Enumerable.Range(1, commandCount)
+                    .Select(index => new JsonObject
+                    {
+                        ["name"] = $"cmd{index}",
+                        ["description"] = $"Command {index}.",
+                    })
+                    .Cast<JsonNode>()
+                    .ToArray()),
+        };
 }

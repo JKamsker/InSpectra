@@ -9,6 +9,7 @@ using System.Text.Json.Nodes;
 internal static class OpenCliDocumentValidator
 {
     internal const long MaxArtifactSizeBytes = 2 * 1024 * 1024;
+    internal const int MaxPublishableCommandCount = 5_000;
 
     public static bool TryLoadValidDocument(string path, out JsonObject? document, out string? reason)
     {
@@ -90,7 +91,7 @@ internal static class OpenCliDocumentValidator
         }
 
         var totalCommandCount = OpenCliDocumentPublishabilityInspector.CountTotalCommands(document);
-        if (totalCommandCount > 500)
+        if (totalCommandCount > MaxPublishableCommandCount)
         {
             reason = $"OpenCLI artifact has an implausible command count ({totalCommandCount}).";
             return false;

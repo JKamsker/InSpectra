@@ -63,7 +63,7 @@ internal static partial class OpenCliDocumentPublishabilityInspector
         foreach (var command in commands.OfType<JsonObject>())
         {
             count += CountTotalCommandsCore(command);
-            if (count > 500)
+            if (count > OpenCliDocumentValidator.MaxPublishableCommandCount)
             {
                 return count;
             }
